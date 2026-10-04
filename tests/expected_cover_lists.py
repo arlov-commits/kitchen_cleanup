@@ -10,7 +10,8 @@ covers the shift as its role, or as what roles.csv says it's covered as.
 Of those who can do that and aren't working that day: same job first, then
 same work group, then everyone else, each fewest shifts first and then A-Z.
 The last resort follows: first anyone with no shift the shift's own
-student could take in return (swaps go shift by shift), then those working that day in the role's
+student could take in return (swaps go shift by shift: a role they can do,
+on a day they're free), then those working that day in the role's
 same-day backup roles, in the order listed. The "Before last resort"
 column counts the backups ahead of it."""
 import csv, io, os
@@ -74,7 +75,8 @@ for who, day, role in shifts:
         return (tier, count[n], n.lower())
 
     free = sorted([n for n in names if n not in working and can_do(n, job)], key=key)
-    two_way = [n for n in free if any(can_do(who, j) for j in jobs[n])]
+    busy = {d for w, d, _ in shifts if w == who}
+    two_way = [n for n in free if any(can_do(who, covered_as(r)) and d not in busy for w, d, r in shifts if w == n)]
     cover = two_way + [n for n in free if n not in two_way]
     for same in roles[job]["same"]:
         cover += sorted([n for n in names if n != who and working.get(n) == same and can_do(n, job)], key=lambda n: (count[n], n.lower()))

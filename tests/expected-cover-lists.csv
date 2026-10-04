@@ -1,16 +1,16 @@
 Student,Shift day,Role,"Cover list, in order",Before last resort
-Adam,Monday,Pots & Pans,"Beth, Irina, Lavanya, Priya, Roxanne, Tsering, Thanh, Adrian, Vayu, Shuxing",6
-Adam,Tuesday,Pots & Pans,"Beth, Huiyi, Ivwananji, Lavanya, Priya, Roxanne, Adrian, Amelia, Shuxing, Thanh",8
+Adam,Monday,Pots & Pans,"Beth, Lavanya, Priya, Roxanne, Tsering, Irina, Thanh, Adrian, Vayu, Shuxing",5
+Adam,Tuesday,Pots & Pans,"Beth, Ivwananji, Lavanya, Priya, Roxanne, Adrian, Huiyi, Amelia, Shuxing, Thanh",6
 Adam,Thursday,Recycling,"Adrian, Ben Kong",2
 Adrian,Monday,Recycling,Ben Kong,1
-Adrian,Wednesday,Shift Leader,"Huiyi, Ivwananji, Lavanya, Nita, Tsering, Adam, Aryashree, Shuxing, Thanh, Amelia",7
-Adrian,Friday,Pots & Pans,"Beth, Huiyi, Irina, Nita, Adam, Amelia, Aryashree, Vayu, Shuxing, Thanh",8
-Amelia,Monday,Pots & Pans,"Beth, Irina, Lavanya, Priya, Roxanne, Tsering, Thanh, Adrian, Vayu, Shuxing",7
-Amelia,Wednesday,Lunch Monitor,"Shuxing, Thanh",2
+Adrian,Wednesday,Shift Leader,"Huiyi, Lavanya, Tsering, Adam, Aryashree, Ivwananji, Nita, Shuxing, Thanh, Amelia",5
+Adrian,Friday,Pots & Pans,"Beth, Huiyi, Irina, Adam, Aryashree, Vayu, Nita, Amelia, Shuxing, Thanh",6
+Amelia,Monday,Pots & Pans,"Irina, Lavanya, Priya, Roxanne, Tsering, Thanh, Beth, Adrian, Vayu, Shuxing",6
+Amelia,Wednesday,Lunch Monitor,"Thanh, Shuxing",1
 Amelia,Thursday,Buckets & Composting,"Irina, Nita, Roxanne, Ivwananji, Priya, Tsering, Thanh, Shuxing",7
 Aryashree,Monday,Buckets & Composting,"Irina, Roxanne, Beth, Lavanya, Priya, Tsering, Thanh, Shuxing",6
-Aryashree,Tuesday,Pots & Pans,"Beth, Huiyi, Ivwananji, Lavanya, Priya, Roxanne, Adrian, Amelia, Shuxing, Thanh",8
-Aryashree,Thursday,Pots & Pans,"Irina, Ivwananji, Nita, Priya, Roxanne, Tsering, Adrian, Thanh, Adam, Shuxing",7
+Aryashree,Tuesday,Pots & Pans,"Beth, Ivwananji, Lavanya, Priya, Roxanne, Adrian, Huiyi, Amelia, Shuxing, Thanh",6
+Aryashree,Thursday,Pots & Pans,"Irina, Ivwananji, Priya, Roxanne, Tsering, Adrian, Nita, Thanh, Adam, Shuxing",6
 Ben Kong,Tuesday,Recycling,Adrian,1
 Ben Kong,Wednesday,Recycling,Adam,1
 Ben Kong,Friday,Recycling,"Adam, Vayu",2
@@ -37,6 +37,6 @@ Thanh,Friday,Lunch Monitor,"Shuxing, Amelia",2
 Tsering,Tuesday,Shift Leader,"Beth, Huiyi, Ivwananji, Lavanya, Priya, Roxanne, Adrian, Amelia, Shuxing, Thanh",8
 Tsering,Friday,Pots & Pans,"Beth, Huiyi, Irina, Nita, Adam, Amelia, Aryashree, Vayu, Shuxing, Thanh",8
 Vayu,Monday,Recycling,Ben Kong,1
-Vayu,Tuesday,Pots & Pans,"Beth, Huiyi, Ivwananji, Lavanya, Priya, Roxanne, Adrian, Amelia, Shuxing, Thanh",8
-Vayu,Wednesday,Pots & Pans,"Huiyi, Ivwananji, Lavanya, Nita, Tsering, Adam, Aryashree, Shuxing, Thanh, Amelia",7
-Vayu,Thursday,Pots & Pans,"Irina, Ivwananji, Nita, Priya, Roxanne, Tsering, Adrian, Thanh, Adam, Shuxing",7
+Vayu,Tuesday,Pots & Pans,"Ivwananji, Lavanya, Priya, Adrian, Beth, Huiyi, Roxanne, Amelia, Shuxing, Thanh",4
+Vayu,Wednesday,Pots & Pans,"Ivwananji, Lavanya, Tsering, Huiyi, Nita, Adam, Aryashree, Shuxing, Thanh, Amelia",3
+Vayu,Thursday,Pots & Pans,"Ivwananji, Priya, Tsering, Adrian, Irina, Nita, Roxanne, Thanh, Adam, Shuxing",4

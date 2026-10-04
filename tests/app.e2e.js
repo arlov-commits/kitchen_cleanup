@@ -116,7 +116,16 @@ function serve(dir, port) {
   check("backups open: each with what they work (role labels, day tags)", await p.$$eval(".shift:first-of-type .cover li", function (l, fn) {
     var works = new Function("return " + fn)();
     return l.map(function (x) { return x.querySelector(".cn").textContent + " = " + works(x); });
-  }, worksOnPage.toString()), mine[0].cover.map(function (c) { return c + " = " + worksOf(c); }));
+  }, worksOnPage.toString()), mine[0].cover.map(function (c) {
+    /* Aryashree can't do Recycling or Lunch Monitor, and works Mon, Tue and Thu:
+       a backup shows only the shifts she could take back, or all they work if none */
+    var free = function (part) {
+      var role = part.split(": ")[0], days = part.split(": ")[1].split(" ").filter(function (d) { return ["Mon", "Tue", "Thu"].indexOf(d) < 0; });
+      return /Recycling|Lunch/.test(role) || !days.length ? null : role + ": " + days.join(" ");
+    };
+    var swaps = worksOf(c).split(" | ").map(free).filter(Boolean);
+    return c + " = " + (swaps.length ? swaps.join(" | ") : worksOf(c));
+  }));
   await p.click(".shift:nth-of-type(2) summary");
   var tue = ROWS.filter(function (r) { return r.who === "Aryashree" && r.day === "Tuesday"; })[0];
   check("last resort: boxed off, numbered on, with the reference's names", await p.$eval(".shift:nth-of-type(2) .backups", function (d) {
@@ -125,11 +134,11 @@ function serve(dir, port) {
       [].map.call(box.querySelectorAll(".cn"), function (x) { return x.textContent; }),
       [].map.call(d.querySelectorAll(":scope > ol .cn"), function (x) { return x.textContent; })] : null;
   }), ["Last resort", String(tue.before + 1), tue.cover.slice(tue.before), tue.cover.slice(0, tue.before)]);
-  check("each backup shows only the shifts you could swap them for", await p.$eval(".shift:nth-of-type(2) .backups", function (d, fn) {
+  check("each backup shows the shifts you could swap them for; in the last resort, all they work", await p.$eval(".shift:nth-of-type(2) .backups", function (d, fn) {
     var works = new Function("return " + fn)(), out = {};
     [].forEach.call(d.querySelectorAll(".cover li"), function (li) { out[li.querySelector(".cn").textContent] = works(li); });
     return [out.Adrian, out.Amelia, out.Shuxing];
-  }, worksOnPage.toString()), ["Pots & Pans: Wed Fri", "Pots & Pans: Mon | Buckets & Composting: Thu", "Lunch Monitor: Mon Thu"]);
+  }, worksOnPage.toString()), ["Pots & Pans: Wed Fri", "Pots & Pans: Mon | Buckets & Composting: Thu | Lunch Monitor: Wed", "Lunch Monitor: Mon Thu"]);
   check("day tags carry their day's colour", await p.$$eval(".shift:first-of-type .cover .dp", function (t) {
     var k = { Mon: "k0", Tue: "k1", Wed: "k2", Thu: "k3", Fri: "k4", Sat: "k5", Sun: "k6" };
     return t.every(function (x) { return x.classList.contains(k[x.textContent]); });
@@ -165,22 +174,30 @@ function serve(dir, port) {
   /* My availability */
   var avail = {};
   ROWS.forEach(function (r) {
-    if (r.cover.indexOf("Aryashree") < 0) return;
+    var at = r.cover.indexOf("Aryashree");
+    if (at < 0) return;
     var as = ROLE[r.role].as, day = avail[r.day] = avail[r.day] || {};
-    (day[as] = day[as] || []).push(r.who);
+    day[as] = day[as] || { main: [], last: [] };
+    day[as][at < r.before ? "main" : "last"].push(r.who);
   });
   var wantAvail = DAYS.filter(function (d) { return avail[d]; }).map(function (d) {
     return d + " | " + Object.keys(avail[d]).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (as) {
-      return "As " + as + ": " + avail[d][as].sort().join(", ");
+      var g = avail[d][as];
+      return "As " + as + ": " + g.main.sort().join(", ") + (g.last.length ? " / last resort for " + g.last.sort().join(", ") : "");
     }).join(" | ");
   });
-  check("availability rows: day, then each role you'd cover as, then names", await p.$$eval(".avail-list li", function (l) {
+  check("availability: by day and role, who may ask (swaps first, last resort on its own line)", await p.$$eval(".avail-list li", function (l) {
     return l.map(function (x) {
       return x.querySelector(".d").textContent + " | " + [].map.call(x.querySelectorAll(".ag"), function (g) {
-        return g.querySelector(".ar").textContent + ": " + g.querySelector(".an").textContent;
+        var lr = g.querySelector(".alr");
+        return g.querySelector(".ar").textContent + ": " + [].map.call(g.querySelectorAll(".ap .an"), function (n) { return n.textContent; }).join(", ") +
+          (lr ? " / " + lr.textContent.replace(/^Last resort/, "last resort") : "");
       }).join(" | ");
     });
   }), wantAvail);
+  check("availability: every swap shows which of your shifts they could take", await p.$$eval(".avail-list .ap", function (a) {
+    return a.every(function (x) { return x.querySelector(".aw").textContent === "swap for your" && x.querySelectorAll(".dp").length > 0; });
+  }), true);
   check("availability: wrong-info line", await text(p, "#avail .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Art).");
   check("band shown", await p.$eval("#avail", function (e) { return e.hidden; }), false);
 

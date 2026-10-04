@@ -48,26 +48,19 @@ types the lists.
 | `students.csv` | student | Student, Gender (F/M, never shown), Only does (roles they're limited to, `;`-separated, blank = any), Trained for (`;`-separated) |
 | `roles.csv` | role, in card order | Role, Work group, Covered as (optional: Shift Leader → Pots & Pans), Gender (Any / Women only / Men only), Trained students only (Yes/No), Same-day backups (asked last, `;`-separated, in order) |
 
-**A cover list.** A backup covers the shift as its role, or as what the
-role is **Covered as**. Of everyone not working that day who can do that
-role (gender, Only does and training all allow it), the list goes:
-1. those who already do that job;
-2. then those with another job in the same work group;
-3. then everyone else.
+**A cover list** follows the numbered rules in HANDOFF.md, "How the cover
+lists are worked out". That section is the specification: the code and
+the tests follow it. In short:
+- **main list:** people not working that day who can do the role, and
+  have at least one shift you could take back on a day you're free. They
+  come in tiers: same job, same work group, other group; each fewest
+  shifts first, then A–Z;
+- **boxed last resort:** those you can't swap with, then same-day backups
+  from `roles.csv` (Lunch Monitor last).
 
-Each tier is fewest shifts first, then alphabetical. Swaps go shift by shift. A backup with no shift the
-shift's own student could take in return (gender, Only does or training
-says no to all of them) moves into a boxed **Last resort** section after
-everyone they could swap with. Each backup's line shows only the shifts
-you could swap them for (all their shifts, in the last resort). Students already working that day in the
-role's same-day backup roles come after them, in the listed order (Lunch
-Monitor last). Each backup is shown with the
-shifts they work: their name in bold, then each role as a quiet label
-followed by day tags in each day's colour. **My availability** shows, by
-day, which role you'd cover (a small label) and for whom. Neither ever
-says "Shift Leader". A Shift Leader's shift shows as Pots & Pans. **On with you** shows only the shift's own work group.
-The full rules, in plain words, are in HANDOFF.md under "How the cover
-lists are worked out".
+Backup lines show the swap options. **My availability** shows, per
+person, which of your shifts they could take. **On with you** shows only
+the shift's own work group.
 
 The footer checks all three files and names anything that looks wrong:
 - a missing column, or a role or student that isn't defined;

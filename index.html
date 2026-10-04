@@ -278,7 +278,11 @@ p{margin:0}
 /* under each day: the role you'd cover as (a small label), then the names */
 .avail-list .ag{display:flex;flex-direction:column;gap:1px;padding-left:17px;margin-top:6px}
 .avail-list .ar{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--band-accent)}
-.avail-list .an{font-size:15px;color:var(--ink)}
+.avail-list .ap{padding:4px 0}
+.avail-list .an{display:block;font-size:15px;font-weight:600;color:var(--ink)}
+.avail-list .sw{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:3px}
+.avail-list .aw{font-size:13px;color:var(--ink-3);margin-right:-6px}
+.avail-list .alr{font-size:13.5px;color:var(--ink-3);margin-top:2px}
 .cover{margin:0;padding:0 0 0 1.6em;font-size:15px}
 /* each backup: the name on its own line, then what they work, as role
    labels each followed by day tags in that day's colour */
@@ -682,14 +686,18 @@ p{margin:0}
       (jobs[x.who] = jobs[x.who] || Object.create(null))[lower(x.r.cover.name)] = x.r.cover;
       (groups[x.who] = groups[x.who] || Object.create(null))[x.r.cover.group] = true;
     });
-    /* Swaps go shift by shift: the roles among the backup's shifts that
-       whoever is asking could take in return (a Shift Leader shift counts
-       as Pots & Pans). A backup with none is one-way. */
-    var swapRoles = function (asker, n) {
-      return Object.keys(jobs[n]).filter(function (k) { return canDo(people[asker], jobs[n][k]); })
-        .map(function (k) { return jobs[n][k].name; });
+    /* Swaps go shift by shift: the backup's shifts that whoever is asking
+       could take in return, meaning they can do the role (a Shift Leader
+       shift counts as Pots & Pans) and aren't already working that day. A
+       backup with none is one-way. */
+    var busy = Object.create(null);
+    out.shifts.forEach(function (x) { (busy[x.who] = busy[x.who] || Object.create(null))[x.day] = true; });
+    var swapShifts = function (asker, n) {
+      return out.shifts.filter(function (x) {
+        return x.who === n && !busy[asker][x.day] && canDo(people[asker], x.r.cover);
+      }).map(function (x) { return { day: x.day, as: x.as }; });
     };
-    var twoWay = function (asker, n) { return swapRoles(asker, n).length > 0; };
+    var twoWay = function (asker, n) { return swapShifts(asker, n).length > 0; };
     var byFew = function (a, b) { return count[a] - count[b] || a.localeCompare(b); };
     out.shifts.forEach(function (s) {
       var as = s.r.cover, job = lower(as.name), working = Object.create(null);
@@ -708,9 +716,9 @@ p{margin:0}
         }).sort(byFew));
       });
       s.cover = cover;
-      /* for each backup, the roles you could swap them for */
+      /* for each backup, their shifts you could take in return */
       s.swap = {};
-      cover.forEach(function (n) { s.swap[n] = swapRoles(s.who, n); });
+      cover.forEach(function (n) { s.swap[n] = swapShifts(s.who, n); });
     });
     out.shifts.forEach(function (s) { delete s.r; });
     return out;
@@ -771,22 +779,24 @@ p{margin:0}
   }
 
   /* a numbered list of backups, starting at a given number. Each shows
-     the shifts you could swap them for, or, if there are none, all they
+     their shifts you could take in return, or, if there are none, all they
      work. */
   function backupList(names, start, swap) {
     if (!names.length) return "";
     return '<ol class="cover"' + (start > 1 ? ' start="' + start + '"' : "") + ">" + names.map(function (c) {
-      return '<li><span class="cn">' + esc(c) + '</span><span class="cw">' + worksHTML(c, swap[c]) + "</span></li>";
+      var shifts = swap[c] && swap[c].length ? swap[c] : shiftsOf(c);
+      return '<li><span class="cn">' + esc(c) + '</span><span class="cw">' + shiftsHTML(shifts) + "</span></li>";
     }).join("") + "</ol>";
   }
+  function shiftsOf(name) {
+    return data.shifts.filter(function (x) { return x.who === name; }).map(function (x) { return { day: x.day, as: x.as }; });
+  }
 
-  /* What a backup works, so whoever asks knows what a swap would mean:
-     each role (as it's covered: a Shift Leader shift shows as Pots & Pans)
-     followed by its days as tags in each day's colour. */
-  function worksHTML(name, only) {
+  /* shifts as each role (as it's covered: a Shift Leader shift shows as
+     Pots & Pans) followed by its days as tags in each day's colour */
+  function shiftsHTML(shifts) {
     var by = {}, order = [];
-    data.shifts.forEach(function (x) {
-      if (x.who !== name || (only && only.length && only.indexOf(x.as) < 0)) return;
+    shifts.forEach(function (x) {
       if (!by[x.as]) { by[x.as] = []; order.push(x.as); }
       if (by[x.as].indexOf(x.day) < 0) by[x.as].push(x.day);
     });
@@ -799,8 +809,9 @@ p{margin:0}
   }
 
   /* The days this student appears in someone's backup list: as which role
-     they'd be covering (a Shift Leader's shift counts as Pots & Pans), and
-     for whom. */
+     they'd be covering (a Shift Leader's shift counts as Pots & Pans), for
+     whom, and which of your shifts each could take in return. Where you're
+     only their last resort, they're named on one quiet line. */
   function availability() {
     var days = [];
     data.shifts.forEach(function (s) {
@@ -812,8 +823,13 @@ p{margin:0}
     days.forEach(function (byRole, d) {
       if (!byRole) return;
       var lines = Object.keys(byRole).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
-        var who = byRole[as].map(function (s) { return s.who; }).sort(function (a, b) { return a.localeCompare(b); });
-        return '<div class="ag"><span class="ar">As ' + esc(as) + '</span><span class="an">' + who.map(esc).join(", ") + "</span></div>";
+        var list = byRole[as].sort(function (a, b) { return a.who.localeCompare(b.who); });
+        var main = list.filter(function (s) { return s.cover.indexOf(me) < s.lastFrom; });
+        var last = list.filter(function (s) { return s.cover.indexOf(me) >= s.lastFrom; });
+        return '<div class="ag"><span class="ar">As ' + esc(as) + "</span>" + main.map(function (s) {
+          return '<div class="ap"><span class="an">' + esc(s.who) + '</span><span class="sw"><span class="aw">swap for your</span>' + shiftsHTML(s.swap[me]) + "</span></div>";
+        }).join("") +
+          (last.length ? '<p class="alr">Last resort for ' + last.map(function (s) { return esc(s.who); }).join(", ") + "</p>" : "") + "</div>";
       });
       rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + "</span>" + lines.join("") + "</li>");
     });

@@ -20,26 +20,24 @@ and the tab shell from the second.
   `roles.csv` (Role, Work group, Covered as, Gender Any/Women only/Men
   only, Trained students only, Same-day backups). They are fetched, so the
   app must be served. **The app works out every cover list**
-  (`buildData()`). A backup covers as the role's "Covered as" role
-  (Shift Leader → Pots & Pans, leaderless) or the role itself. Among those
-  not working that day who can do it (`canDo()`: gender, Only does,
-  training), the tiers are: same job, then same work group, then other
-  groups. Each tier is fewest shifts, then A–Z. **Last resort**
-  (`s.lastFrom` marks where it starts) is boxed off on the card. First
-  come one-way backups: anyone with **no** shift the asking student could
-  take in return. Swaps are shift by shift, not person by person
-  (`swapRoles()`/`twoWay()`, via `canDo()` on each of the backup's
-  covered-as roles). Requiring every shift was tried and rejected as
-  overconstrained. `s.swap[name]` holds the roles you could swap for. The
-  backup's line shows only those, or all their shifts if there are none. Then come students working that day in that role's
-  same-day backup roles, in order (Lunch Monitor last). `tests/expected_cover_lists.py` is an independent Python copy of
-  these rules that writes `tests/expected-cover-lists.csv`. Change both
-  together, and regenerate after any data change. Rules belong in the
-  CSVs, never hard-coded.
-- "Can cover for you" shows each backup as a bold name, then their shifts
-  (`worksHTML()`): each role as a quiet label followed by day tags (`.dp`)
-  in that day's hue. My availability groups each day by the role you'd
-  cover as: a small label (`.ar`), with the names under it (`.an`).
+  (`buildData()`). **The specification is HANDOFF.md, "How the cover lists
+  are worked out" (Rules 1–5, plus the settled contradictions).** Change
+  that section, `buildData()` and `tests/expected_cover_lists.py` (an
+  independent Python copy that writes `tests/expected-cover-lists.csv`)
+  together, and regenerate after any data change. In code terms:
+  `canDo()` is Rule 1. `swapShifts()` is Rule 2: role allowed **and** the
+  asker is free that day; swaps are shift by shift, and requiring every
+  shift was rejected as overconstrained. Rule 3 is the tiers. Rule 4 is
+  last resort, from `s.lastFrom`: no-swap backups, then same-day backup
+  roles. `s.swap[name]` lists the shifts. Rules belong in the CSVs, never
+  hard-coded.
+- "Can cover for you" shows each backup as a bold name, then their swap
+  options (`shiftsHTML()`), or all their shifts in the last resort: each
+  role as a quiet label followed by day tags (`.dp`) in that day's hue.
+  My availability groups each day by the role you'd cover as (`.ar`).
+  Each person (`.an`) has "swap for your" plus the shifts of yours they
+  could take (`s.swap[me]`). People whose last resort you are get one
+  quiet line (`.alr`).
   **Substitute lists and My availability never say "Shift Leader"**: they
   use the covered-as role (Pots & Pans). The user was explicit. Only the
   shift's own card header and "On with you" show Shift Leader.
