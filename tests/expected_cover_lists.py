@@ -9,8 +9,10 @@ The rules (HANDOFF.md, "How the cover lists are worked out"): a backup
 covers the shift as its role, or as what roles.csv says it's covered as.
 Of those who can do that and aren't working that day: same job first, then
 same work group, then everyone else, each fewest shifts first and then A-Z.
-Last come those working that day in the role's same-day backup roles, in
-the order listed."""
+The last resort follows: first anyone whose shifts the shift's own student
+couldn't take in return, then those working that day in the role's
+same-day backup roles, in the order listed. The "Before last resort"
+column counts the backups ahead of it."""
 import csv, io, os
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -62,7 +64,7 @@ groups = {n: {roles[covered_as(r)]["group"] for w, _, r in shifts if w == n} for
 
 out = io.StringIO()
 w = csv.writer(out, lineterminator="\n")
-w.writerow(["Student", "Shift day", "Role", "Cover list, in order"])
+w.writerow(["Student", "Shift day", "Role", "Cover list, in order", "Before last resort"])
 for who, day, role in shifts:
     job = covered_as(role)
     working = {n: r for n, d, r in shifts if d == day}
@@ -71,10 +73,12 @@ for who, day, role in shifts:
         tier = 0 if job in jobs[n] else 1 if roles[job]["group"] in groups[n] else 2
         return (tier, count[n], n.lower())
 
-    cover = sorted([n for n in names if n not in working and can_do(n, job)], key=key)
+    free = sorted([n for n in names if n not in working and can_do(n, job)], key=key)
+    two_way = [n for n in free if all(can_do(who, j) for j in jobs[n])]
+    cover = two_way + [n for n in free if n not in two_way]
     for same in roles[job]["same"]:
         cover += sorted([n for n in names if n != who and working.get(n) == same and can_do(n, job)], key=lambda n: (count[n], n.lower()))
-    w.writerow([who, DAYS[day], roles[role]["name"], ", ".join(cover)])
+    w.writerow([who, DAYS[day], roles[role]["name"], ", ".join(cover), len(two_way)])
 
 with open(os.path.join(ROOT, "tests", "expected-cover-lists.csv"), "w") as f:
     f.write(out.getvalue())

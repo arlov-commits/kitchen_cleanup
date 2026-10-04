@@ -116,19 +116,26 @@ do it themselves:
   monitors come late in other people's lists: they can't easily swap,
   because no one else can take their lunch shift in return.
 
-**The order.** Of everyone who can do the role and isn't working that
-day:
+**The order.** First come the backups you could **swap with**: people
+not working that day, every one of whose shifts you could take in return:
 1. **Same job:** students who already do that job (Shift Leaders count
    as Pots & Pans).
 2. **Same work group:** students with another job in the group, for
    example Buckets & Composting people for a Pots & Pans shift.
-3. **A different group:** everyone else, for example a lunch monitor on
-   another day.
+3. **A different group:** everyone else.
 
 Within each of these, those with the fewest shifts come first, then
-alphabetical order. Then, last of all:
+alphabetical order.
 
-4. **Already working that day, in another group**, from the role's
+Then, boxed off under **Last resort**:
+
+4. **One-way backups:** people who can cover for you, but whose shifts
+   you couldn't take back. For a woman, that's anyone who also does
+   Recycling, and lunch monitors (unless she's trained too). For a man,
+   it's anyone who also does Buckets & Composting or Lunch Monitor. Ben
+   Kong can't take anyone else's Pots & Pans, so his whole list is last
+   resort.
+5. **Already working that day, in another group**, from the role's
    **same-day backups**, in order. For Pots & Pans, that's Recycling, then
    Lunch Monitor at the very end. For Buckets & Composting, it's Lunch
    Monitor at the very end. Recycling and Lunch Monitor have none.

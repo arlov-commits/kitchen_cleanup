@@ -55,9 +55,12 @@ role (gender, Only does and training all allow it), the list goes:
 2. then those with another job in the same work group;
 3. then everyone else.
 
-Each tier is fewest shifts first, then alphabetical. After them come
-students already working that day in the role's same-day backup roles, in
-the listed order (Lunch Monitor last). Each backup is shown with the
+Each tier is fewest shifts first, then alphabetical. Backups whose shifts
+the shift's own student couldn't take in return (gender, Only does or
+training says no) move into a boxed **Last resort** section after
+everyone they could swap with. Students already working that day in the
+role's same-day backup roles come after them, in the listed order (Lunch
+Monitor last). Each backup is shown with the
 shifts they work: their name in bold, then each role as a quiet label
 followed by day tags in each day's colour. **My availability** shows, by
 day, which role you'd cover (a small label) and for whom. Neither ever

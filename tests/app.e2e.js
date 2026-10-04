@@ -22,12 +22,12 @@ function truthy(label, v) { check(label, !!v, true); }
    work groups and role order straight from roles.csv. */
 function rowsOf(file) {
   return fs.readFileSync(path.join(ROOT, file), "utf8").replace(/^\uFEFF/, "").trim().split(/\r?\n/).slice(1).map(function (line) {
-    var m = line.match(/^([^,]*),([^,]*),([^,]*),"?([^"]*)"?/);
-    return [m[1], m[2], m[3], m[4]];
+    var m = line.match(/^([^,]*),([^,]*),([^,]*),(?:"([^"]*)"|([^,]*))(?:,(.*))?$/);
+    return [m[1], m[2], m[3], m[4] !== undefined ? m[4] : m[5], m[6]];
   });
 }
 var ROWS = rowsOf("tests/expected-cover-lists.csv").map(function (r) {
-  return { who: r[0], day: r[1], role: r[2], cover: r[3].split(",").map(function (s) { return s.trim(); }).filter(Boolean) };
+  return { who: r[0], day: r[1], role: r[2], cover: r[3].split(",").map(function (s) { return s.trim(); }).filter(Boolean), before: +r[4] };
 });
 var ROLE = {};
 rowsOf("roles.csv").forEach(function (r, i) { ROLE[r[0]] = { group: r[1] || r[0], as: r[2] || r[0], rank: i }; });
@@ -117,6 +117,14 @@ function serve(dir, port) {
     var works = new Function("return " + fn)();
     return l.map(function (x) { return x.querySelector(".cn").textContent + " = " + works(x); });
   }, worksOnPage.toString()), mine[0].cover.map(function (c) { return c + " = " + worksOf(c); }));
+  await p.click(".shift:nth-of-type(2) summary");
+  var tue = ROWS.filter(function (r) { return r.who === "Aryashree" && r.day === "Tuesday"; })[0];
+  check("last resort: boxed off, numbered on, with the reference's names", await p.$eval(".shift:nth-of-type(2) .backups", function (d) {
+    var box = d.querySelector(".last");
+    return box ? [box.querySelector(".last-h").textContent, box.querySelector("ol").getAttribute("start"),
+      [].map.call(box.querySelectorAll(".cn"), function (x) { return x.textContent; }),
+      [].map.call(d.querySelectorAll(":scope > ol .cn"), function (x) { return x.textContent; })] : null;
+  }), ["Last resort", String(tue.before + 1), tue.cover.slice(tue.before), tue.cover.slice(0, tue.before)]);
   check("day tags carry their day's colour", await p.$$eval(".shift:first-of-type .cover .dp", function (t) {
     var k = { Mon: "k0", Tue: "k1", Wed: "k2", Thu: "k3", Fri: "k4", Sat: "k5", Sun: "k6" };
     return t.every(function (x) { return x.classList.contains(k[x.textContent]); });

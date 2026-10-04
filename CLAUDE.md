@@ -24,9 +24,12 @@ and the tab shell from the second.
   (Shift Leader → Pots & Pans, leaderless) or the role itself. Among those
   not working that day who can do it (`canDo()`: gender, Only does,
   training), the tiers are: same job, then same work group, then other
-  groups. Each tier is fewest shifts, then A–Z. Then come students working
-  that day in that role's same-day backup roles, in order (Lunch Monitor
-  last). `tests/expected_cover_lists.py` is an independent Python copy of
+  groups. Each tier is fewest shifts, then A–Z. **Last resort**
+  (`s.lastFrom` marks where it starts) is boxed off on the card. First
+  come one-way backups: anyone with a shift the asking student couldn't
+  take in return (`twoWay()`, via `canDo()` on each of the backup's
+  covered-as roles). Then come students working that day in that role's
+  same-day backup roles, in order (Lunch Monitor last). `tests/expected_cover_lists.py` is an independent Python copy of
   these rules that writes `tests/expected-cover-lists.csv`. Change both
   together, and regenerate after any data change. Rules belong in the
   CSVs, never hard-coded.
