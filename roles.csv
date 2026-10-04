@@ -1,6 +1,6 @@
 ﻿Role,Work group,Covered as,Gender,Trained students only,Same-day backups (asked last)
-Shift Leader,Kitchen,Pots & Pans,Any,No,
-Pots & Pans,Kitchen,,Any,No,Recycling; Lunch Monitor
-Buckets & Composting,Kitchen,,Women only,No,Lunch Monitor
-Recycling,Recycling,,Men only,No,
-Lunch Monitor,Lunch Monitor,,Women only,Yes,
+Shift Leader,Dishwashing,Pots & Pans,Any,No,
+Pots & Pans,Dishwashing,,Any,No,Recycling; Lunch Monitor
+Buckets & Composting,Dishwashing,,Women only,No,Lunch Monitor
+Recycling,Recycling,,Men only,No,Pots & Pans
+Lunch Monitor,Lunch Monitors,,Women only,Yes,

@@ -1,18 +1,18 @@
-﻿Student,Gender,Only does,Trained for
-Adam,M,,
-Adrian,M,,
-Amelia,F,,Lunch Monitor
-Aryashree,F,,
-Ben Kong,M,Recycling,
-Beth,F,,
-Huiyi,F,,
-Irina,F,,
-Ivwananji,F,,
-Lavanya,F,,
-Nita,F,,
-Priya,F,,
-Roxanne,F,,
-Shuxing,F,,Lunch Monitor
-Thanh,F,,Lunch Monitor
-Tsering,F,,
-Vayu,M,,
+﻿Student,Gender,Trained for,Only does,Only covers,Covered only by same job
+Adam,M,,,,
+Adrian,M,,,,
+Amelia,F,Lunch Monitor,,,
+Aryashree,F,,,,
+Ben Kong,M,,Recycling,Recycling,Yes
+Beth,F,,,,
+Huiyi,F,,,,
+Irina,F,,,,
+Ivwananji,F,,,,
+Lavanya,F,,,,
+Nita,F,,,,
+Priya,F,,,,
+Roxanne,F,,,,
+Shuxing,F,Lunch Monitor,,,
+Thanh,F,Lunch Monitor,,,
+Tsering,F,,,,
+Vayu,M,,,,

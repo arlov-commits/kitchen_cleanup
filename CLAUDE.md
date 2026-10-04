@@ -16,31 +16,45 @@ and the tab shell from the second.
   file. No build step and no dependencies. There are three tabs, chosen by
   hash: `#shifts`, `#callout` and `#timesheet`.
 - **The shift files** are `shifts.csv` (Student, Shift day, Role),
-  `students.csv` (Student, Gender F/M, Only does, Trained for) and
-  `roles.csv` (Role, Work group, Covered as, Gender Any/Women only/Men
-  only, Trained students only, Same-day backups). They are fetched, so the
-  app must be served. **The app works out every cover list**
-  (`buildData()`). **The specification is HANDOFF.md, "How the cover lists
-  are worked out" (Rules 1–5, plus the settled contradictions).** Change
-  that section, `buildData()` and `tests/expected_cover_lists.py` (an
-  independent Python copy that writes `tests/expected-cover-lists.csv`)
-  together, and regenerate after any data change. In code terms:
-  `canDo()` is Rule 1. `swapShifts()` is Rule 2: role allowed **and** the
-  asker is free that day; swaps are shift by shift, and requiring every
-  shift was rejected as overconstrained. Rule 3 is the tiers. Rule 4 is
-  last resort, from `s.lastFrom`: no-swap backups, then same-day backup
-  roles. `s.swap[name]` lists the shifts. Rules belong in the CSVs, never
-  hard-coded.
+  `students.csv` (Student, Gender F/M, Trained for, and the optional
+  Only does, Only covers, Covered only by same job) and `roles.csv`
+  (Role, Work group, Covered as, Gender Any/Women only/Men only, Trained
+  students only, Same-day backups). They are fetched, so the app must be
+  served. **The app works out every cover list** (`buildData()`). **The
+  specification is HANDOFF.md, "How the cover lists are worked out"
+  (Groups A/B/C, the user's Rules 1–6, plus the settled
+  contradictions).** Change that section, `buildData()` and
+  `tests/expected_cover_lists.py` (an independent Python copy that writes
+  `tests/expected-cover-lists.csv`, cover lists and swap options)
+  together, and regenerate after any data change. In code terms: Rule 1
+  is `role.cover`. `canDo()` is Rule 2. `canCover()` and `sameJobOnly`
+  are Rule 3. `eligible()` adds Rule 4: free that day, or working that
+  day in one of the job's same-day backups (the hours allow a double).
+  `repay()` is the swap: the backup's shifts the asker is `eligible()`
+  for, never on the covered day. Swaps are shift by shift; requiring
+  every shift was rejected as overconstrained. Rule 5 is the order: free
+  and repayable by tier, then the last resort from `s.lastFrom`: free but
+  no swap, then same day. `s.swap[name]` lists the shifts. The hours are
+  for understanding only: never show them in the app. Rules belong in
+  the CSVs, never hard-coded.
 - "Can cover for you" shows each backup as a bold name, then their swap
-  options (`shiftsHTML()`), or all their shifts in the last resort: each
-  role as a quiet label followed by day tags (`.dp`) in that day's hue.
-  My availability groups each day by the role you'd cover as (`.ar`).
-  Each person (`.an`) has "swap for your" plus the shifts of yours they
-  could take (`s.swap[me]`). People whose last resort you are get one
-  quiet line (`.alr`).
-  **Substitute lists and My availability never say "Shift Leader"**: they
-  use the covered-as role (Pots & Pans). The user was explicit. Only the
-  shift's own card header and "On with you" show Shift Leader.
+  options (`shiftsHTML()`, the shift's own job first), or all their
+  shifts in the last resort: each role as a quiet label followed by day
+  tags (`.dp`) in that day's hue. My availability groups as far as it
+  goes: day covered (`li`), then "In exchange for your" one day of yours
+  (`.ax`, from `s.swap[me]`), then the role you'd cover as (`.ar`), then
+  the names (`.an`). A person who could take several of your shifts is
+  under each. Anyone whose last resort you are is in a quiet "Last
+  resort" group (`.ax.lr`) at the end of that day.
+- The head of My shifts: the heading with the name beside it as a pill
+  (`.who.set`: the select sits unseen over `#me-pill`; before a name is
+  chosen it is a full-width labelled select). Under it, the week at a
+  glance (`glance()`): "Today is …", then each shift by its next date
+  (`nextDate()`), with the Today/Tomorrow pill. No shift count line. The
+  page re-renders when the date changes (`newDay()`).
+  **"Shift Leader" appears only in "On with you"** (listed first). The
+  card header, the week at a glance, substitute lists and My availability
+  all use the covered-as role (Pots & Pans). The user was explicit.
 - "On with you" shows only the shift's own work group, and is left out
   when empty. Roles are shown as written ("Shift Leader"). Never
   highlight one. Role order on cards is `roles.csv` row order.

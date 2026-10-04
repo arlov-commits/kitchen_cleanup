@@ -18,30 +18,43 @@ function check(label, got, want) {
 function truthy(label, v) { check(label, !!v, true); }
 
 /* The expected answers, independent of the app's code: the cover lists
-   come from tests/expected-cover-lists.csv (worked out by hand), and the
-   work groups and role order straight from roles.csv. */
+   and swap options come from tests/expected-cover-lists.csv (worked out by
+   a separate Python copy of the rules), and the work groups and role order
+   straight from roles.csv. */
 function rowsOf(file) {
-  return fs.readFileSync(path.join(ROOT, file), "utf8").replace(/^\uFEFF/, "").trim().split(/\r?\n/).slice(1).map(function (line) {
-    var m = line.match(/^([^,]*),([^,]*),([^,]*),(?:"([^"]*)"|([^,]*))(?:,(.*))?$/);
-    return [m[1], m[2], m[3], m[4] !== undefined ? m[4] : m[5], m[6]];
-  });
+  var text = fs.readFileSync(path.join(ROOT, file), "utf8").replace(/^\uFEFF/, ""), rows = [], row = [], f = "", q = false;
+  for (var i = 0; i < text.length; i++) {
+    var c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += c; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(f); rows.push(row); row = []; f = ""; }
+    else f += c;
+  }
+  if (f || row.length) { row.push(f); rows.push(row); }
+  return rows.slice(1).filter(function (r) { return r.join(""); });
 }
 var ROWS = rowsOf("tests/expected-cover-lists.csv").map(function (r) {
-  return { who: r[0], day: r[1], role: r[2], cover: r[3].split(",").map(function (s) { return s.trim(); }).filter(Boolean), before: +r[4] };
+  var swaps = {};
+  (r[5] || "").split("; ").filter(Boolean).forEach(function (part) {
+    var m = part.match(/^(.*?): (.*)$/);
+    swaps[m[1]] = m[2] === "none" ? [] : m[2].split(", ").map(function (x) { var w = x.split(" "); return { day: w[0], as: w.slice(1).join(" ") }; });
+  });
+  return { who: r[0], day: r[1], role: r[2], cover: r[3].split(",").map(function (s) { return s.trim(); }).filter(Boolean), before: +r[4], swaps: swaps };
 });
 var ROLE = {};
 rowsOf("roles.csv").forEach(function (r, i) { ROLE[r[0]] = { group: r[1] || r[0], as: r[2] || r[0], rank: i }; });
-/* "Pots & Pans: Wed Thu | Recycling: Mon": what a student works, each role as
-   it's covered (a Shift Leader shift counts as Pots & Pans) */
-function worksOf(name) {
+/* "Pots & Pans: Wed Thu | Recycling: Mon": shifts by role as covered (a
+   Shift Leader shift counts as Pots & Pans), the given role first, then
+   roles.csv order. Without shifts, all a student works. */
+function worksOf(name, first, shifts) {
   var by = {};
-  ROWS.forEach(function (r) {
-    if (r.who !== name) return;
-    var as = ROLE[r.role].as, d = DAYS.indexOf(r.day);
-    by[as] = by[as] || [];
-    if (by[as].indexOf(d) < 0) by[as].push(d);
+  (shifts || ROWS.filter(function (r) { return r.who === name; }).map(function (r) { return { day: r.day, as: ROLE[r.role].as }; })).forEach(function (x) {
+    var d = DAYS.indexOf(x.day);
+    by[x.as] = by[x.as] || [];
+    if (by[x.as].indexOf(d) < 0) by[x.as].push(d);
   });
-  return Object.keys(by).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (role) {
+  return Object.keys(by).sort(function (a, b) { return (b === first) - (a === first) || ROLE[a].rank - ROLE[b].rank; }).map(function (role) {
     return role + ": " + by[role].sort().map(function (d) { return DAYS[d].slice(0, 3); }).join(" ");
   }).join(" | ");
 }
@@ -91,10 +104,34 @@ function serve(dir, port) {
   check("picker: placeholder then every student", names, [""].concat(Array.from(new Set(ROWS.map(function (r) { return r.who; }))).sort()));
   check("empty state", await text(p, "#shifts-body"), "Choose your name above to see your shifts and who can cover them.");
   check("band hidden with no name", await p.$eval("#avail", function (e) { return e.hidden; }), true);
+  check("no name: a labelled list under the heading, no week at a glance", await p.evaluate(function () {
+    return [document.getElementById("who").className, getComputedStyle(document.querySelector("#who label")).width !== "1px", document.getElementById("glance").hidden];
+  }), ["who", true, true]);
 
   await p.selectOption("#me", "Aryashree");
   var mine = ROWS.filter(function (r) { return r.who === "Aryashree"; });
-  check("lead line", await text(p, "#shifts-body .lead"), mine.length + " shifts a week.");
+  check("name chosen: a pill with the name, still a labelled list", await p.evaluate(function () {
+    var w = document.getElementById("who");
+    return [w.className, document.getElementById("me-pill").textContent, document.querySelector("label[for=me]").textContent, document.getElementById("me").value];
+  }), ["who set", "Aryashree", "Your name", "Aryashree"]);
+  /* the week at a glance, on Monday October 5: each shift by its next date */
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function glanceOf(rows, now) {
+    var today = (now.getDay() + 6) % 7;
+    return rows.map(function (r) {
+      var d = DAYS.indexOf(r.day), t = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (d - today + 7) % 7);
+      return { t: t, line: r.day.slice(0, 3) + "|" + MON[t.getMonth()] + " " + t.getDate() + "|" + ROLE[r.role].as + "|" + (d === today ? "Today" : d === (today + 1) % 7 ? "Tomorrow" : "") };
+    }).sort(function (a, b) { return a.t - b.t; }).map(function (x) { return x.line; });
+  }
+  function glanceOnPage(p) {
+    return p.evaluate(function () {
+      return [document.querySelector(".today").textContent].concat([].map.call(document.querySelectorAll(".gl li"), function (l) {
+        return [].map.call(l.children, function (c) { return c.textContent; }).join("|");
+      }));
+    });
+  }
+  check("glance: today's date, then each shift by its next date, with Today and Tomorrow", await glanceOnPage(p),
+    ["Today is Monday, October 5"].concat(glanceOf(mine, new Date(2026, 9, 5))));
   var cards = await p.$$eval(".shift", function (cs) {
     return cs.map(function (c) {
       return { day: c.querySelector("h2").firstChild.textContent, when: (c.querySelector(".when") || {}).textContent || "", tmrw: !!c.querySelector(".when.tmrw"),
@@ -104,7 +141,7 @@ function serve(dir, port) {
   });
   check("cards: days in week order", cards.map(function (c) { return c.day; }), mine.map(function (r) { return r.day; }));
   check("cards: Today / Tomorrow", cards.map(function (c) { return c.when + (c.tmrw ? "(outlined)" : ""); }), ["Today", "Tomorrow(outlined)", ""]);
-  check("cards: own role", cards.map(function (c) { return c.role; }), mine.map(function (r) { return r.role; }));
+  check("cards: own role, as covered", cards.map(function (c) { return c.role; }), mine.map(function (r) { return ROLE[r.role].as; }));
   cards.forEach(function (c) {
     check("on with you, " + c.day + ": own work group, in roles.csv order", c.crew, crewOf("Aryashree", c.day, c.role));
   });
@@ -117,14 +154,9 @@ function serve(dir, port) {
     var works = new Function("return " + fn)();
     return l.map(function (x) { return x.querySelector(".cn").textContent + " = " + works(x); });
   }, worksOnPage.toString()), mine[0].cover.map(function (c) {
-    /* Aryashree can't do Recycling or Lunch Monitor, and works Mon, Tue and Thu:
-       a backup shows only the shifts she could take back, or all they work if none */
-    var free = function (part) {
-      var role = part.split(": ")[0], days = part.split(": ")[1].split(" ").filter(function (d) { return ["Mon", "Tue", "Thu"].indexOf(d) < 0; });
-      return /Recycling|Lunch/.test(role) || !days.length ? null : role + ": " + days.join(" ");
-    };
-    var swaps = worksOf(c).split(" | ").map(free).filter(Boolean);
-    return c + " = " + (swaps.length ? swaps.join(" | ") : worksOf(c));
+    /* the shifts she could take back, or all they work if none; her job first */
+    var job = ROLE[mine[0].role].as, swaps = mine[0].swaps[c];
+    return c + " = " + worksOf(c, job, swaps.length ? swaps : null);
   }));
   await p.click(".shift:nth-of-type(2) summary");
   var tue = ROWS.filter(function (r) { return r.who === "Aryashree" && r.day === "Tuesday"; })[0];
@@ -157,7 +189,7 @@ function serve(dir, port) {
       });
     });
   }
-  check("Recycling alone: no On with you; Kitchen days list only Kitchen", await crews("Adam"),
+  check("Recycling alone: no On with you; Dishwashing days list only Dishwashing", await crews("Adam"),
     ["Monday: " + crewOf("Adam", "Monday", "Pots & Pans").map(function (x) { return x.split("|")[0]; }).join(", "),
      "Tuesday: " + crewOf("Adam", "Tuesday", "Pots & Pans").map(function (x) { return x.split("|")[0]; }).join(", "),
      "Thursday: (none)"]);
@@ -166,38 +198,66 @@ function serve(dir, port) {
   check("no Shift Leader in any substitute list or in My availability", await p.evaluate(function () {
     return [].some.call(document.querySelectorAll(".cover, #avail"), function (e) { return /shift leader/i.test(e.textContent); });
   }), false);
-  check("Shift Leader card: covered as Pots & Pans, leaderless", await text(p, ".shift:nth-of-type(2) .cover-lead"), "Can cover for you, as Pots & Pans. The shift goes without a Shift Leader.");
+  check("Shift Leader's own card: Pots & Pans, nothing about leading", [await text(p, ".shift:nth-of-type(2) .role"), await text(p, ".shift:nth-of-type(2) .cover-lead")],
+    ["Pots & Pans", "Can cover for you"]);
+  async function leaderOutsideCrew(who) {
+    await p.selectOption("#me", who);
+    await p.evaluate(function () { document.querySelectorAll("details.backups").forEach(function (d) { d.open = true; }); });
+    return p.evaluate(function () {
+      var all = (document.querySelector(".pane").innerText.match(/shift leader/gi) || []).length;
+      var crew = [].reduce.call(document.querySelectorAll(".crew"), function (n, c) { return n + (c.innerText.match(/shift leader/gi) || []).length; }, 0);
+      return [all > 0 || crew === 0, all - crew];
+    });
+  }
+  for (var w of ["Adrian", "Ivwananji", "Beth", "Adam"]) check("Shift Leader appears only in On with you: " + w, await leaderOutsideCrew(w), [true, 0]);
+  check("and On with you shows the Shift Leader first", (await crews("Beth"))[0].split(": ")[1].split(", ")[0], "Adrian");
   check("Lunch Monitor: no On with you", await crews("Shuxing"), ["Monday: (none)", "Thursday: (none)"]);
   check("Kitchen never lists Recycling or Lunch Monitor", (await crews("Huiyi"))[0].indexOf("Adrian") < 0 && (await crews("Huiyi"))[0].indexOf("Shuxing") < 0, true);
   await p.selectOption("#me", "Aryashree");
 
-  /* My availability */
-  var avail = {};
-  ROWS.forEach(function (r) {
-    var at = r.cover.indexOf("Aryashree");
-    if (at < 0) return;
-    var as = ROLE[r.role].as, day = avail[r.day] = avail[r.day] || {};
-    day[as] = day[as] || { main: [], last: [] };
-    day[as][at < r.before ? "main" : "last"].push(r.who);
-  });
-  var wantAvail = DAYS.filter(function (d) { return avail[d]; }).map(function (d) {
-    return d + " | " + Object.keys(avail[d]).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (as) {
-      var g = avail[d][as];
-      return "As " + as + ": " + g.main.sort().join(", ") + (g.last.length ? " / last resort for " + g.last.sort().join(", ") : "");
-    }).join(" | ");
-  });
-  check("availability: by day and role, who may ask (swaps first, last resort on its own line)", await p.$$eval(".avail-list li", function (l) {
-    return l.map(function (x) {
-      return x.querySelector(".d").textContent + " | " + [].map.call(x.querySelectorAll(".ag"), function (g) {
-        var lr = g.querySelector(".alr");
-        return g.querySelector(".ar").textContent + ": " + [].map.call(g.querySelectorAll(".ap .an"), function (n) { return n.textContent; }).join(", ") +
-          (lr ? " / " + lr.textContent.replace(/^Last resort/, "last resort") : "");
+  /* My availability: day covered, then your day in exchange, then the
+     role you'd cover as, then who; the last resort at the end of the day */
+  function availOf(me) {
+    var avail = {};
+    ROWS.forEach(function (r) {
+      var at = r.cover.indexOf(me);
+      if (at < 0) return;
+      var day = avail[r.day] = avail[r.day] || {}, as = ROLE[r.role].as;
+      (at < r.before ? r.swaps[me].map(function (x) { return x.day; }) : ["Last resort"]).forEach(function (back) {
+        var g = day[back] = day[back] || {};
+        (g[as] = g[as] || []).push(r.who);
+      });
+    });
+    return DAYS.filter(function (d) { return avail[d]; }).map(function (d) {
+      return d + " | " + DAYS.concat("Last resort").filter(function (b) { return avail[d][b]; }).map(function (b) {
+        var g = avail[d][b];
+        return (b === "Last resort" ? b : "In exchange for your " + b.slice(0, 3)) + " > " + Object.keys(g).sort(function (x, y) { return ROLE[x].rank - ROLE[y].rank; }).map(function (as) {
+          return "As " + as + ": " + g[as].sort().join(", ");
+        }).join(" / ");
       }).join(" | ");
     });
-  }), wantAvail);
-  check("availability: every swap shows which of your shifts they could take", await p.$$eval(".avail-list .ap", function (a) {
-    return a.every(function (x) { return x.querySelector(".aw").textContent === "swap for your" && x.querySelectorAll(".dp").length > 0; });
+  }
+  function availOnPage() {
+    return p.$$eval(".avail-list li", function (l) {
+      return l.map(function (x) {
+        return x.querySelector(".d").textContent + " | " + [].map.call(x.querySelectorAll(".ax"), function (g) {
+          return g.querySelector(".xh").textContent + " > " + [].map.call(g.querySelectorAll(".ag"), function (a) {
+            return a.querySelector(".ar").textContent + ": " + a.querySelector(".an").textContent;
+          }).join(" / ");
+        }).join(" | ");
+      });
+    });
+  }
+  check("availability: by day, day in exchange, role, then who", await availOnPage(), availOf("Aryashree"));
+  check("availability: exchange days carry their day's colour", await p.$$eval(".avail-list .xh .dp", function (t) {
+    var k = { Mon: "k0", Tue: "k1", Wed: "k2", Thu: "k3", Fri: "k4", Sat: "k5", Sun: "k6" };
+    return t.length > 0 && t.every(function (x) { return x.classList.contains(k[x.textContent]); });
   }), true);
+  for (var who of ["Adam", "Ben Kong", "Ivwananji", "Thanh"]) {
+    await p.selectOption("#me", who);
+    check("availability: " + who, await availOnPage(), availOf(who));
+  }
+  await p.selectOption("#me", "Aryashree");
   check("availability: wrong-info line", await text(p, "#avail .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Art).");
   check("band shown", await p.$eval("#avail", function (e) { return e.hidden; }), false);
 
@@ -249,6 +309,15 @@ function serve(dir, port) {
   await p.clock.setFixedTime(new Date("2026-10-11T08:00:00"));
   await p.evaluate(function () { document.dispatchEvent(new Event("visibilitychange")); });
   check("badge appears when the app returns on Sunday", await p.$$eval(".badge", function (b) { return b.length; }), 2);
+  await p.context().close();
+  p = await page({ time: "2026-10-10T23:00:00", init: function () { localStorage.setItem("kitchen.me", "Adam"); } });   // Saturday night, left open
+  await p.goto(BASE); await ready(p);
+  var adam = ROWS.filter(function (r) { return r.who === "Adam"; });
+  check("glance: Saturday", await glanceOnPage(p), ["Today is Saturday, October 10"].concat(glanceOf(adam, new Date(2026, 9, 10))));
+  await p.clock.setFixedTime(new Date("2026-10-11T08:00:00"));
+  await p.evaluate(function () { document.dispatchEvent(new Event("visibilitychange")); });
+  check("glance: moves on to Sunday when the app returns", await glanceOnPage(p), ["Today is Sunday, October 11"].concat(glanceOf(adam, new Date(2026, 9, 11))));
+  check("cards: Tomorrow moves to Monday", await p.$$eval(".shift .when", function (w) { return w.map(function (x) { return x.closest(".shift").querySelector("h2").firstChild.textContent + " " + x.textContent; }); }), ["Monday Tomorrow"]);
   await p.context().close();
 
   /* ------------------------------------------------------- settings */
@@ -346,6 +415,10 @@ function serve(dir, port) {
           return { sideways: s.scrollWidth - s.clientWidth, navInView: nav.top >= 0 && nav.bottom <= innerHeight + 0.5, oneLine: Math.max.apply(null, items) - Math.min.apply(null, items) };
         });
         check("layout " + v[0] + " " + mode + " " + (tab || "#shifts"), m, { sideways: 0, navInView: true, oneLine: 0 });
+        if (!tab) check("layout " + v[0] + " " + mode + ": the name pill sits beside the heading, and the list covers it", await p.evaluate(function () {
+          var h = document.querySelector(".title h1").getBoundingClientRect(), pill = document.getElementById("me-pill").getBoundingClientRect(), sel = document.getElementById("me").getBoundingClientRect();
+          return [pill.left > h.right, pill.top < h.bottom && pill.bottom > h.top, Math.round(sel.width) === Math.round(pill.width) && Math.round(sel.height) === Math.round(pill.height)];
+        }), [true, true, true]);
       }
       await p.context().close();
     }

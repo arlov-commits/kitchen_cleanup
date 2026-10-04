@@ -60,9 +60,9 @@ the app.
    the footer shows no yellow "Check…" text.
 5. **Go through the rules.** Read **"How the cover lists are worked
    out"** below together. Point out the students with special settings
-   in `students.csv`: anyone limited under **Only does**, and who is
-   trained as a lunch monitor. Explain anything that has changed, and add
-   it to the log.
+   in `students.csv` (anything under **Only does**, **Only covers** or
+   **Covered only by same job**) and who is trained as a lunch monitor.
+   Explain anything that has changed, and add it to the log.
 6. **Their phone.** They open the app and tap **Install as app** at the
    bottom.
 7. **Second owner.** Make sure the Work Study Manager is still an owner.
@@ -93,96 +93,117 @@ The app works out every shift's cover list itself, from `shifts.csv`,
 is either a setting in those files (marked ⚙, so it can be changed
 without code) or built into the app.
 
-**Words used here**
-- **Work groups:** Kitchen (Shift Leader, Pots & Pans, Buckets &
-  Composting), Recycling, and Lunch Monitor. ⚙ *Work group*
-- **Covered as:** a Shift Leader is a leader within Pots & Pans. Whoever
-  covers a Shift Leader covers as Pots & Pans, and the shift goes without
-  a leader. ⚙ *Covered as*
-- **A student's jobs:** the roles of their shifts, as covered (a Shift
-  Leader shift counts as Pots & Pans).
+**The groups.** Each group works on its own. ⚙ *Work group* in `roles.csv`
+- **Group A, Lunch Monitors:** Lunch Monitor.
+- **Group B, Dishwashing:** team B1, Pots & Pans (and its Shift Leader),
+  and team B2, Buckets & Composting.
+- **Group C, Recycling:** Recycling.
 
-**Rule 1: who can do a role.** A student can do a role, and so cover it,
-only if all three allow it:
-- **gender** ⚙ *Gender*: Recycling is men only. Buckets & Composting and
-  Lunch Monitor are women only. Pots & Pans (and so Shift Leader) is
-  anyone.
-- **limits** ⚙ *Only does*: Ben Kong does Recycling only.
-- **training** ⚙ *Trained students only* / *Trained for*: only trained
-  lunch monitors can do Lunch Monitor.
+**The hours,** for the record. They explain Rule 4, and the app doesn't
+show them:
+- Lunch Monitor: 10:50 to 11:30.
+- Pots & Pans and Buckets & Composting: 11:40 to 12:40.
+- Recycling: 11:40 to 13:40 on Monday, 11:40 to 12:40 on other days. It
+  can be done at any time before 6 pm.
 
-**Rule 2: a swap is shift for shift.** A backup's shift is a **swap
-option** for you if you can do its role (Rule 1) and you aren't already
-working that day. A backup with at least one swap option is someone
-you can **swap with**.
+**Rule 1: a Shift Leader is Pots & Pans.** Whoever covers a Shift Leader
+shift does Pots & Pans, and in every list and swap it counts as Pots &
+Pans. "Shift Leader" appears in one place only: in "On with you" on the
+other cards that day, listed first. Even the Shift Leader's own card says
+Pots & Pans. ⚙ *Covered as*
 
-**Rule 3: the main list.** These are students **not working that day** who
-can do the role (Rule 1) and whom you can swap with (Rule 2), in three
-tiers:
-1. **Same job:** they already do this job.
-2. **Same work group**, another job, for example Buckets & Composting
-   people for a Pots & Pans shift.
-3. **A different work group.**
+**Rule 2: who can do which job.** ⚙ *Gender*, *Trained students only* and
+*Trained for*
+- Group A (Lunch Monitor) is for women trained as lunch monitors. They can
+  also do any Group B job.
+- Group B women can do any Group B job.
+- Men can do Pots & Pans (B1) and Recycling (Group C).
+- Only men do Recycling. Only women do Buckets & Composting and Lunch
+  Monitor.
 
-Within each tier, fewest shifts come first, then alphabetical order.
+**Rule 3: special students.** Three options in `students.csv`, blank for
+almost everyone:
+- ⚙ *Only does:* the only jobs they can work.
+- ⚙ *Only covers:* the only jobs they can substitute for, or `None`.
+- ⚙ *Covered only by same job:* `Yes` means only students who do the same
+  job can cover their shifts.
 
-**Rule 4: the last resort,** boxed off below the main list, in this order:
-1. Students **not working that day** who can do the role, but whom you
-   can't swap with (no swap option), in the same tier order.
-2. Students **already working that day** in one of the role's **same-day
-   backup** roles ⚙ *Same-day backups*, in the order listed, each fewest
-   shifts first:
-   - Pots & Pans and Shift Leader: Recycling, then Lunch Monitor, at the
-     very end.
-   - Buckets & Composting: Lunch Monitor, at the very end.
-   - Recycling and Lunch Monitor: none.
+Ben Kong has all three: Recycling, Recycling, Yes. He works and covers
+Recycling only, and only Recycling students cover his shifts.
 
-   Nobody else who is working that day is ever listed. So Buckets &
-   Composting and Pots & Pans never cover each other on the same day.
+**Rule 4: the same day.** Someone already working that day can cover only
+where the hours allow both. ⚙ *Same-day backups*, in order:
+- **Pots & Pans:** Recycling (they recycle afterwards), then Lunch
+  Monitor (10:50 to 12:40 with a 10-minute break), at the very end.
+- **Buckets & Composting:** Lunch Monitor, at the very end.
+- **Recycling:** Pots & Pans (recycling can wait until after).
+- **Lunch Monitor:** no one.
 
-**Rule 5: what students see.**
-- **On with you:** only your own work group, and left out when no one
-  else in it is on. So a Recycling card shows it only when two or more do
-  Recycling that day.
-- **Can cover for you:** each backup's name, with their swap options
-  underneath (all their shifts, in the last resort). Substitute lists
-  never say "Shift Leader": that shift shows as Pots & Pans.
-- **My availability:** each day you're on someone's list, by the role
-  you'd cover as. For each person, the shifts of yours they could take in
-  return. People whose last resort you are get one quiet line.
+Nobody else who is working that day is ever listed, and nobody covers
+the same job twice in a day.
 
-**Where your instructions pulled against each other, and how it's
-settled.** For the record, so a later rule change starts from here:
+**Rule 5: the order.** Your shift is a **swap** for a backup if you could
+take one of their shifts in return: on another day, and allowed by Rules
+1 to 4 (a double the hours allow counts). The list has two parts.
+1. **The main list:** students **not working that day** whom you can swap
+   with. First priority is the same job on a different date:
+   1. **Same job:** they already do this job.
+   2. **Same group,** another job, for example Buckets & Composting people
+      for a Pots & Pans shift.
+   3. **Another group,** for example a lunch monitor.
+
+   Within each, fewest shifts first, then alphabetical order.
+2. **The last resort,** boxed off below:
+   1. Students not working that day with **no shift you could take back**
+      (they'd help without a swap), in the same order.
+   2. Students **already working that day** (Rule 4), in the order of the
+      same-day backups, each fewest shifts first. They are always last
+      resort, even when you could repay them. For example, a man can take a
+      Recycling student's Recycling shift on another day.
+
+**Rule 6: what students see.**
+- **The week at a glance,** at the top: today's date, then each shift by
+  the next date it falls on, with **Today** or **Tomorrow**. The name
+  sits beside the heading once chosen.
+- **Each card:** the day, the job (Rule 1), and **On with you:** only your
+  own group, left out when no one else in it is on. So a Recycling card
+  shows it only when two or more do Recycling that day.
+- **Shift Backups:** each backup's name, then their shifts you could take
+  in return, same job first (all their shifts, in the last resort).
+- **My availability:** the days you're on someone's list, grouped by the
+  day you'd cover, then each shift of yours they could take in exchange,
+  then the job you'd cover as, then who. Anyone whose last resort you
+  are is in a quiet "Last resort" group at the end of that day.
+
+**Where instructions pulled against each other, and how it's settled.**
+For the record, so a later rule change starts from here:
 1. *"Buckets & Composting doesn't substitute for Pots & Pans or vice
    versa"* and *"next is same group (Buckets for Pots & Pans)"*. Settled:
-   the first applies **on the same day only** (Rule 4), the second on
-   other days (Rule 3, tier 2). This matches the original hand-made lists.
+   the first applies **on the same day only**, since the hours overlap
+   (Rule 4). The second applies on other days (Rule 5, same group).
 2. *"Lunch monitors don't get substitutes"* and *"they can only
    substitute amongst themselves"*. Settled: lunch shifts are covered
-   only by trained lunch monitors (Rule 1), as in the hand-made lists.
-3. *"Lunch monitors only substitute amongst themselves"* and lunch
-   monitors appearing in Pots & Pans and Buckets lists (*"same day, very
-   last"*). Settled: lunch monitors **can** cover other women's shifts.
-   No one else can take their lunch shift, though, so for an untrained
-   student they're no swap and land in the last resort (Rules 2 and 4).
-4. *"Lunch monitors on other days: regular order"* and *"they shouldn't
-   be a viable option that often"* / *"square them off as last resort"*.
-   Settled by the later instruction: no swap means last resort.
-5. Ben Kong appeared in Pots & Pans lists in the shift file, against
-   *"he cannot work any other role"*. Settled: the rule wins. He is only
-   ever a backup for Recycling.
-6. *"Fourth: a different group on the same day"* (in general) and the
-   hand-made lists, where Kitchen students working that day never cover
-   Recycling. Settled: only the same-day roles listed in `roles.csv`
-   count. To let Kitchen men working that day be a last resort for
-   Recycling, add `Pots & Pans; Shift Leader` to Recycling's
-   *Same-day backups*.
-7. *"Swap options"* counted roles but not days, so someone whose only
-   matching shifts fell on your own working days looked like a swap.
-   Settled: a swap option has to be on a day you're free (Rule 2).
-8. *My availability* listed days where you'd only be someone's last
-   resort, as if you were a main backup. Settled: those are on their own
-   quiet line (Rule 5).
+   only by trained lunch monitors (Rule 2).
+3. *"Lunch monitors only substitute amongst themselves"* and *"Group A
+   can do the work of Group A or Group B"*. Settled by the later rule:
+   lunch monitors can cover Group B shifts. Only another lunch monitor can
+   take their lunch shift, though. So for anyone else they're no swap,
+   and land in the last resort unless they also have a Group B shift you
+   could take.
+4. Ben Kong appeared in Pots & Pans lists in an early shift file, against
+   *"he cannot work any other role"*. Settled: the rule wins (Rule 3).
+5. Same-day Recycling was at first left out: Dishwashing students working
+   that day never covered it. Settled by the hours: Recycling can be done
+   any time before 6 pm, so a Pots & Pans student working that day can
+   do it afterwards, as a last resort (Rule 4).
+6. *"Male students aren't ideal same-day substitutes; in an emergency they
+   can fill in pro bono, except for a male student, who could repay."*
+   Settled: same-day backups are always last resort. Where you could
+   repay them, their line shows the shifts you could take.
+7. A swap on the very day you're asking to have covered isn't a swap,
+   since you won't be there (Rule 5).
+8. A swap only counts where the hours allow it. A shift on a day you
+   already work counts only as a double Rule 4 allows.
 
 `tests/expected-cover-lists.csv` holds every shift's list as worked out by
 a second, independent copy of these rules (`tests/expected_cover_lists.py`),

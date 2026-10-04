@@ -21,7 +21,7 @@ the files link.
 | The Work Study Manager's name | `settings.csv` |
 | The timesheet portal link | `settings.csv` |
 | Who works which day, in which role | `shifts.csv` |
-| Who the students are: gender, and any roles they're limited to or trained for | `students.csv` |
+| Who the students are: gender, training, and any special limits | `students.csv` |
 | The rules for each role: gender, training, work group, same-day backups (rarely) | `roles.csv` |
 
 **You never write the cover lists.** The app works out who can cover each
@@ -116,8 +116,14 @@ has three rows.
 | --- | --- | --- |
 | **Student** | Their name, spelled as in `shifts.csv` | `Ben Kong` |
 | **Gender** | `F` or `M`. It's never shown in the app. | `M` |
-| **Only does** | Leave blank, unless the student can only do certain roles. Then list them, separated by `;` | `Recycling` |
 | **Trained for** | Any roles that need training (see `roles.csv`), separated by `;` | `Lunch Monitor` |
+| **Only does** | Leave blank, unless the student can only work certain roles. Then list them, separated by `;` | `Recycling` |
+| **Only covers** | Leave blank, unless the student can only substitute for certain roles. Then list them, separated by `;`, or write `None` | `Recycling` |
+| **Covered only by same job** | Leave blank, unless only students who do the same job may cover this student's shifts. Then write `Yes` | `Yes` |
+
+The last three are for special students and are blank for almost
+everyone. Ben Kong, for example, has `Recycling`, `Recycling`, `Yes`: he
+works and covers Recycling only, and only Recycling students cover him.
 
 **`roles.csv`**: the rules for each role. You'll rarely need to change it.
 See **"Changing a rule"** below.
@@ -174,16 +180,18 @@ their name in **both** `shifts.csv` and `students.csv`.
 | Column | What it means | Choices |
 | --- | --- | --- |
 | **Role** | The role's name, as used in the other files | |
-| **Work group** | Roles in the same group work side by side. "On with you" shows only your own group, and backups from the same group are asked before other groups. | for example `Kitchen`, `Recycling`, `Lunch Monitor` |
-| **Covered as** | Leave blank, unless backups cover this role as a different one. Shift Leader is covered as Pots & Pans: the backup does Pots & Pans, and the shift goes without a leader. | for example `Pots & Pans` |
+| **Work group** | Roles in the same group work side by side. "On with you" shows only your own group, and backups from the same group are asked before other groups. | for example `Dishwashing`, `Recycling`, `Lunch Monitors` |
+| **Covered as** | Leave blank, unless the role counts as a different one. Shift Leader is covered as Pots & Pans: the app calls it Pots & Pans everywhere except "On with you". | for example `Pots & Pans` |
 | **Gender** | Who can do it, and so who can cover it | `Any`, `Women only` or `Men only` |
 | **Trained students only** | `Yes` means only students with this role under **Trained for** can do or cover it | `Yes` or `No` |
-| **Same-day backups (asked last)** | Roles from other groups whose students, even when already working that day, can cover this role, but only after everyone else. Listed in order, separated by `;`. A role that's **Covered as** another uses that role's list instead. | for example `Recycling; Lunch Monitor` |
+| **Same-day backups (asked last)** | Roles whose students, even when already working that day, can cover this role because the hours allow both. They're asked only after everyone else, in the order listed, separated by `;`. A role that's **Covered as** another uses that role's list instead. | for example `Recycling; Lunch Monitor` |
 
 For example:
 - To let anyone do Recycling, change its **Gender** to `Any`.
 - To limit a student to two roles, put both under **Only does** in
   `students.csv`, for example `Pots & Pans; Shift Leader`.
+- To keep a student off every cover list, put `None` under **Only
+  covers**.
 - To train someone as a lunch monitor, add `Lunch Monitor` under their
   **Trained for**.
 

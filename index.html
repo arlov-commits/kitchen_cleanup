@@ -231,10 +231,43 @@ p{margin:0}
 .panel{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px}
 
 /* ------------------------------------------------------- My shifts */
-.who{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+/* the heading, with the name beside it: before a name is chosen, a full
+   width labelled list under the heading; after, a small pill at its right */
+.title{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px}
+.who{position:relative;flex:1 0 100%;display:flex;flex-direction:column;gap:6px}
 .who label{font-size:13px;font-weight:600;color:var(--ink-2)}
-.who select{width:100%;max-width:360px;font-size:17px;font-weight:600;padding:10px 12px;border:1.5px solid var(--ink);border-radius:8px;
-  background:var(--white);color:var(--ink)}
+.who select{-webkit-appearance:none;appearance:none;width:100%;max-width:360px;font-size:17px;font-weight:600;padding:10px 38px 10px 12px;
+  border:1.5px solid var(--ink);border-radius:8px;background:var(--white);color:var(--ink);cursor:pointer}
+.who::after{content:"";position:absolute;right:16px;bottom:21px;width:8px;height:8px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);
+  transform:rotate(45deg);pointer-events:none}
+/* once chosen, the name shows as a pill sized to it, and the list sits
+   unseen over the pill, so tapping the pill opens it */
+.me-pill{display:none}
+.who.set{flex:0 1 auto;min-width:0}
+.who.set::after{display:none}
+.who.set label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.who.set .me-pill{display:flex;align-items:center;gap:8px;max-width:100%;padding:7px 14px 7px 12px;border:1px solid var(--line);border-radius:30px;
+  background:var(--white);font-size:15px;font-weight:600;color:var(--ink)}
+.me-pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me-pill::before{content:"";flex:0 0 auto;width:16px;height:16px;background-color:var(--ink-3);
+  -webkit-mask:var(--ic-me) center/contain no-repeat;mask:var(--ic-me) center/contain no-repeat}
+.me-pill::after{content:"";flex:0 0 auto;width:7px;height:7px;margin:-4px 2px 0 2px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);transform:rotate(45deg)}
+.who.set select{position:absolute;top:0;left:0;width:100%;height:100%;max-width:none;padding:0;opacity:0}
+.who.set:focus-within .me-pill{outline:2px solid var(--rust-deep);outline-offset:2px}
+@media (max-width:359px){.title{column-gap:10px}.who.set .me-pill{padding-left:12px}.me-pill::before{display:none}}
+:root{--ic-me:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4.5 20.5a7.5 7.5 0 0 1 15 0'/%3E%3C/svg%3E")}
+/* the week at a glance: today's date, then each shift by its next date */
+.glance{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.today{font-size:14px;color:var(--ink-2)}
+.gl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.gl li{display:grid;grid-template-columns:3.4em 3.6em 1fr auto;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line-soft);font-size:15px}
+.gl li:last-child{border-bottom:1px solid var(--line-soft)}
+.gl .gd{display:flex;align-items:center;gap:7px;font-weight:700;color:var(--ci)}
+.gl .gd::before{content:"";flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:var(--c)}
+.gl .gt{color:var(--ink-2)}
+.gl .gr{color:var(--ink);line-height:1.3}
+.gl .when{font-size:10.5px;padding:4px 8px}
+@media (max-width:359px){.gl li{gap:8px;grid-template-columns:3.2em 3.4em 1fr auto}}
 /* one shift: the day in its hue, the role, the crew, the cover list */
 .shift{border-top:4px solid var(--c)}
 .shift-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
@@ -260,7 +293,7 @@ p{margin:0}
 .backups .cover-lead{font-size:15px;color:var(--ink-2);margin-bottom:6px}
 .backups .cover{margin-bottom:4px}
 /* My availability: a full-width band between the shift cards and the
-   footer, set apart the way the footer is, in warm sand rather than black */
+   footer, set apart the way the footer is, in soft sage rather than black */
 #view-shifts{display:flex;flex-direction:column}
 #view-shifts>.body{flex:1 0 auto}
 .band{background:var(--band);border-top:1px solid var(--band-line)}
@@ -275,14 +308,15 @@ p{margin:0}
 /* the day in ink with a small dot in its hue: calm on the sage */
 .avail-list .d{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:18px;font-weight:600;color:var(--ink)}
 .avail-list .d::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
-/* under each day: the role you'd cover as (a small label), then the names */
-.avail-list .ag{display:flex;flex-direction:column;gap:1px;padding-left:17px;margin-top:6px}
+/* under each day: the shifts of yours they'd take in exchange, then the
+   role you'd cover as (a small label), then the names */
+.avail-list .ax{display:flex;flex-direction:column;gap:3px;padding-left:17px;margin-top:8px}
+.avail-list .xh{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:13.5px;color:var(--ink-2)}
+.avail-list .ag{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;padding-left:12px;border-left:2px solid var(--band-line)}
 .avail-list .ar{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--band-accent)}
-.avail-list .ap{padding:4px 0}
-.avail-list .an{display:block;font-size:15px;font-weight:600;color:var(--ink)}
-.avail-list .sw{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:3px}
-.avail-list .aw{font-size:13px;color:var(--ink-3);margin-right:-6px}
-.avail-list .alr{font-size:13.5px;color:var(--ink-3);margin-top:2px}
+.avail-list .an{font-size:15px;font-weight:600;color:var(--ink)}
+.avail-list .ax.lr .xh,.avail-list .ax.lr .an{color:var(--ink-3)}
+.avail-list .ax.lr .an{font-weight:400}
 .cover{margin:0;padding:0 0 0 1.6em;font-size:15px}
 /* each backup: the name on its own line, then what they work, as role
    labels each followed by day tags in that day's colour */
@@ -385,11 +419,15 @@ p{margin:0}
 <main class="view" id="view-shifts">
   <div class="head"><div class="in">
     <div class="head-top"><span class="eyebrow">Kitchen cleanup</span><button type="button" class="theme-btn" data-theme-btn></button></div>
-    <h1>Your <em>shifts</em></h1>
-    <div class="who">
-      <label for="me">Your name</label>
-      <select id="me"><option value="">Choose your name…</option></select>
+    <div class="title">
+      <h1>Your <em>shifts</em></h1>
+      <div class="who" id="who">
+        <label for="me">Your name</label>
+        <span class="me-pill" id="me-pill" aria-hidden="true"></span>
+        <select id="me"><option value="">Choose your name…</option></select>
+      </div>
     </div>
+    <div class="glance" id="glance" hidden></div>
   </div></div>
   <div class="body"><div class="in" id="shifts-body">
     <p class="note">Loading the shift list…</p>
@@ -503,6 +541,7 @@ p{margin:0}
   var SETTINGS_FILE = "settings.csv", settingsProblems = [];
 
   var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   var TABS = [
     { id: "shifts", label: "My shifts", title: "My shifts" },
     { id: "callout", label: "Call out", title: "Call out" },
@@ -516,7 +555,7 @@ p{margin:0}
     del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
 
-  var data = null, loadError = null, me = store.get(ME_KEY) || "";
+  var data = null, loadError = null, me = store.get(ME_KEY) || "", shownDay = "";
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -604,31 +643,48 @@ p{margin:0}
       if (role.as === k) role.as = "";
       if (role.as && !roles.by[role.as]) { problems.push(F + ": " + role.name + " is covered as \"" + role.as + "\", which isn't a role."); role.as = ""; }
     });
-    /* the role a backup actually does: itself, or what it's covered as */
+    /* the role a backup actually does: itself, or what it's covered as.
+       Same-day backups name roles as covered too (Shift Leader is Pots &
+       Pans). */
     roles.order.forEach(function (k) { roles.by[k].cover = roles.by[k].as ? roles.by[roles.by[k].as] : roles.by[k]; });
+    roles.order.forEach(function (k) {
+      roles.by[k].same = roles.by[k].same.map(function (x) { return roles.by[x] ? lower(roles.by[x].cover.name) : x; });
+    });
     return roles;
   }
 
-  /* students.csv: one row per student: gender, the roles they're limited to
-     (blank = any), and any roles they're trained for. */
+  /* students.csv: one row per student: gender, any roles they're trained
+     for, and, for special students, three options (blank = no limit):
+       Only does                 the roles they can work (and so cover)
+       Only covers               the roles they can substitute for, or None
+       Covered only by same job  Yes: only students who do that job can
+                                 cover their shifts */
   function readStudents(text, roles, problems) {
     var rows = parseCSV(text), F = FILES.students, people = Object.create(null);
-    var col = header(rows, F, { who: /^(student|name)/, gender: /^gender/, only: /^only/, trained: /^trained/ }, problems);
+    var col = header(rows, F, { who: /^(student|name)/, gender: /^gender/, only: /^only do/, trained: /^trained/ }, problems);
     if (!col) return people;
+    var covCol = -1, sameCol = -1;
+    rows[0].forEach(function (h, i) {
+      if (/^only cover/.test(lower(h))) covCol = i;
+      if (/^covered only/.test(lower(h))) sameCol = i;
+    });
     rows.slice(1).forEach(function (r, n) {
       var who = cell(r, col.who), line = F + " line " + (n + 2) + ": ";
       if (!who) return;
       if (people[who]) { problems.push(line + who + " is listed twice."); return; }
       var g = personGender(cell(r, col.gender));
       if (!g) problems.push(line + who + "'s gender should be F or M.");
-      var p = { gender: g, only: list(cell(r, col.only)), trained: list(cell(r, col.trained)) };
-      p.only.concat(p.trained).forEach(function (x) { if (!roles.by[x]) problems.push(line + who + ": \"" + x + "\" isn't a role in " + FILES.roles + "."); });
+      var p = { gender: g, only: list(cell(r, col.only)), trained: list(cell(r, col.trained)),
+                covers: covCol < 0 ? [] : list(cell(r, covCol)), sameJobOnly: sameCol >= 0 && yes(cell(r, sameCol)) };
+      p.only.concat(p.trained, p.covers.filter(function (x) { return x !== "none"; })).forEach(function (x) {
+        if (!roles.by[x]) problems.push(line + who + ": \"" + x + "\" isn't a role in " + FILES.roles + ".");
+      });
       people[who] = p;
     });
     return people;
   }
 
-  /* Can this student do (or cover) this role? Gender, their limits, and
+  /* Rule 2: can this student do this role? Gender, their limits, and
      training all have to allow it. */
   function canDo(p, role) {
     if (!p || !role) return false;
@@ -637,23 +693,26 @@ p{margin:0}
     if (role.trained && p.trained.indexOf(lower(role.name)) < 0) return false;
     return true;
   }
+  /* ...and substitute for it? Also their Only covers option (Rule 3). */
+  function canCover(p, role) {
+    if (!canDo(p, role)) return false;
+    if (p.covers.indexOf("none") >= 0) return false;
+    return !p.covers.length || p.covers.indexOf(lower(role.name)) >= 0;
+  }
 
-  /* The whole shift list, with every cover list worked out by the rules.
-     A backup covers the shift as its role, or as what the role is covered
-     as (a Shift Leader's backups cover as Pots & Pans). Of everyone who can
-     do that, and who isn't working that day:
-       1. those who already do that job,
-       2. then those with another job in the same work group,
-       3. then everyone else;
-     each fewest shifts first, then alphabetical. Anyone with no shift you
-     could take in return (say a lunch monitor, for a woman who isn't
-     trained) moves down to the last resort, after everyone you could swap
-     with. Swaps go shift by shift: someone who does Pots & Pans and
-     Recycling is a swap for a woman's Pots & Pans shift, for their Pots &
-     Pans shifts. Last of all come those already working
-     that day in one of the role's same-day backup roles, in the order
-     listed (so Lunch Monitor, listed last, is the very last).
-     s.lastFrom is where the last resort starts. */
+  /* The whole shift list, with every cover list worked out by the rules
+     in HANDOFF.md, "How the cover lists are worked out":
+     - a shift's job is its role as covered (a Shift Leader shift is Pots &
+       Pans);
+     - a student is eligible to cover it if they can substitute for that
+       job, the owner's "covered only by same job" allows them, and they're
+       either free that day or working that day in one of the job's
+       same-day backup roles (hours allow a double);
+     - a backup can repay you if you'd be eligible for one of their shifts.
+     The list: those free that day who can repay you (same job, then same
+     work group, then another group; each fewest shifts first, then A-Z);
+     then the last resort: those free that day who can't repay you, then
+     those working that day, in the order of the job's same-day backups. */
   function buildData(shiftsText, studentsText, rolesText) {
     var out = { shifts: [], names: [], problems: [], roleRank: Object.create(null) };
     var P = out.problems, F = FILES.shifts;
@@ -680,45 +739,45 @@ p{margin:0}
     });
     Object.keys(people).forEach(function (n) { if (!count[n]) P.push(n + " is in " + FILES.students + " but has no shifts."); });
 
-    /* each student's jobs (what their shifts are covered as) and groups */
-    var jobs = Object.create(null), groups = Object.create(null);
+    /* each student's jobs (what their shifts are covered as), groups, and
+       job on each day they work */
+    var jobs = Object.create(null), groups = Object.create(null), onDay = Object.create(null);
     out.shifts.forEach(function (x) {
       (jobs[x.who] = jobs[x.who] || Object.create(null))[lower(x.r.cover.name)] = x.r.cover;
       (groups[x.who] = groups[x.who] || Object.create(null))[x.r.cover.group] = true;
+      (onDay[x.who] = onDay[x.who] || Object.create(null))[x.day] = lower(x.r.cover.name);
     });
-    /* Swaps go shift by shift: the backup's shifts that whoever is asking
-       could take in return, meaning they can do the role (a Shift Leader
-       shift counts as Pots & Pans) and aren't already working that day. A
-       backup with none is one-way. */
-    var busy = Object.create(null);
-    out.shifts.forEach(function (x) { (busy[x.who] = busy[x.who] || Object.create(null))[x.day] = true; });
-    var swapShifts = function (asker, n) {
-      return out.shifts.filter(function (x) {
-        return x.who === n && !busy[asker][x.day] && canDo(people[asker], x.r.cover);
-      }).map(function (x) { return { day: x.day, as: x.as }; });
+    /* Can n cover shift x? (Rules 2, 3 and 4) */
+    var eligible = function (n, x) {
+      var job = x.r.cover, owner = people[x.who], today = onDay[n] && onDay[n][x.day];
+      if (n === x.who || !canCover(people[n], job)) return false;
+      if (owner && owner.sameJobOnly && !jobs[n][lower(job.name)]) return false;
+      return !today || job.same.indexOf(today) >= 0;
     };
-    var twoWay = function (asker, n) { return swapShifts(asker, n).length > 0; };
+    /* the shifts of n's that s's student could take in return: never on
+       the day they're asking to have covered */
+    var repay = function (s, n) {
+      return out.shifts.filter(function (x) { return x.who === n && x.day !== s.day && eligible(s.who, x); })
+        .map(function (x) { return { day: x.day, as: x.as }; });
+    };
     var byFew = function (a, b) { return count[a] - count[b] || a.localeCompare(b); };
     out.shifts.forEach(function (s) {
-      var as = s.r.cover, job = lower(as.name), working = Object.create(null);
-      out.shifts.forEach(function (x) { if (x.day === s.day) working[x.who] = lower(x.role); });
-      var free = out.names.filter(function (n) { return !(n in working) && canDo(people[n], as); });
+      var as = s.r.cover, job = lower(as.name);
+      var can = out.names.filter(function (n) { return eligible(n, s); });
       var tier = function (n) { return jobs[n][job] ? 0 : groups[n][as.group] ? 1 : 2; };
-      var sorted = free.sort(function (a, b) { return tier(a) - tier(b) || byFew(a, b); });
-      /* last resort: backups you couldn't cover back, then those already
-         working that day */
-      var cover = sorted.filter(function (n) { return twoWay(s.who, n); });
-      s.lastFrom = cover.length;
-      cover = cover.concat(sorted.filter(function (n) { return !twoWay(s.who, n); }));
-      as.same.forEach(function (sameRole) {
-        cover = cover.concat(out.names.filter(function (n) {
-          return n !== s.who && working[n] === sameRole && canDo(people[n], as);
-        }).sort(byFew));
+      var byTier = function (a, b) { return tier(a) - tier(b) || byFew(a, b); };
+      var free = can.filter(function (n) { return !onDay[n][s.day]; });
+      var swaps = {};
+      can.forEach(function (n) { swaps[n] = repay(s, n); });
+      var main = free.filter(function (n) { return swaps[n].length; }).sort(byTier);
+      var oneWay = free.filter(function (n) { return !swaps[n].length; }).sort(byTier);
+      var sameDay = can.filter(function (n) { return onDay[n][s.day]; }).sort(function (a, b) {
+        return as.same.indexOf(onDay[a][s.day]) - as.same.indexOf(onDay[b][s.day]) || byFew(a, b);
       });
-      s.cover = cover;
-      /* for each backup, their shifts you could take in return */
+      s.cover = main.concat(oneWay, sameDay);
+      s.lastFrom = main.length;
       s.swap = {};
-      cover.forEach(function (n) { s.swap[n] = swapShifts(s.who, n); });
+      s.cover.forEach(function (n) { s.swap[n] = swaps[n]; });
     });
     out.shifts.forEach(function (s) { delete s.r; });
     return out;
@@ -736,11 +795,45 @@ p{margin:0}
     }).join("");
     sel.innerHTML = opts;
     sel.disabled = !data || !data.names.length;
+    drawWho();
+  }
+  /* the name as a pill once it's chosen */
+  function drawWho() {
+    $("who").className = "who" + (me && data ? " set" : "");
+    $("me-pill").innerHTML = "<span>" + esc(me) + "</span>";
+  }
+
+  /* dates: the next date (today included) a shift on weekday d falls on */
+  function nextDate(d, now) {
+    var t = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    t.setDate(t.getDate() + (d - (now.getDay() + 6) % 7 + 7) % 7);
+    return t;
+  }
+  /* "Sunday, October 4" and "Oct 4" */
+  function longDate(t) { return DAYS[(t.getDay() + 6) % 7] + ", " + MONTHS[t.getMonth()] + " " + t.getDate(); }
+  function shortDate(t) { return MONTHS[t.getMonth()].slice(0, 3) + " " + t.getDate(); }
+  function whenPill(d, today) {
+    return d === today ? '<span class="when">Today</span>' : d === (today + 1) % 7 ? '<span class="when tmrw">Tomorrow</span>' : "";
+  }
+
+  /* the week at a glance, in the head: today's date, then each of your
+     shifts by the next date it falls on, as the job it is (a Shift Leader
+     shift shows as Pots & Pans) */
+  function glance(mine, now) {
+    var today = (now.getDay() + 6) % 7;
+    var next = mine.map(function (s) { return { s: s, t: nextDate(s.day, now) }; }).sort(function (a, b) { return a.t - b.t; });
+    return '<p class="today">Today is ' + longDate(now) + "</p>" +
+      '<ul class="gl" aria-label="Your shifts this week">' + next.map(function (x) {
+        return '<li class="k' + x.s.day + '"><span class="gd">' + DAYS[x.s.day].slice(0, 3) + '</span><span class="gt">' + shortDate(x.t) +
+          '</span><span class="gr">' + esc(x.s.as) + "</span>" + (whenPill(x.s.day, today) || "<span></span>") + "</li>";
+      }).join("") + "</ul>";
   }
 
   function renderShifts() {
     var body = $("shifts-body");
     $("avail").hidden = true;
+    $("glance").hidden = true;
+    shownDay = dateKey(new Date());
     if (loadError) {
       body.innerHTML = '<div class="panel msg"><b>The shift list didn\'t load.</b><p class="note">' + esc(loadError) +
         "</p><p class=\"note\">" + (location.protocol === "file:" ? "Open the app from its web address. A page opened straight off the disk can't read the list." :
@@ -750,27 +843,26 @@ p{margin:0}
     if (!data) { body.innerHTML = '<p class="note">Loading the shift list…</p>'; return; }
     if (!me) { body.innerHTML = '<p class="note">Choose your name above to see your shifts and who can cover them.</p>'; return; }
 
-    var today = (new Date().getDay() + 6) % 7, tomorrow = (today + 1) % 7;
+    var now = new Date(), today = (now.getDay() + 6) % 7;
     var mine = data.shifts.filter(function (s) { return s.who === me; }).sort(function (a, b) { return a.day - b.day; });
-    body.innerHTML = '<p class="lead">' + mine.length + " shift" + (mine.length === 1 ? "" : "s") + " a week.</p>" +
-      mine.map(function (s) {
+    $("glance").innerHTML = glance(mine, now);
+    $("glance").hidden = false;
+    body.innerHTML = mine.map(function (s) {
         /* only your own work group; left out when no one else in it is on */
         var crew = data.shifts.filter(function (x) { return x.day === s.day && x.group === s.group && x.who !== me; })
           .sort(function (a, b) { return roleRank(a.role) - roleRank(b.role) || a.who.localeCompare(b.who); });
         return '<section class="panel shift k' + s.day + '">' +
-          '<div class="shift-h"><h2>' + DAYS[s.day] +
-          (s.day === today ? '<span class="when">Today</span>' : s.day === tomorrow ? '<span class="when tmrw">Tomorrow</span>' : "") + "</h2>" +
-          (s.role ? '<span class="role">' + esc(s.role) + "</span>" : "") + "</div>" +
+          '<div class="shift-h"><h2>' + DAYS[s.day] + whenPill(s.day, today) + "</h2>" +
+          '<span class="role">' + esc(s.as) + "</span></div>" +
           (crew.length ? '<div class="part"><h4>On with you</h4><ul class="crew">' + crew.map(function (x) {
             return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(x.role) + "</span></li>";
           }).join("") + "</ul></div>" : "") +
           '<details class="backups"><summary><span>Shift Backups · ' + s.cover.length + "</span></summary>" +
-          (s.cover.length ? '<p class="cover-lead">Can cover for you' +
-            (s.as !== s.role ? ", as " + esc(s.as) + ". The shift goes without a " + esc(s.role) + "." : "") + "</p>" +
-            backupList(s.cover.slice(0, s.lastFrom), 1, s.swap) +
+          (s.cover.length ? '<p class="cover-lead">Can cover for you</p>' +
+            backupList(s.cover.slice(0, s.lastFrom), 1, s.swap, s.as) +
             (s.lastFrom < s.cover.length ? '<div class="last"><p class="last-h">Last resort</p>' +
               "<p class=\"last-n\">They can cover for you, but you can't cover their shifts in return, or they're already working that day.</p>" +
-              backupList(s.cover.slice(s.lastFrom), s.lastFrom + 1, s.swap) + "</div>" : "") :
+              backupList(s.cover.slice(s.lastFrom), s.lastFrom + 1, s.swap, s.as) + "</div>" : "") :
             '<p class="cover-lead">No one is listed to cover this shift yet.</p>') + "</details>" +
           "</section>";
       }).join("");
@@ -779,13 +871,13 @@ p{margin:0}
   }
 
   /* a numbered list of backups, starting at a given number. Each shows
-     their shifts you could take in return, or, if there are none, all they
-     work. */
-  function backupList(names, start, swap) {
+     their shifts you could take in return (your own job first), or, if
+     there are none, all they work. */
+  function backupList(names, start, swap, job) {
     if (!names.length) return "";
     return '<ol class="cover"' + (start > 1 ? ' start="' + start + '"' : "") + ">" + names.map(function (c) {
       var shifts = swap[c] && swap[c].length ? swap[c] : shiftsOf(c);
-      return '<li><span class="cn">' + esc(c) + '</span><span class="cw">' + shiftsHTML(shifts) + "</span></li>";
+      return '<li><span class="cn">' + esc(c) + '</span><span class="cw">' + shiftsHTML(shifts, job) + "</span></li>";
     }).join("") + "</ol>";
   }
   function shiftsOf(name) {
@@ -793,54 +885,58 @@ p{margin:0}
   }
 
   /* shifts as each role (as it's covered: a Shift Leader shift shows as
-     Pots & Pans) followed by its days as tags in each day's colour */
-  function shiftsHTML(shifts) {
+     Pots & Pans) followed by its days as tags in each day's colour. The
+     given role first, then roles.csv order. */
+  function dayTag(d) { return '<span class="dp k' + d + '">' + DAYS[d].slice(0, 3) + "</span>"; }
+  function shiftsHTML(shifts, first) {
     var by = {}, order = [];
     shifts.forEach(function (x) {
       if (!by[x.as]) { by[x.as] = []; order.push(x.as); }
       if (by[x.as].indexOf(x.day) < 0) by[x.as].push(x.day);
     });
-    order.sort(function (a, b) { return roleRank(a) - roleRank(b); });
+    order.sort(function (a, b) { return (b === first) - (a === first) || roleRank(a) - roleRank(b); });
     return order.map(function (r) {
-      return '<span class="wk"><span class="wr">' + esc(r) + "</span>" + by[r].sort().map(function (d) {
-        return '<span class="dp k' + d + '">' + DAYS[d].slice(0, 3) + "</span>";
-      }).join("") + "</span>";
+      return '<span class="wk"><span class="wr">' + esc(r) + "</span>" + by[r].sort().map(dayTag).join("") + "</span>";
     }).join("");
   }
 
-  /* The days this student appears in someone's backup list: as which role
-     they'd be covering (a Shift Leader's shift counts as Pots & Pans), for
-     whom, and which of your shifts each could take in return. Where you're
-     only their last resort, they're named on one quiet line. */
+  /* The days this student appears in someone's backup list, grouped as
+     far as they go: the day you'd cover, then each shift of yours they
+     could take in exchange, then the role you'd cover as (a Shift Leader's
+     shift counts as Pots & Pans), then who. Someone who could take more
+     than one of your shifts is under each. Where you're only their last
+     resort, that's its own quiet group at the end of the day. */
   function availability() {
     var days = [];
     data.shifts.forEach(function (s) {
-      if (s.cover.indexOf(me) < 0) return;
-      var day = days[s.day] = days[s.day] || {};
-      (day[s.as] = day[s.as] || []).push(s);
+      var i = s.cover.indexOf(me);
+      if (i < 0) return;
+      var day = days[s.day] = days[s.day] || [];
+      (i < s.lastFrom ? s.swap[me].map(function (x) { return x.day; }) : [7]).forEach(function (back) {
+        var roles = day[back] = day[back] || {};
+        (roles[s.as] = roles[s.as] || []).push(s.who);
+      });
     });
     var rows = [];
-    days.forEach(function (byRole, d) {
-      if (!byRole) return;
-      var lines = Object.keys(byRole).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
-        var list = byRole[as].sort(function (a, b) { return a.who.localeCompare(b.who); });
-        var main = list.filter(function (s) { return s.cover.indexOf(me) < s.lastFrom; });
-        var last = list.filter(function (s) { return s.cover.indexOf(me) >= s.lastFrom; });
-        return '<div class="ag"><span class="ar">As ' + esc(as) + "</span>" + main.map(function (s) {
-          return '<div class="ap"><span class="an">' + esc(s.who) + '</span><span class="sw"><span class="aw">swap for your</span>' + shiftsHTML(s.swap[me]) + "</span></div>";
-        }).join("") +
-          (last.length ? '<p class="alr">Last resort for ' + last.map(function (s) { return esc(s.who); }).join(", ") + "</p>" : "") + "</div>";
-      });
-      rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + "</span>" + lines.join("") + "</li>");
+    days.forEach(function (day, d) {
+      if (!day) return;
+      /* by your day in exchange, Monday first; 7 is the last resort */
+      rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + "</span>" + day.map(function (roles, back) {
+        return '<div class="ax' + (back < 7 ? "" : " lr") + '"><p class="xh">' +
+          (back < 7 ? "In exchange for your " + dayTag(back) : "Last resort") + "</p>" +
+          Object.keys(roles).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
+            return '<p class="ag"><span class="ar">As ' + esc(as) + '</span><span class="an">' +
+              roles[as].sort(function (a, b) { return a.localeCompare(b); }).map(esc).join(", ") + "</span></p>";
+          }).join("") + "</div>";
+      }).filter(Boolean).join("") + "</li>");
     });
     var km = CONFIG.contacts.filter(function (c) { return /kitchen manager/i.test(c.role); })[0];
     return '<span class="eyebrow">My availability</span><h2>Days you may be <em>asked to cover</em></h2>' +
-      (rows.length ? '<p class="note">You\'re a backup on these days, so someone on that shift may ask you to cover.</p>' +
+      (rows.length ? '<p class="note">You\'re a backup on these days, so someone on that shift may ask you to cover, in exchange for a shift of yours.</p>' +
         '<ul class="avail-list">' + rows.join("") + "</ul>" :
         '<p class="note">You\'re not listed as a backup on any day.</p>') +
       (km ? '<p class="note">Something here wrong or out of date? Send an email to the ' + esc(km.role) + " (" + esc(km.name) + ").</p>" : "");
   }
-
 
   /* settings.csv: two columns, Setting and Value. Rows are matched by the
      Setting text, so their order doesn't matter. */
@@ -890,6 +986,7 @@ p{margin:0}
   $("me").addEventListener("change", function () {
     me = this.value;
     if (me) store.set(ME_KEY, me); else store.del(ME_KEY);
+    drawWho();
     renderShifts();
   });
 
@@ -929,8 +1026,13 @@ p{margin:0}
   document.querySelector(".portal").addEventListener("click", function () {
     store.set(TS_KEY, dateKey(new Date())); drawNavs();
   });
-  /* an app left open overnight picks up Sunday, and the hour, when it comes back on screen */
-  document.addEventListener("visibilitychange", function () { if (!document.hidden) { drawNavs(); drawTheme(); } });
+  /* an app left open overnight picks up the new day (dates, Today and
+     Tomorrow, Sunday's timesheet) and the hour, when it comes back on
+     screen or at the next minute's check */
+  function newDay() {
+    if (shownDay && shownDay !== dateKey(new Date())) { renderShifts(); drawNavs(); }
+  }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) { newDay(); drawNavs(); drawTheme(); } });
 
   /* ------------------------------------------------------ appearance */
   var MODES = { auto: "Auto (dark 7 pm to 7 am)", light: "Light", dark: "Dark" }, NEXT = { auto: "light", light: "dark", dark: "auto" };
@@ -949,7 +1051,7 @@ p{margin:0}
     if (m === "auto") store.del("kitchen.theme"); else store.set("kitchen.theme", m);
     drawTheme();
   });
-  setInterval(drawTheme, 60000);   /* Auto turns over at 7 am and 7 pm */
+  setInterval(function () { drawTheme(); newDay(); }, 60000);   /* Auto turns over at 7 am and 7 pm */
   drawTheme();
 
   /* -------------------------------------------------- install as app */

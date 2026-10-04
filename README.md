@@ -28,7 +28,7 @@ dependencies. Served over the web, it installs as an app on a phone.
 
 | Tab | What it shows |
 | --- | --- |
-| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day (with a **Today** or **Tomorrow** pill beside it when it is) and your role, and who else from your work group is on that day, with their roles, in `roles.csv` order (left out when no one else in your group is on). Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. At the foot, in a full-width sage band above the footer, **My availability** lists the days the student is a backup on, and for whom, with a line to email the Student Kitchen Manager (Art) if anything is wrong. |
+| **My shifts** | Choose your name from the list. The phone remembers it, and shows it as a small pill beside the heading. Under the heading, **the week at a glance**: today's date, then each of your shifts by the next date it falls on, with a **Today** or **Tomorrow** pill. Then, for each of your shifts: the day (with the same pill) and your job, and who else from your work group is on that day, with their roles, in `roles.csv` order (left out when no one else in your group is on). Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. At the foot, in a full-width sage band above the footer, **My availability** lists the days the student is a backup on, grouped by the day, the shift of theirs taken in exchange, the job, then who, with a line to email the Student Kitchen Manager (Art) if anything is wrong. |
 | **Call out** | The substitute-replacement steps from the poster: **Planned Absence**, then **Sick or Unexpected Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
 | **Submit Timesheet** | The deadline, Sunday at 5 pm, and a button to the timesheet portal at drbu.edu/timesheet. On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). |
 
@@ -45,22 +45,24 @@ types the lists.
 | File | One row per | Columns |
 | --- | --- | --- |
 | `shifts.csv` | shift | Student, Shift day, Role |
-| `students.csv` | student | Student, Gender (F/M, never shown), Only does (roles they're limited to, `;`-separated, blank = any), Trained for (`;`-separated) |
+| `students.csv` | student | Student, Gender (F/M, never shown), Trained for (`;`-separated), and for special students: Only does (the roles they can work), Only covers (the roles they can substitute for, or `None`), Covered only by same job (`Yes`). Blank = no limit. The last three columns are optional. |
 | `roles.csv` | role, in card order | Role, Work group, Covered as (optional: Shift Leader → Pots & Pans), Gender (Any / Women only / Men only), Trained students only (Yes/No), Same-day backups (asked last, `;`-separated, in order) |
 
 **A cover list** follows the numbered rules in HANDOFF.md, "How the cover
-lists are worked out". That section is the specification: the code and
-the tests follow it. In short:
-- **main list:** people not working that day who can do the role, and
-  have at least one shift you could take back on a day you're free. They
-  come in tiers: same job, same work group, other group; each fewest
-  shifts first, then A–Z;
-- **boxed last resort:** those you can't swap with, then same-day backups
-  from `roles.csv` (Lunch Monitor last).
+lists are worked out": the groups (A Lunch Monitors, B Dishwashing, C
+Recycling) and Rules 1 to 6. That section is the specification: the code
+and the tests follow it. In short:
+- **main list:** people not working that day who can cover the job, and
+  have at least one shift you could take back on another day. They come
+  in tiers: same job, same work group, other group; each fewest shifts
+  first, then A–Z;
+- **boxed last resort:** those you can't swap with, then those working
+  that day in one of the job's same-day backups from `roles.csv`, where
+  the hours allow both (Lunch Monitor last).
 
-Backup lines show the swap options. **My availability** shows, per
-person, which of your shifts they could take. **On with you** shows only
-the shift's own work group.
+A Shift Leader shift counts as Pots & Pans everywhere except **On with
+you**, which shows only the shift's own work group. Backup lines show the
+swap options. **My availability** groups by your day in exchange.
 
 The footer checks all three files and names anything that looks wrong:
 - a missing column, or a role or student that isn't defined;
@@ -119,15 +121,16 @@ NODE_PATH=$(npm root -g) node tests/app.e2e.js   # every screen in Chromium (nee
 ```
 
 `data.test.js` lifts each data function out of `index.html` by name, so
-it always tests the code that ships. It checks every cover list against
-`tests/expected-cover-lists.csv`, which `tests/expected_cover_lists.py`
-writes from the same three files with a separate Python copy of the rules
-(`python3 tests/expected_cover_lists.py` after changing a shift file or a
-rule). then flips each setting in `roles.csv`
-and `students.csv` to see that the lists change as they should. `app.e2e.js` serves the repo and
-drives the whole app:
-- picking a name, the shift cards, work groups, backups and My
-  availability;
+it always tests the code that ships. It checks every cover list and swap
+option against `tests/expected-cover-lists.csv`, which
+`tests/expected_cover_lists.py` writes from the same three files with a
+separate Python copy of the rules (run `python3
+tests/expected_cover_lists.py` after changing a shift file or a rule). It
+then flips each setting in `roles.csv` and `students.csv` to see that the
+lists change as they should. `app.e2e.js` serves the repo and drives the
+whole app:
+- picking a name, the week at a glance, the shift cards, work groups,
+  backups and My availability;
 - the tabs, the Sunday badge, settings and load errors;
 - the theme button and Install as app;
 - the layout at 320, 375 and 1280px in both modes;
@@ -169,8 +172,8 @@ page's first line on a phone, and in the menu bar on a wide screen. The
 icon shows the current mode: a half-filled circle for Auto, a sun for
 Light, a moon for Dark. **Auto** is the default and goes by the
 phone's clock: dark from 7 pm to 7 am, checked every minute and whenever
-the app comes back on screen. Dark mode uses the same layout on a
+the app comes back on screen. The dates, Today and Tomorrow move on at
+midnight the same way. Dark mode uses the same layout on a
 blue-black ground. Text colours are lighter, and anything with white text
 on it (the path headers, the portal button, the badge) keeps its
 light-mode depth. Every text colour meets WCAG AA in both modes.
-Every text colour meets WCAG AA.
