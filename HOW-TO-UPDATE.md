@@ -174,10 +174,11 @@ their name in **both** `shifts.csv` and `students.csv`.
 | Column | What it means | Choices |
 | --- | --- | --- |
 | **Role** | The role's name, as used in the other files | |
-| **Work group** | Roles in the same group work side by side. "On with you" shows only your own group. | for example `Kitchen`, `Recycling`, `Lunch Monitor` |
+| **Work group** | Roles in the same group work side by side. "On with you" shows only your own group, and backups from the same group are asked before other groups. | for example `Kitchen`, `Recycling`, `Lunch Monitor` |
+| **Covered as** | Leave blank, unless backups cover this role as a different one. Shift Leader is covered as Pots & Pans: the backup does Pots & Pans, and the shift goes without a leader. | for example `Pots & Pans` |
 | **Gender** | Who can do it, and so who can cover it | `Any`, `Women only` or `Men only` |
 | **Trained students only** | `Yes` means only students with this role under **Trained for** can do or cover it | `Yes` or `No` |
-| **Same-day backups (asked last)** | Roles whose students, even when already working that day, can cover this role, but only after everyone else. Listed in order, separated by `;` | for example `Recycling; Lunch Monitor` |
+| **Same-day backups (asked last)** | Roles from other groups whose students, even when already working that day, can cover this role, but only after everyone else. Listed in order, separated by `;`. A role that's **Covered as** another uses that role's list instead. | for example `Recycling; Lunch Monitor` |
 
 For example:
 - To let anyone do Recycling, change its **Gender** to `Any`.

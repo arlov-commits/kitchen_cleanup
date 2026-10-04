@@ -3,9 +3,9 @@
    these tests always exercise the code the app actually ships.
 
    tests/expected-cover-lists.csv is the reference: every shift's cover
-   list as the Student Kitchen Manager worked it out by hand (with Ben Kong
-   corrected to Recycling only). The app must produce exactly those lists
-   from shifts.csv, students.csv and roles.csv. */
+   list, written by tests/expected_cover_lists.py, a second implementation
+   of the rules in Python. The app's JavaScript must give exactly the same
+   lists from shifts.csv, students.csv and roles.csv. */
 "use strict";
 var fs = require("fs"), path = require("path"), vm = require("vm");
 var root = path.join(__dirname, "..");
@@ -95,11 +95,17 @@ check("work groups", ["Ivwananji|Monday", "Adam|Monday", "Aryashree|Monday", "Ad
 }), ["kitchen", "kitchen", "kitchen", "recycling", "lunch monitor"]);
 
 /* the rules, one by one, on the shipped files */
-check("not working that day: fewest shifts, then A-Z; same-day Recycling, then Lunch Monitor last",
-  coverOf(real, "Adam", "Monday"), ["Beth", "Irina", "Lavanya", "Priya", "Roxanne", "Thanh", "Tsering", "Adrian", "Vayu", "Shuxing"]);
+check("order: same job, then other groups, then same-day Recycling, then same-day Lunch Monitor",
+  coverOf(real, "Adam", "Monday"), ["Beth", "Irina", "Lavanya", "Priya", "Roxanne", "Tsering", "Thanh", "Adrian", "Vayu", "Shuxing"]);
+check("order: same job (Buckets) before same group (Kitchen) before another group (Lunch Monitor)",
+  coverOf(real, "Aryashree", "Monday"), ["Irina", "Roxanne", "Beth", "Lavanya", "Priya", "Tsering", "Thanh", "Shuxing"]);
+check("order: within a tier, fewest shifts first", coverOf(real, "Adam", "Tuesday").slice(5, 8), ["Roxanne", "Adrian", "Amelia"]);
+check("Shift Leader is covered as Pots & Pans", [shiftOf(real, "Adrian", "Wednesday").as, shiftOf(real, "Adrian", "Wednesday").role], ["Pots & Pans", "Shift Leader"]);
+check("Shift Leader's backups are Pots & Pans backups", coverOf(real, "Adrian", "Wednesday"), coverOf(real, "Beth", "Wednesday"));
+check("a Shift Leader counts as doing the Pots & Pans job", coverOf(real, "Adam", "Tuesday").indexOf("Adrian") < coverOf(real, "Adam", "Tuesday").indexOf("Shuxing"), true);
 check("Recycling: men only, no same-day backups", coverOf(real, "Adam", "Thursday"), ["Adrian", "Ben Kong"]);
 check("Buckets: women only; same-day Lunch Monitor last; no same-day Pots & Pans",
-  coverOf(real, "Amelia", "Thursday"), ["Irina", "Ivwananji", "Nita", "Priya", "Roxanne", "Thanh", "Tsering", "Shuxing"]);
+  coverOf(real, "Amelia", "Thursday"), ["Irina", "Nita", "Roxanne", "Ivwananji", "Priya", "Tsering", "Thanh", "Shuxing"]);
 check("Lunch Monitor: only trained lunch monitors, fewest shifts first", coverOf(real, "Thanh", "Tuesday"), ["Shuxing", "Amelia"]);
 check("Ben Kong only ever covers Recycling", real.shifts.filter(function (s) { return s.role !== "Recycling" && s.cover.indexOf("Ben Kong") >= 0; }).length, 0);
 check("Ben Kong covers Recycling", coverOf(real, "Vayu", "Monday"), ["Ben Kong"]);
@@ -112,33 +118,39 @@ check("women never cover Recycling", real.shifts.filter(function (s) {
 }).length, 0);
 
 /* the switches in roles.csv and students.csv */
-var anyRec = build(null, null, edit(ROLES, "Recycling,Recycling,Men only,No,", "Recycling,Recycling,Any,No,"));
-check("switch: Recycling to Any lets women cover it", coverOf(anyRec, "Adam", "Thursday").slice(0, 3), ["Irina", "Ivwananji", "Nita"]);
+var anyRec = build(null, null, edit(ROLES, "Recycling,Recycling,,Men only,No,", "Recycling,Recycling,,Any,No,"));
+check("switch: Recycling to Any lets women cover it, after those who do Recycling", coverOf(anyRec, "Adam", "Thursday").slice(0, 3), ["Adrian", "Ben Kong", "Irina"]);
 check("switch: Recycling to Any adds no problems", anyRec.problems, []);
-var womenRec = build(null, null, edit(ROLES, "Recycling,Recycling,Men only,No,", "Recycling,Recycling,Women only,No,"));
+var womenRec = build(null, null, edit(ROLES, "Recycling,Recycling,,Men only,No,", "Recycling,Recycling,,Women only,No,"));
 has("switch: Recycling to Women only flags the men on it", womenRec.problems, "Adam can't do Recycling");
-var anyBuckets = build(null, null, edit(ROLES, "Buckets & Composting,Kitchen,Women only,No,Lunch Monitor", "Buckets & Composting,Kitchen,Any,No,Lunch Monitor"));
+var anyBuckets = build(null, null, edit(ROLES, "Buckets & Composting,Kitchen,,Women only,No,Lunch Monitor", "Buckets & Composting,Kitchen,,Any,No,Lunch Monitor"));
 check("switch: Buckets to Any lets men cover it (Ben Kong still can't)", coverOf(anyBuckets, "Amelia", "Thursday").filter(function (c) { return MEN.test(c); }), ["Adrian"]);
 var freeBen = build(null, edit(STUDENTS, "Ben Kong,M,Recycling,", "Ben Kong,M,,"));
 check("switch: Ben Kong unlimited covers Pots & Pans again", coverOf(freeBen, "Adam", "Monday").indexOf("Ben Kong") >= 0, true);
 var twoRoles = build(null, edit(STUDENTS, "Beth,F,,", "Beth,F,Pots & Pans; Shift Leader,"));
 check("switch: limited to two roles covers those", coverOf(twoRoles, "Adam", "Monday").indexOf("Beth") >= 0, true);
 check("switch: but not a third", coverOf(twoRoles, "Aryashree", "Monday").indexOf("Beth"), -1);
-var untrained = build(null, null, edit(ROLES, "Lunch Monitor,Lunch Monitor,Women only,Yes,", "Lunch Monitor,Lunch Monitor,Women only,No,"));
+var untrained = build(null, null, edit(ROLES, "Lunch Monitor,Lunch Monitor,,Women only,Yes,", "Lunch Monitor,Lunch Monitor,,Women only,No,"));
 check("switch: Lunch Monitor untrained opens it to all women", coverOf(untrained, "Thanh", "Tuesday").length > 2, true);
 var bethTrained = build(null, edit(STUDENTS, "Beth,F,,", "Beth,F,,Lunch Monitor"));
 check("switch: training a student adds them to Lunch Monitor lists", coverOf(bethTrained, "Thanh", "Tuesday").indexOf("Beth") >= 0, true);
-var noSame = build(null, null, edit(ROLES, "Pots & Pans,Kitchen,Any,No,Recycling; Lunch Monitor", "Pots & Pans,Kitchen,Any,No,"));
-check("switch: no same-day backups for Pots & Pans", coverOf(noSame, "Adam", "Monday"), ["Beth", "Irina", "Lavanya", "Priya", "Roxanne", "Thanh", "Tsering"]);
-var lmFirst = build(null, null, edit(ROLES, "Pots & Pans,Kitchen,Any,No,Recycling; Lunch Monitor", "Pots & Pans,Kitchen,Any,No,Lunch Monitor; Recycling"));
+var noSame = build(null, null, edit(ROLES, "Pots & Pans,Kitchen,,Any,No,Recycling; Lunch Monitor", "Pots & Pans,Kitchen,,Any,No,"));
+check("switch: no same-day backups for Pots & Pans", coverOf(noSame, "Adam", "Monday"), ["Beth", "Irina", "Lavanya", "Priya", "Roxanne", "Tsering", "Thanh"]);
+var lmFirst = build(null, null, edit(ROLES, "Pots & Pans,Kitchen,,Any,No,Recycling; Lunch Monitor", "Pots & Pans,Kitchen,,Any,No,Lunch Monitor; Recycling"));
 check("switch: same-day order follows the list", coverOf(lmFirst, "Adam", "Monday").slice(-3), ["Shuxing", "Adrian", "Vayu"]);
 var ownGroup = build(null, null, edit(ROLES, "Buckets & Composting,Kitchen,", "Buckets & Composting,,"));
+check("switch: Buckets in its own group puts Kitchen and Lunch Monitor people in one tier, A-Z", coverOf(ownGroup, "Aryashree", "Monday"), ["Irina", "Roxanne", "Beth", "Lavanya", "Priya", "Thanh", "Tsering", "Shuxing"]);
+var leaderOwn = build(null, null, edit(ROLES, "Shift Leader,Kitchen,Pots & Pans,Any,No,", "Shift Leader,Kitchen,,Any,No,"));
+check("switch: Shift Leader not covered as Pots & Pans: Shift Leaders first", coverOf(leaderOwn, "Adrian", "Wednesday").slice(0, 3), ["Ivwananji", "Lavanya", "Tsering"]);
+check("switch: and it has no same-day backups of its own", coverOf(leaderOwn, "Adrian", "Wednesday").indexOf("Amelia"), -1);
 check("switch: a blank work group makes a role its own group", shiftOf(ownGroup, "Aryashree", "Monday").group, "buckets & composting");
 
 /* ----------------------------------------------- the files' checks */
 function probs(shifts, students, roles) { return build(shifts, students, roles).problems; }
 has("roles: missing column", probs(null, null, "Role,Gender\nPots & Pans,Any\n"), "roles.csv is missing a column: group, trained, same");
-has("roles: bad gender", probs(null, null, edit(ROLES, "Recycling,Men only", "Recycling,Nobody")), "Recycling's gender should be Any, Women only or Men only");
+has("roles: bad gender", probs(null, null, edit(ROLES, "Recycling,,Men only", "Recycling,,Nobody")), "Recycling's gender should be Any, Women only or Men only");
+has("roles: covered as an unknown role", probs(null, null, edit(ROLES, "Shift Leader,Kitchen,Pots & Pans", "Shift Leader,Kitchen,Pots")), "Shift Leader is covered as \"pots\", which isn't a role");
+check("roles: Covered as is optional", build(null, null, ROLES.replace(/,Covered as/, "").replace(/(\r?\n[^,\r\n]*,[^,\r\n]*),[^,\r\n]*/g, "$1")).problems, []);
 has("roles: duplicate", probs(null, null, ROLES + "Recycling,Recycling,Any,No,\r\n"), "Recycling is listed twice");
 has("roles: same-day names an unknown role", probs(null, null, edit(ROLES, "Recycling; Lunch Monitor", "Recycling; Lunch")), "\"lunch\", which isn't a role");
 has("students: bad gender", probs(null, edit(STUDENTS, "Beth,F,", "Beth,X,")), "Beth's gender should be F or M");

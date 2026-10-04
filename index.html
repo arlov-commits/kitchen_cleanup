@@ -276,7 +276,9 @@ p{margin:0}
 .avail-list .d{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:18px;font-weight:600;color:var(--ink)}
 .avail-list .d::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
 .avail-list .f{font-size:14.5px;color:var(--ink-2);padding-left:17px}
-.cover{margin:0;padding:0 0 0 1.6em;columns:2;column-gap:20px;font-size:15px}
+.cover{margin:0;padding:0 0 0 1.6em;font-size:15px}
+/* beside each backup, the shifts they work, so you know what a swap means */
+.cover .cm{font-size:13.5px;color:var(--ink-3)}
 .cover li{padding:2px 0;break-inside:avoid}
 .cover li::marker{color:var(--ci);font-weight:600;font-size:13px}
 
@@ -558,11 +560,14 @@ p{margin:0}
   /* roles.csv: one row per role. Its row order is the order of roles on the
      shift cards. Roles in the same work group work side by side, so "On
      with you" shows only your own group (blank = the role is its own
-     group). */
+     group). "Covered as" (optional) makes a role's backups cover it as
+     another role, as a Shift Leader's backups cover as Pots & Pans. */
   function readRoles(text, problems) {
     var rows = parseCSV(text), F = FILES.roles, roles = { order: [], by: Object.create(null) };
     var col = header(rows, F, { role: /^role/, group: /group/, gender: /^gender/, trained: /^trained/, same: /^same/ }, problems);
     if (!col) return roles;
+    var asCol = -1;
+    rows[0].forEach(function (h, i) { if (/^covered/.test(lower(h))) asCol = i; });
     rows.slice(1).forEach(function (r, n) {
       var name = cell(r, col.role), key = lower(name), line = F + " line " + (n + 2) + ": ";
       if (!name) return;
@@ -570,12 +575,17 @@ p{margin:0}
       var g = roleGender(cell(r, col.gender));
       if (g === null) { problems.push(line + name + "'s gender should be Any, Women only or Men only."); g = "any"; }
       roles.by[key] = { name: name, group: lower(cell(r, col.group)) || key, gender: g, trained: yes(cell(r, col.trained)),
-                        same: list(cell(r, col.same)), rank: roles.order.length };
+                        same: list(cell(r, col.same)), as: asCol < 0 ? "" : lower(cell(r, asCol)), rank: roles.order.length };
       roles.order.push(key);
     });
     roles.order.forEach(function (k) {
-      roles.by[k].same.forEach(function (x) { if (!roles.by[x]) problems.push(F + ": " + roles.by[k].name + "'s same-day backups name \"" + x + "\", which isn't a role."); });
+      var role = roles.by[k];
+      role.same.forEach(function (x) { if (!roles.by[x]) problems.push(F + ": " + role.name + "'s same-day backups name \"" + x + "\", which isn't a role."); });
+      if (role.as === k) role.as = "";
+      if (role.as && !roles.by[role.as]) { problems.push(F + ": " + role.name + " is covered as \"" + role.as + "\", which isn't a role."); role.as = ""; }
     });
+    /* the role a backup actually does: itself, or what it's covered as */
+    roles.order.forEach(function (k) { roles.by[k].cover = roles.by[k].as ? roles.by[roles.by[k].as] : roles.by[k]; });
     return roles;
   }
 
@@ -608,10 +618,16 @@ p{margin:0}
     return true;
   }
 
-  /* The whole shift list, with every cover list worked out by the rules:
-     first everyone not working that day who can do the role, fewest shifts
-     first and then alphabetical; then, last of all, anyone working that day
-     in one of the role's same-day backup roles, in the order listed. */
+  /* The whole shift list, with every cover list worked out by the rules.
+     A backup covers the shift as its role, or as what the role is covered
+     as (a Shift Leader's backups cover as Pots & Pans). Of everyone who can
+     do that, and who isn't working that day:
+       1. those who already do that job,
+       2. then those with another job in the same work group,
+       3. then everyone else;
+     each fewest shifts first, then alphabetical. Last of all come those
+     already working that day in one of the role's same-day backup roles,
+     in the order listed (so Lunch Monitor, listed last, is the very last). */
   function buildData(shiftsText, studentsText, rolesText) {
     var out = { shifts: [], names: [], problems: [], roleRank: Object.create(null) };
     var P = out.problems, F = FILES.shifts;
@@ -630,7 +646,7 @@ p{margin:0}
       if (!people[who]) { if (!noRow[who]) P.push(who + " isn't in " + FILES.students + "."); noRow[who] = true; }
       else if (!canDo(people[who], role)) P.push(line + who + " can't do " + role.name + " (check gender, Only does and Trained for).");
       count[who] = (count[who] || 0) + 1;
-      out.shifts.push({ who: who, day: d, role: role.name, group: role.group, r: role });
+      out.shifts.push({ who: who, day: d, role: role.name, as: role.cover.name, group: role.group, r: role });
     });
     out.names = Object.keys(count).sort(function (a, b) { return a.localeCompare(b); });
     out.names.forEach(function (n) {
@@ -638,19 +654,27 @@ p{margin:0}
     });
     Object.keys(people).forEach(function (n) { if (!count[n]) P.push(n + " is in " + FILES.students + " but has no shifts."); });
 
+    /* each student's jobs (what their shifts are covered as) and groups */
+    var jobs = Object.create(null), groups = Object.create(null);
+    out.shifts.forEach(function (x) {
+      (jobs[x.who] = jobs[x.who] || Object.create(null))[lower(x.r.cover.name)] = true;
+      (groups[x.who] = groups[x.who] || Object.create(null))[x.r.cover.group] = true;
+    });
     var byFew = function (a, b) { return count[a] - count[b] || a.localeCompare(b); };
     out.shifts.forEach(function (s) {
-      var working = Object.create(null);
+      var as = s.r.cover, job = lower(as.name), working = Object.create(null);
       out.shifts.forEach(function (x) { if (x.day === s.day) working[x.who] = lower(x.role); });
-      var cover = out.names.filter(function (n) { return !(n in working) && canDo(people[n], s.r); }).sort(byFew);
-      s.r.same.forEach(function (sameRole) {
+      var free = out.names.filter(function (n) { return !(n in working) && canDo(people[n], as); });
+      var tier = function (n) { return jobs[n][job] ? 0 : groups[n][as.group] ? 1 : 2; };
+      var cover = free.sort(function (a, b) { return tier(a) - tier(b) || byFew(a, b); });
+      as.same.forEach(function (sameRole) {
         cover = cover.concat(out.names.filter(function (n) {
-          return n !== s.who && working[n] === sameRole && canDo(people[n], s.r);
+          return n !== s.who && working[n] === sameRole && canDo(people[n], as);
         }).sort(byFew));
       });
       s.cover = cover;
-      delete s.r;
     });
+    out.shifts.forEach(function (s) { delete s.r; });
     return out;
   }
 
@@ -695,7 +719,9 @@ p{margin:0}
             return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(x.role) + "</span></li>";
           }).join("") + "</ul></div>" : "") +
           '<details class="backups"><summary><span>Shift Backups · ' + s.cover.length + "</span></summary>" +
-          (s.cover.length ? '<p class="cover-lead">Can cover for you</p><ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol>" :
+          (s.cover.length ? '<p class="cover-lead">Can cover for you' +
+            (s.as !== s.role ? ", as " + esc(s.as) + ". The shift goes without a " + esc(s.role) + "." : "") + '</p><ol class="cover">' +
+            s.cover.map(function (c) { return '<li><span class="cn">' + esc(c) + '</span> <span class="cm">(' + esc(worksText(c)) + ")</span></li>"; }).join("") + "</ol>" :
             '<p class="cover-lead">No one is listed to cover this shift yet.</p>') + "</details>" +
           "</section>";
       }).join("");
@@ -703,18 +729,40 @@ p{margin:0}
     $("avail").hidden = false;
   }
 
-  /* The days this student appears in someone's backup list, and for whom. */
+  /* "Pots & Pans Wed, Thu; Buckets & Composting Fri": the shifts a student
+     works, by role in roles.csv order */
+  function worksText(name) {
+    var by = {}, order = [];
+    data.shifts.forEach(function (x) {
+      if (x.who !== name) return;
+      if (!by[x.role]) { by[x.role] = []; order.push(x.role); }
+      by[x.role].push(x.day);
+    });
+    order.sort(function (a, b) { return roleRank(a) - roleRank(b); });
+    return order.map(function (r) {
+      return r + " " + by[r].sort().map(function (d) { return DAYS[d].slice(0, 3); }).join(", ");
+    }).join("; ");
+  }
+
+  /* The days this student appears in someone's backup list: for whom, and
+     as which role they'd be covering. */
   function availability() {
     var days = [];
     data.shifts.forEach(function (s) {
       if (s.cover.indexOf(me) < 0) return;
-      (days[s.day] = days[s.day] || []).push(s.who);
+      var day = days[s.day] = days[s.day] || {};
+      (day[s.as] = day[s.as] || []).push(s);
     });
     var rows = [];
-    days.forEach(function (who, d) {
-      if (!who) return;
-      who.sort(function (a, b) { return a.localeCompare(b); });
-      rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + '</span><span class="f">For ' + who.map(esc).join(", ") + "</span></li>");
+    days.forEach(function (byRole, d) {
+      if (!byRole) return;
+      var lines = Object.keys(byRole).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
+        var who = byRole[as].sort(function (a, b) { return a.who.localeCompare(b.who); }).map(function (s) {
+          return esc(s.who) + (s.role !== as ? " (" + esc(s.role) + ")" : "");
+        });
+        return '<span class="f">As ' + esc(as) + " for " + who.join(", ") + "</span>";
+      });
+      rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + "</span>" + lines.join("") + "</li>");
     });
     var km = CONFIG.contacts.filter(function (c) { return /kitchen manager/i.test(c.role); })[0];
     return '<span class="eyebrow">My availability</span><h2>Days you may be <em>asked to cover</em></h2>' +

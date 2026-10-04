@@ -46,16 +46,22 @@ types the lists.
 | --- | --- | --- |
 | `shifts.csv` | shift | Student, Shift day, Role |
 | `students.csv` | student | Student, Gender (F/M, never shown), Only does (roles they're limited to, `;`-separated, blank = any), Trained for (`;`-separated) |
-| `roles.csv` | role, in card order | Role, Work group, Gender (Any / Women only / Men only), Trained students only (Yes/No), Same-day backups (asked last, `;`-separated, in order) |
+| `roles.csv` | role, in card order | Role, Work group, Covered as (optional: Shift Leader → Pots & Pans), Gender (Any / Women only / Men only), Trained students only (Yes/No), Same-day backups (asked last, `;`-separated, in order) |
 
-**A cover list** is everyone not working that day who can do the role
-(gender, Only does and training all allow it), fewest shifts first, then
-alphabetical. After them come students already working that day in one of
-the role's same-day backup roles, in the listed order. **On with you**
-shows only the shift's own work group. The full rules, in plain words,
-are in HANDOFF.md under "How the cover lists are worked out".
-`tests/expected-cover-lists.csv` holds the Student Kitchen Manager's
-hand-made lists, which the shipped files reproduce exactly.
+**A cover list.** A backup covers the shift as its role, or as what the
+role is **Covered as**. Of everyone not working that day who can do that
+role (gender, Only does and training all allow it), the list goes:
+1. those who already do that job;
+2. then those with another job in the same work group;
+3. then everyone else.
+
+Each tier is fewest shifts first, then alphabetical. After them come
+students already working that day in the role's same-day backup roles, in
+the listed order (Lunch Monitor last). Each backup is shown with the
+shifts they work. **My availability** shows, by day, which role you'd
+cover and for whom. **On with you** shows only the shift's own work group.
+The full rules, in plain words, are in HANDOFF.md under "How the cover
+lists are worked out".
 
 The footer checks all three files and names anything that looks wrong:
 - a missing column, or a role or student that isn't defined;
@@ -115,7 +121,10 @@ NODE_PATH=$(npm root -g) node tests/app.e2e.js   # every screen in Chromium (nee
 
 `data.test.js` lifts each data function out of `index.html` by name, so
 it always tests the code that ships. It checks every cover list against
-`tests/expected-cover-lists.csv`, then flips each setting in `roles.csv`
+`tests/expected-cover-lists.csv`, which `tests/expected_cover_lists.py`
+writes from the same three files with a separate Python copy of the rules
+(`python3 tests/expected_cover_lists.py` after changing a shift file or a
+rule). then flips each setting in `roles.csv`
 and `students.csv` to see that the lists change as they should. `app.e2e.js` serves the repo and
 drives the whole app:
 - picking a name, the shift cards, work groups, backups and My

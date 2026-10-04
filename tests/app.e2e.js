@@ -30,7 +30,15 @@ var ROWS = rowsOf("tests/expected-cover-lists.csv").map(function (r) {
   return { who: r[0], day: r[1], role: r[2], cover: r[3].split(",").map(function (s) { return s.trim(); }).filter(Boolean) };
 });
 var ROLE = {};
-rowsOf("roles.csv").forEach(function (r, i) { ROLE[r[0]] = { group: r[1] || r[0], rank: i }; });
+rowsOf("roles.csv").forEach(function (r, i) { ROLE[r[0]] = { group: r[1] || r[0], as: r[2] || r[0], rank: i }; });
+/* "Pots & Pans Wed, Thu; Recycling Mon": what a student works */
+function worksOf(name) {
+  var by = {};
+  ROWS.forEach(function (r) { if (r.who === name) (by[r.role] = by[r.role] || []).push(DAYS.indexOf(r.day)); });
+  return Object.keys(by).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (role) {
+    return role + " " + by[role].sort().map(function (d) { return DAYS[d].slice(0, 3); }).join(", ");
+  }).join("; ");
+}
 function crewOf(who, day, role) {
   return ROWS.filter(function (r) { return r.day === day && r.who !== who && ROLE[r.role].group === ROLE[role].group; })
     .sort(function (a, b) { return ROLE[a.role].rank - ROLE[b.role].rank || a.who.localeCompare(b.who); })
@@ -92,7 +100,9 @@ function serve(dir, port) {
   check("backups summary", cards.map(function (c) { return c.summary; }), mine.map(function (r) { return "SHIFT BACKUPS · " + r.cover.length; }));
   await p.click(".shift >> nth=0 >> summary");
   check("backups open: lead text", await text(p, ".shift >> nth=0 >> .cover-lead"), "Can cover for you");
-  check("backups open: list in the CSV's order", await p.$$eval(".shift:first-of-type .cover li", function (l) { return l.map(function (x) { return x.textContent; }); }), mine[0].cover);
+  check("backups open: list in the reference order", await p.$$eval(".shift:first-of-type .cover .cn", function (l) { return l.map(function (x) { return x.textContent; }); }), mine[0].cover);
+  check("backups open: each with what they work", await p.$$eval(".shift:first-of-type .cover li", function (l) { return l.map(function (x) { return x.textContent; }); }),
+    mine[0].cover.map(function (c) { return c + " (" + worksOf(c) + ")"; }));
   check("summary unchanged when open", await text(p, ".shift >> nth=0 >> summary"), "SHIFT BACKUPS · " + mine[0].cover.length);
   var page1 = await p.$eval(".pane", function (e) { return e.innerText; });
   check("no Student Leader anywhere", /student leader/i.test(page1), false);
@@ -112,14 +122,24 @@ function serve(dir, port) {
      "Tuesday: " + crewOf("Adam", "Tuesday", "Pots & Pans").map(function (x) { return x.split("|")[0]; }).join(", "),
      "Thursday: (none)"]);
   check("Recycling with two on: shows the other", (await crews("Adrian"))[0], "Monday: Vayu");
+  await p.click(".shift:nth-of-type(2) summary");
+  check("Shift Leader card: covered as Pots & Pans, leaderless", await text(p, ".shift:nth-of-type(2) .cover-lead"), "Can cover for you, as Pots & Pans. The shift goes without a Shift Leader.");
   check("Lunch Monitor: no On with you", await crews("Shuxing"), ["Monday: (none)", "Thursday: (none)"]);
   check("Kitchen never lists Recycling or Lunch Monitor", (await crews("Huiyi"))[0].indexOf("Adrian") < 0 && (await crews("Huiyi"))[0].indexOf("Shuxing") < 0, true);
   await p.selectOption("#me", "Aryashree");
 
   /* My availability */
   var avail = {};
-  ROWS.forEach(function (r) { if (r.cover.indexOf("Aryashree") >= 0) (avail[r.day] = avail[r.day] || []).push(r.who); });
-  var wantAvail = DAYS.filter(function (d) { return avail[d]; }).map(function (d) { return d + " For " + avail[d].sort().join(", "); });
+  ROWS.forEach(function (r) {
+    if (r.cover.indexOf("Aryashree") < 0) return;
+    var as = ROLE[r.role].as, day = avail[r.day] = avail[r.day] || {};
+    (day[as] = day[as] || []).push(r.who + (r.role !== as ? " (" + r.role + ")" : ""));
+  });
+  var wantAvail = DAYS.filter(function (d) { return avail[d]; }).map(function (d) {
+    return d + " " + Object.keys(avail[d]).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (as) {
+      return "As " + as + " for " + avail[d][as].sort().join(", ");
+    }).join(" ");
+  });
   check("availability rows", await p.$$eval(".avail-list li", function (l) { return l.map(function (x) { return x.innerText.replace(/\s+/g, " ").trim(); }); }), wantAvail);
   check("availability: wrong-info line", await text(p, "#avail .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Art).");
   check("band shown", await p.$eval("#avail", function (e) { return e.hidden; }), false);

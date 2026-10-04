@@ -17,14 +17,22 @@ and the tab shell from the second.
   hash: `#shifts`, `#callout` and `#timesheet`.
 - **The shift files** are `shifts.csv` (Student, Shift day, Role),
   `students.csv` (Student, Gender F/M, Only does, Trained for) and
-  `roles.csv` (Role, Work group, Gender Any/Women only/Men only, Trained
-  students only, Same-day backups). They are fetched, so the app must be
-  served. **The app works out every cover list** (`buildData()`): first
-  everyone not working that day who can do the role (`canDo()`: gender,
-  Only does, training), fewest shifts then A–Z; then students working that
-  day in the role's same-day backup roles, in order. The user's own
-  hand-made lists are `tests/expected-cover-lists.csv` and must keep
-  matching exactly. Rules belong in the CSVs, never hard-coded.
+  `roles.csv` (Role, Work group, Covered as, Gender Any/Women only/Men
+  only, Trained students only, Same-day backups). They are fetched, so the
+  app must be served. **The app works out every cover list**
+  (`buildData()`). A backup covers as the role's "Covered as" role
+  (Shift Leader → Pots & Pans, leaderless) or the role itself. Among those
+  not working that day who can do it (`canDo()`: gender, Only does,
+  training), the tiers are: same job, then same work group, then other
+  groups. Each tier is fewest shifts, then A–Z. Then come students working
+  that day in that role's same-day backup roles, in order (Lunch Monitor
+  last). `tests/expected_cover_lists.py` is an independent Python copy of
+  these rules that writes `tests/expected-cover-lists.csv`. Change both
+  together, and regenerate after any data change. Rules belong in the
+  CSVs, never hard-coded.
+- "Can cover for you" shows each backup's own shifts in brackets
+  (`worksText()`). My availability groups each day by the role you'd cover
+  as, naming the shift's role when it differs.
 - "On with you" shows only the shift's own work group, and is left out
   when empty. Roles are shown as written ("Shift Leader"). Never
   highlight one. Role order on cards is `roles.csv` row order.
