@@ -125,6 +125,11 @@ function serve(dir, port) {
       [].map.call(box.querySelectorAll(".cn"), function (x) { return x.textContent; }),
       [].map.call(d.querySelectorAll(":scope > ol .cn"), function (x) { return x.textContent; })] : null;
   }), ["Last resort", String(tue.before + 1), tue.cover.slice(tue.before), tue.cover.slice(0, tue.before)]);
+  check("each backup shows only the shifts you could swap them for", await p.$eval(".shift:nth-of-type(2) .backups", function (d, fn) {
+    var works = new Function("return " + fn)(), out = {};
+    [].forEach.call(d.querySelectorAll(".cover li"), function (li) { out[li.querySelector(".cn").textContent] = works(li); });
+    return [out.Adrian, out.Amelia, out.Shuxing];
+  }, worksOnPage.toString()), ["Pots & Pans: Wed Fri", "Pots & Pans: Mon | Buckets & Composting: Thu", "Lunch Monitor: Mon Thu"]);
   check("day tags carry their day's colour", await p.$$eval(".shift:first-of-type .cover .dp", function (t) {
     var k = { Mon: "k0", Tue: "k1", Wed: "k2", Thu: "k3", Fri: "k4", Sat: "k5", Sun: "k6" };
     return t.every(function (x) { return x.classList.contains(k[x.textContent]); });

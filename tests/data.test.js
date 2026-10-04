@@ -98,13 +98,17 @@ check("work groups", ["Ivwananji|Monday", "Adam|Monday", "Aryashree|Monday", "Ad
 }), ["kitchen", "kitchen", "kitchen", "recycling", "lunch monitor"]);
 
 /* the rules, one by one, on the shipped files */
-check("order for a man: those he can swap with, then the last resort (Buckets people, a lunch monitor, then same-day)",
-  coverOf(real, "Adam", "Monday"), ["Beth", "Lavanya", "Priya", "Tsering", "Irina", "Roxanne", "Thanh", "Adrian", "Vayu", "Shuxing"]);
-check("last resort starts after those he can swap with", shiftOf(real, "Adam", "Monday").lastFrom, 4);
-check("Aryashree, Tuesday: Recycling and Lunch Monitor people are last resort",
+check("order for a man: anyone with a shift he can take back, then the last resort (a lunch monitor, then same-day)",
+  coverOf(real, "Adam", "Monday"), ["Beth", "Irina", "Lavanya", "Priya", "Roxanne", "Tsering", "Thanh", "Adrian", "Vayu", "Shuxing"]);
+check("last resort starts after those he can swap with", shiftOf(real, "Adam", "Monday").lastFrom, 6);
+check("swaps are shift by shift: Irina is a swap for Adam for her Pots & Pans, not her Buckets", shiftOf(real, "Adam", "Monday").swap.Irina, ["Pots & Pans"]);
+check("Aryashree, Tuesday: only those with no shift she can take are last resort",
   [coverOf(real, "Aryashree", "Tuesday").slice(shiftOf(real, "Aryashree", "Tuesday").lastFrom), shiftOf(real, "Aryashree", "Tuesday").lastFrom],
-  [["Adrian", "Amelia", "Shuxing", "Thanh"], 6]);
-check("Ben Kong can't cover Pots & Pans back, so his whole list is last resort", shiftOf(real, "Ben Kong", "Friday").lastFrom, 0);
+  [["Shuxing", "Thanh"], 8]);
+check("Aryashree can swap with Adrian for Pots & Pans, not Recycling", shiftOf(real, "Aryashree", "Tuesday").swap.Adrian, ["Pots & Pans"]);
+check("and with Amelia for Pots & Pans and Buckets, not Lunch Monitor", shiftOf(real, "Aryashree", "Tuesday").swap.Amelia.slice().sort(), ["Buckets & Composting", "Pots & Pans"]);
+check("Shuxing has nothing Aryashree can take", shiftOf(real, "Aryashree", "Tuesday").swap.Shuxing, []);
+check("Ben Kong can swap Recycling for Recycling", [shiftOf(real, "Ben Kong", "Friday").lastFrom, shiftOf(real, "Ben Kong", "Friday").swap.Adam], [2, ["Recycling"]]);
 check("a lunch monitor who can do everything a backup does swaps both ways", shiftOf(real, "Thanh", "Tuesday").lastFrom, 2);
 check("no one you could swap with is ever below the last resort line", real.shifts.every(function (s) {
   return s.lastFrom >= 0 && s.lastFrom <= s.cover.length;
@@ -131,7 +135,7 @@ check("women never cover Recycling", real.shifts.filter(function (s) {
 
 /* the switches in roles.csv and students.csv */
 var anyRec = build(null, null, edit(ROLES, "Recycling,Recycling,,Men only,No,", "Recycling,Recycling,,Any,No,"));
-check("switch: Recycling to Any lets women cover it, after those who do Recycling", coverOf(anyRec, "Adam", "Thursday").slice(0, 3), ["Adrian", "Ben Kong", "Ivwananji"]);
+check("switch: Recycling to Any lets women cover it, after those who do Recycling", coverOf(anyRec, "Adam", "Thursday").slice(0, 3), ["Adrian", "Ben Kong", "Irina"]);
 check("switch: Recycling to Any adds no problems", anyRec.problems, []);
 var womenRec = build(null, null, edit(ROLES, "Recycling,Recycling,,Men only,No,", "Recycling,Recycling,,Women only,No,"));
 has("switch: Recycling to Women only flags the men on it", womenRec.problems, "Adam can't do Recycling");
@@ -147,7 +151,7 @@ check("switch: Lunch Monitor untrained opens it to all women", coverOf(untrained
 var bethTrained = build(null, edit(STUDENTS, "Beth,F,,", "Beth,F,,Lunch Monitor"));
 check("switch: training a student adds them to Lunch Monitor lists", coverOf(bethTrained, "Thanh", "Tuesday").indexOf("Beth") >= 0, true);
 var noSame = build(null, null, edit(ROLES, "Pots & Pans,Kitchen,,Any,No,Recycling; Lunch Monitor", "Pots & Pans,Kitchen,,Any,No,"));
-check("switch: no same-day backups for Pots & Pans", coverOf(noSame, "Adam", "Monday"), ["Beth", "Lavanya", "Priya", "Tsering", "Irina", "Roxanne", "Thanh"]);
+check("switch: no same-day backups for Pots & Pans", coverOf(noSame, "Adam", "Monday"), ["Beth", "Irina", "Lavanya", "Priya", "Roxanne", "Tsering", "Thanh"]);
 var lmFirst = build(null, null, edit(ROLES, "Pots & Pans,Kitchen,,Any,No,Recycling; Lunch Monitor", "Pots & Pans,Kitchen,,Any,No,Lunch Monitor; Recycling"));
 check("switch: same-day order follows the list", coverOf(lmFirst, "Adam", "Monday").slice(-3), ["Shuxing", "Adrian", "Vayu"]);
 var ownGroup = build(null, null, edit(ROLES, "Buckets & Composting,Kitchen,", "Buckets & Composting,,"));

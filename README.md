@@ -55,10 +55,11 @@ role (gender, Only does and training all allow it), the list goes:
 2. then those with another job in the same work group;
 3. then everyone else.
 
-Each tier is fewest shifts first, then alphabetical. Backups whose shifts
-the shift's own student couldn't take in return (gender, Only does or
-training says no) move into a boxed **Last resort** section after
-everyone they could swap with. Students already working that day in the
+Each tier is fewest shifts first, then alphabetical. Swaps go shift by shift. A backup with no shift the
+shift's own student could take in return (gender, Only does or training
+says no to all of them) moves into a boxed **Last resort** section after
+everyone they could swap with. Each backup's line shows only the shifts
+you could swap them for (all their shifts, in the last resort). Students already working that day in the
 role's same-day backup roles come after them, in the listed order (Lunch
 Monitor last). Each backup is shown with the
 shifts they work: their name in bold, then each role as a quiet label

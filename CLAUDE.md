@@ -26,9 +26,12 @@ and the tab shell from the second.
   training), the tiers are: same job, then same work group, then other
   groups. Each tier is fewest shifts, then A–Z. **Last resort**
   (`s.lastFrom` marks where it starts) is boxed off on the card. First
-  come one-way backups: anyone with a shift the asking student couldn't
-  take in return (`twoWay()`, via `canDo()` on each of the backup's
-  covered-as roles). Then come students working that day in that role's
+  come one-way backups: anyone with **no** shift the asking student could
+  take in return. Swaps are shift by shift, not person by person
+  (`swapRoles()`/`twoWay()`, via `canDo()` on each of the backup's
+  covered-as roles). Requiring every shift was tried and rejected as
+  overconstrained. `s.swap[name]` holds the roles you could swap for. The
+  backup's line shows only those, or all their shifts if there are none. Then come students working that day in that role's
   same-day backup roles, in order (Lunch Monitor last). `tests/expected_cover_lists.py` is an independent Python copy of
   these rules that writes `tests/expected-cover-lists.csv`. Change both
   together, and regenerate after any data change. Rules belong in the

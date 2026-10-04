@@ -116,8 +116,11 @@ do it themselves:
   monitors come late in other people's lists: they can't easily swap,
   because no one else can take their lunch shift in return.
 
-**The order.** First come the backups you could **swap with**: people
-not working that day, every one of whose shifts you could take in return:
+**The order.** Swaps go **shift by shift**. First come the backups you
+could **swap with**: people not working that day who have at least one
+shift you could take in return. Someone who does Pots & Pans and
+Recycling is a swap for a woman's Pots & Pans shift, for their Pots &
+Pans shifts.
 1. **Same job:** students who already do that job (Shift Leaders count
    as Pots & Pans).
 2. **Same work group:** students with another job in the group, for
@@ -129,12 +132,9 @@ alphabetical order.
 
 Then, boxed off under **Last resort**:
 
-4. **One-way backups:** people who can cover for you, but whose shifts
-   you couldn't take back. For a woman, that's anyone who also does
-   Recycling, and lunch monitors (unless she's trained too). For a man,
-   it's anyone who also does Buckets & Composting or Lunch Monitor. Ben
-   Kong can't take anyone else's Pots & Pans, so his whole list is last
-   resort.
+4. **One-way backups:** people who can cover for you, but who have no
+   shift you could take back, for example a lunch monitor who does
+   nothing else, for someone who isn't trained.
 5. **Already working that day, in another group**, from the role's
    **same-day backups**, in order. For Pots & Pans, that's Recycling, then
    Lunch Monitor at the very end. For Buckets & Composting, it's Lunch
@@ -143,9 +143,11 @@ Then, boxed off under **Last resort**:
 So Buckets & Composting and Pots & Pans never cover each other on the
 same day.
 
-**What students see.** Each backup is shown with their own shifts under
-their name: each role, followed by its days as small tags in that day's
-colour. So whoever's asking knows what a swap would mean. In **My
+**What students see.** Under each backup's name are the shifts you could
+swap them for: each role, followed by its days as small tags in that
+day's colour. So whoever's asking knows what a swap would mean. In the
+last resort, where there's nothing to swap, it shows everything the
+person works. In **My
 availability**, each day shows the role you'd be covering as a small
 label, with the names under it. Substitute lists never say "Shift
 Leader": a Shift Leader's shift is shown as Pots & Pans, because that's
