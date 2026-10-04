@@ -32,7 +32,9 @@ and the tab shell from the second.
 - `CONFIG` at the top of the script holds the contacts (names and emails
   only). A `[BRACKETED]` value is a placeholder.
 - The third tab, Submit Timesheet, gives the deadline (Sunday, 5 pm) and
-  a button to https://www.drbu.edu/timesheet.
+  a button to https://www.drbu.edu/timesheet. On a Sunday its tab carries a "1"
+  bubble until that button is pressed that day (`kitchen.timesheet` holds
+  the date it was pressed).
 - It is an installable PWA. A file added to the app must also go in `SHELL`
   in `sw.js`. The page and `shift_cover_list.csv` are served network-first,
   and everything else cache-first. Bump `CACHE` in `sw.js` whenever

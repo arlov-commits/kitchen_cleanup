@@ -18,7 +18,7 @@ dependencies. Served over the web, it installs as an app on a phone.
 | --- | --- |
 | **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day (marked **Today** or **Tomorrow** in oxblood when it is) and your role, and who else is on that day with their roles, the Shift Leader first and Buckets & Composting last. Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. |
 | **Call out** | The substitute-replacement steps from the poster: **Planned Absence**, then **Sick or Unexpected Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
-| **Submit Timesheet** | The deadline, Sunday at 5 pm, and a button to the timesheet portal at drbu.edu/timesheet. |
+| **Submit Timesheet** | The deadline, Sunday at 5 pm, and a button to the timesheet portal at drbu.edu/timesheet. On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). |
 
 There are no phone numbers and no call buttons in the app.
 

@@ -71,6 +71,7 @@ body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);f
 button,input,select{font:inherit;color:inherit}
 a{color:var(--rust-deep);text-decoration-thickness:1px;text-underline-offset:3px}
 :focus-visible{outline:2px solid var(--rust-deep);outline-offset:2px;border-radius:2px}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 .k0{--c:var(--k0);--ci:var(--k0-ink);--cw:var(--k0-w)}
 .k1{--c:var(--k1);--ci:var(--k1-ink);--cw:var(--k1-w)}
@@ -137,6 +138,11 @@ p{margin:0}
 /* labels stay on one line, so the bar keeps its height on the narrowest phones */
 .bn-item{white-space:nowrap}
 @media (max-width:359px){.bn-item{font-size:11px;letter-spacing:0;padding-left:2px;padding-right:2px}}
+/* the Sunday reminder: a "1" bubble on the Submit Timesheet tab's icon */
+.ico{position:relative;display:inline-flex}
+.badge{position:absolute;top:-6px;right:-9px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--rust-deep);color:#fff;
+  font-size:11px;font-weight:700;line-height:17px;text-align:center;letter-spacing:0;box-shadow:0 0 0 2px var(--white)}
+.nav-item .ico:has(.badge){margin-right:8px}
 .nav-item:focus-visible,.bn-item:focus-visible{outline:2px solid var(--rust-deep);outline-offset:-3px}
 @media (min-width:820px){
   .topbar{display:flex}
@@ -370,7 +376,7 @@ p{margin:0}
     { id: "callout", label: "Call out", title: "Call out" },
     { id: "timesheet", label: "Submit Timesheet", title: "Submit timesheet" }
   ];
-  var ME_KEY = "kitchen.me";
+  var ME_KEY = "kitchen.me", TS_KEY = "kitchen.timesheet";
 
   var store = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -527,20 +533,38 @@ p{margin:0}
     for (var i = 0; i < TABS.length; i++) if (TABS[i].id === h) return h;
     return "shifts";
   }
-  function route() {
-    var cur = current();
-    TABS.forEach(function (t) { $("view-" + t.id).hidden = t.id !== cur; });
+  /* On a Sunday the timesheet is due, so its tab carries a "1" until the
+     portal button is pressed that day. Next Sunday it comes back. */
+  function dateKey(d) { return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+  function timesheetDue() {
+    var d = new Date();
+    return d.getDay() === 0 && store.get(TS_KEY) !== dateKey(d);
+  }
+  function drawNavs() {
+    var cur = current(), due = timesheetDue();
     function item(cls, t) {
-      var on = t.id === cur;
+      var on = t.id === cur, badge = due && t.id === "timesheet";
       return '<a class="' + cls + (on ? " active" : "") + '" href="#' + t.id + '"' + (on ? ' aria-current="page"' : "") + ">" +
-        '<span class="nav-icon" aria-hidden="true" style="--icon:var(--nv-' + t.id + ')"></span>' + t.label + "</a>";
+        '<span class="ico"><span class="nav-icon" aria-hidden="true" style="--icon:var(--nv-' + t.id + ')"></span>' +
+        (badge ? '<span class="badge" aria-hidden="true">1</span>' : "") + "</span>" + t.label +
+        (badge ? '<span class="sr">(due today)</span>' : "") + "</a>";
     }
     $("top-nav").innerHTML = TABS.map(function (t) { return item("nav-item", t); }).join("");
     $("bottom-nav").innerHTML = TABS.map(function (t) { return item("bn-item", t); }).join("");
+  }
+  function route() {
+    var cur = current();
+    TABS.forEach(function (t) { $("view-" + t.id).hidden = t.id !== cur; });
+    drawNavs();
     $("scroll").scrollTop = 0;
     document.title = TABS.filter(function (t) { return t.id === cur; })[0].title + " · Kitchen Cleanup";
   }
   window.addEventListener("hashchange", route);
+  document.querySelector(".portal").addEventListener("click", function () {
+    store.set(TS_KEY, dateKey(new Date())); drawNavs();
+  });
+  /* an app left open overnight picks up Sunday when it comes back on screen */
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) drawNavs(); });
 
   /* ------------------------------------------------------------ start */
   route(); renderAll();
