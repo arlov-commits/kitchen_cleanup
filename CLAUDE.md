@@ -29,6 +29,15 @@ and the tab shell from the second.
   names in a cover list, duplicates and shift counts, all in the footer.
 - The managers are named consistently everywhere: "Student Kitchen
   Manager" (never just "Kitchen Manager") and "Work Study Manager".
+- `kitchen.js` holds the shift-list code shared by the app and the
+  cover-list maker (`KC.parseCSV`, `buildData`, `readSchedule`,
+  `checkSchedule`, `makeCoverLists`, `toCSV`). Plain ES5 with no DOM,
+  loaded by a script tag before each page's own script.
+  `make-cover-lists.html` is the maker: a worksheet for whoever looks
+  after the app, deliberately not linked from the app's tabs. The rules in
+  `makeCoverLists()` must keep reproducing the shipped CSV byte for byte
+  (tested). A rule change goes there and into HANDOFF.md's Cover-list
+  rules.
 - **It is information, not a tool.** Each tab shows everything at once,
   phone first. Don't add toggles, in-card links or buttons, a whole-team
   view, phone numbers or call buttons, or a shift time. The user ruled
@@ -66,6 +75,9 @@ and the tab shell from the second.
   a button to https://www.drbu.edu/timesheet. On a Sunday its tab carries a "1"
   bubble until that button is pressed that day (`kitchen.timesheet` holds
   the date it was pressed).
+- The service worker keeps each page under its own name (a navigation is
+  cached by its file name), so opening the maker never replaces the app's
+  offline copy.
 - The service worker's self-update reloads open pages from **outside**
   `activate`'s `waitUntil`. A reload is a fetch the worker can't answer
   until activation finishes, so waiting on it inside deadlocks the app.

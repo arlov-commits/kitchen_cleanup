@@ -8,8 +8,9 @@
 >
 > **The app:** https://arlov-commits.github.io/kitchen_cleanup/
 > **Its files:** https://github.com/arlov-commits/kitchen_cleanup
+> **The cover-list maker:** https://arlov-commits.github.io/kitchen_cleanup/make-cover-lists.html
 >
-> *These two links are the only place the guides take them from. Update
+> *These links are the only place the guides take them from. Update
 > them here if the app ever moves (see HANDOFF.md).*
 
 A quick reference for work study students on the kitchen cleanup crew: your
@@ -51,7 +52,11 @@ One row per shift, as exported from the spreadsheet:
 | `Can be asked to cover (fewest shifts first)` | The names, comma-separated, in the order to ask them. |
 
 The app shows the cover list **exactly as written**, in that order. It
-doesn't work out who is free by itself. "On with you" is everyone else who
+doesn't work out who is free by itself. The lists are written by the
+**cover-list maker**, which follows the rules in `makeCoverLists()`
+(`kitchen.js`): everyone not working that day, fewest shifts first, ties
+alphabetical, and women only for Buckets & Composting. Run on today's
+schedule, it reproduces the shipped file byte for byte. "On with you" is everyone else who
 has a row on the same day. Roles are shown exactly as written.
 
 **Buckets & Composting is for women only.** Men are never put on it and
@@ -95,6 +100,8 @@ phone numbers.
 | `index.html` | The whole app. |
 | `shift_cover_list.csv` | The shifts, roles and cover lists. Read when the app opens. |
 | `settings.csv` | The two managers' names and the timesheet portal link. Read when the app opens. |
+| `kitchen.js` | The shift-list code shared by the app and the maker: reading the CSV, the checks, and the cover-list rules (`makeCoverLists()`). |
+| `make-cover-lists.html` | The **cover-list maker**, for whoever looks after the app. Start from the current list or a spreadsheet, edit who works which day and role, read the checks, and download `shift_cover_list.csv` with every cover list written by the rules. Its work is saved on the device as `kitchen.maker`. It isn't linked from the app's tabs. |
 | `HOW-TO-UPDATE.md` | For whoever is taking the app over or looking after it, written for someone who has never used GitHub. |
 | `HANDOFF.md` | For whoever is handing it over: the steps, the handover log, the cover-list rules, and the one-time move into a shared organization. |
 | `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
@@ -115,10 +122,13 @@ node tests/data.test.js                          # the data functions, against t
 NODE_PATH=$(npm root -g) node tests/app.e2e.js   # every screen in Chromium (needs Playwright)
 ```
 
-`data.test.js` lifts each data function out of `index.html` by name, so
-it always tests the code that ships. `app.e2e.js` serves the repo and
+`data.test.js` runs `kitchen.js` as is, and lifts the few functions that
+live only in `index.html` out of it by name, so it always tests the code
+that ships. `app.e2e.js` serves the repo and
 drives the whole app:
 - picking a name, the shift cards, backups and My availability;
+- the cover-list maker: loading, editing, checks, the download (compared
+  with the shipped file), drafts, spreadsheets, and layout;
 - the tabs, the Sunday badge, settings and load errors;
 - the theme button and Install as app;
 - the layout at 320, 375 and 1280px in both modes;

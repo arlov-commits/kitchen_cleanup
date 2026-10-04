@@ -1,6 +1,7 @@
-/* Checks for the data functions in index.html: node tests/data.test.js
-   Each function is lifted out of index.html by name and run on its own, so
-   these tests always exercise the code the app actually ships. */
+/* Checks for the data functions: node tests/data.test.js
+   kitchen.js (shared by the app and the cover-list maker) is run as is;
+   the few functions that live only in index.html are lifted out of it by
+   name. Either way, these tests exercise the code that actually ships. */
 "use strict";
 var fs = require("fs"), path = require("path"), vm = require("vm");
 var root = path.join(__dirname, "..");
@@ -27,9 +28,9 @@ function sandbox() {
     settingsProblems: []
   };
   vm.createContext(box);
-  ["esc", "parseCSV", "dayIndex", "womenOnly", "buildData", "roleRank", "applySettings", "dateKey"].forEach(function (n) {
-    vm.runInContext(lift(n), box);
-  });
+  vm.runInContext(fs.readFileSync(path.join(root, "kitchen.js"), "utf8") + "\nthis.KC = KC;", box);
+  ["parseCSV", "dayIndex", "womenOnly", "buildData", "readSchedule", "checkSchedule", "makeCoverLists", "toCSV"].forEach(function (n) { box[n] = box.KC[n]; });
+  ["esc", "roleRank", "applySettings", "dateKey"].forEach(function (n) { vm.runInContext(lift(n), box); });
   return box;
 }
 
@@ -141,6 +142,48 @@ st = settings("Setting,Value\nTimesheet portal link,javascript:alert(1)\nStudent
 check("settings refuse a non-web link", st.CONFIG.portal, "https://www.drbu.edu/timesheet");
 var shipped = settings(fs.readFileSync(path.join(root, "settings.csv"), "utf8"));
 check("shipped settings clean", shipped.settingsProblems, []);
+
+/* ---------------------------------------------------- cover-list maker */
+var shippedText = fs.readFileSync(path.join(root, "shift_cover_list.csv"), "utf8");
+var sched = b.readSchedule(shippedText);
+check("maker reads the shipped file", [sched.problems, sched.rows.length], [[], 30]);
+check("maker: shipped schedule checks out", b.checkSchedule(sched.rows), []);
+check("maker rebuilds the shipped file byte for byte", b.toCSV(b.makeCoverLists(sched.rows)) === shippedText, true);
+check("maker output reads cleanly in the app", b.buildData(b.toCSV(b.makeCoverLists(sched.rows))).problems, []);
+function R(who, gender, day, role) { return { who: who, gender: gender, day: day, role: role }; }
+var mini = [R("Zoe", "F", "Monday", "Shift Leader"), R("Zoe", "F", "Wednesday", "Pots & Pans"), R("Zoe", "F", "Friday", "Pots & Pans"),
+            R("Amy", "F", "Monday", "Buckets & Composting"), R("Amy", "F", "Tuesday", "Shift Leader"),
+            R("Bo", "M", "Tuesday", "Pots & Pans"), R("Bo", "M", "Wednesday", "Shift Leader"),
+            R("Cy", "F", "Wednesday", "Pots & Pans"), R("Cy", "F", "Thursday", "Shift Leader"),
+            R("Di", "F", "Thursday", "Pots & Pans"), R("Di", "F", "Friday", "Shift Leader")];
+var made = b.makeCoverLists(mini);
+check("maker: sorted by student, then day", made.map(function (s) { return s.who + " " + s.day.slice(0, 3); }),
+  ["Amy Mon", "Amy Tue", "Bo Tue", "Bo Wed", "Cy Wed", "Cy Thu", "Di Thu", "Di Fri", "Zoe Mon", "Zoe Wed", "Zoe Fri"]);
+check("maker: fewest shifts first, then alphabetical", made[1].cover, ["Cy", "Di", "Zoe"]);
+check("maker: women only for Buckets (Bo left out)", made[0].cover, ["Cy", "Di"]);
+check("maker: Bo can cover Pots & Pans", made[9].cover, ["Amy", "Di"]);
+check("maker: never the shift's own student or anyone on that day", made.every(function (s) {
+  return s.cover.every(function (c) { return c !== s.who && !mini.some(function (r) { return r.who === c && r.day === s.day; }); });
+}), true);
+check("maker: mini schedule has no problems", b.checkSchedule(mini), []);
+function texts(rows) { return b.checkSchedule(rows).map(function (p) { return p.level + ": " + p.text; }); }
+has("maker: blank name", texts([R("", "F", "Monday", "Pots & Pans")]), "error: Row 1: add the student's name.");
+has("maker: no day", texts([R("Amy", "F", "", "Pots & Pans")]), "error: Row 1 (Amy): choose a day.");
+has("maker: bad day", texts([R("Amy", "F", "Funday", "Pots & Pans")]), "\"Funday\" isn't a day");
+has("maker: no role", texts([R("Amy", "F", "Monday", "")]), "error: Row 1 (Amy): choose a role.");
+has("maker: no gender", texts([R("Amy", "", "Monday", "Pots & Pans")]), "gender should be F or M");
+has("maker: two genders", texts([R("Amy", "F", "Monday", "Pots & Pans"), R("Amy", "M", "Tuesday", "Pots & Pans")]), "Amy is marked F on one row and M on another");
+has("maker: same day twice", texts([R("Amy", "F", "Monday", "Pots & Pans"), R("Amy", "F", "Monday", "Shift Leader")]), "Amy is on Monday twice");
+has("maker: man on Buckets", texts([R("Bo", "M", "Monday", "Buckets & Composting")]), "error: Bo is on Buckets & Composting on Monday, which is for women only.");
+has("maker: one shift is a warning", texts([R("Amy", "F", "Monday", "Shift Leader")]), "warn: Amy has 1 shift (usually 2 to 4).");
+has("maker: day with no leader", texts(mini.concat([R("Eve", "F", "Saturday", "Pots & Pans"), R("Eve", "F", "Sunday", "Shift Leader")])), "warn: Saturday has no Shift Leader.");
+has("maker: two leaders", texts(mini.concat([R("Eve", "F", "Monday", "Shift Leader"), R("Eve", "F", "Sunday", "Shift Leader")])), "warn: Monday has 2 Shift Leaders: Zoe, Eve.");
+has("maker: empty", texts([]), "error: Add at least one shift.");
+var loose = b.readSchedule("\uFEFFName,Day,Gender,Role,Notes\r\nAmy, mon ,female,Pots & Pans,x\r\nAmy,Tue,F,Shift Leader,\r\n");
+check("maker reads loose spreadsheets", loose.rows, [R("Amy", "F", "Monday", "Pots & Pans"), R("Amy", "F", "Tuesday", "Shift Leader")]);
+has("maker: missing columns", b.readSchedule("Student,Day\nAmy,Monday").problems.map(function (p) { return p.text; }), "The file needs these columns: Gender, Role.");
+check("toCSV quotes only where needed", b.toCSV([{ who: "Amy", gender: "F", day: "Monday", role: "Pots & Pans", cover: ["Bo"] }, { who: 'A "B", C', gender: "F", day: "Monday", role: "x", cover: ["Bo", "Cy"] }]),
+  "\uFEFFStudent,Gender,Shift day,Role,# who can cover,Can be asked to cover (fewest shifts first)\r\nAmy,F,Monday,Pots & Pans,1,Bo\r\n\"A \"\"B\"\", C\",F,Monday,x,2,\"Bo, Cy\"\r\n");
 
 /* ----------------------------------------------------------- dateKey */
 check("dateKey", b.dateKey(new Date(2026, 9, 4)), "2026-10-4");

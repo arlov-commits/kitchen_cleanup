@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Make the cover lists · Kitchen Cleanup</title>
+<meta name="description" content="For the Student Kitchen Manager: enter who works which day and role, and get shift_cover_list.csv with every cover list written by the rules.">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<script>
+/* The app's appearance setting (kitchen.theme), applied before paint:
+   Light, Dark, or Auto (dark from 7 pm to 7 am). Changed from the app. */
+(function () {
+  var m = null;
+  try { m = localStorage.getItem("kitchen.theme"); } catch (e) {}
+  var h = new Date().getHours();
+  var dark = m === "dark" || (m !== "light" && (h < 7 || h >= 19));
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  if (dark) document.querySelector('meta[name="theme-color"]').setAttribute("content", "#1b2028");
+})();
+</script>
+<style>
+/* The app's Ru-Yi tokens and type (see index.html), laid out as a plain
+   worksheet: start, edit the shifts, read the checks, download. */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/inter-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/inter-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-italic-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+:root{
+  color-scheme:light;
+  --white:#ffffff; --cream:#f5f6f8; --dark:#14181f;
+  --ink:#1a1a1a; --ink-2:#4a4a4a; --ink-3:#6b6b6b;
+  --line:#dee2e6; --line-soft:#e7e7ea;
+  --rust:#b8431c; --rust-deep:#8c2f12; --rust-btn:#8c2f12;
+  --err-bg:rgba(184,67,28,.09); --err-ink:#8c2f12;
+  --warn-bg:rgba(224,169,63,.16); --warn-ink:#6b4410;
+  --ok-bg:rgba(47,158,68,.10); --ok-ink:#24733a;
+  --display:'Playfair Display',Georgia,'Times New Roman',serif;
+  --body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --white:#1b2028; --cream:#12161c; --dark:#0b0e12;
+  --ink:#eceef1; --ink-2:#c3c7ce; --ink-3:#9aa0a9;
+  --line:#2e353f; --line-soft:#262c35;
+  --rust-deep:#ec8a66; --rust-btn:#a33a17;
+  --err-bg:rgba(240,144,107,.14); --err-ink:#ffc9b5;
+  --warn-bg:rgba(224,169,63,.16); --warn-ink:#ffd9a0;
+  --ok-bg:rgba(126,224,143,.13); --ok-ink:#b2f2bb;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--cream)}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:clip}
+[hidden]{display:none !important}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--rust-deep);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--rust-deep);outline-offset:2px}
+h1,h2{font-family:var(--display);font-weight:600;letter-spacing:-.01em;line-height:1.14;margin:0;color:var(--ink);text-wrap:balance}
+h1{font-size:clamp(28px,6vw,36px)}
+h1 em,h2 em{font-style:italic;color:var(--rust-deep)}
+h2{font-size:21px}
+p{margin:0}
+.eyebrow{display:block;font-family:var(--display);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--rust-deep);font-weight:600}
+.note{font-size:14.5px;color:var(--ink-3)}
+.in{max-width:900px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
+.head{background:var(--white);border-bottom:1px solid var(--line-soft)}
+.head .in{padding-top:22px;padding-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.back{font-size:14px;font-weight:600;text-decoration:none}
+main .in{padding-top:20px;padding-bottom:48px;display:flex;flex-direction:column;gap:18px}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.step{display:flex;align-items:baseline;gap:10px}
+.step .n{font-family:var(--display);font-style:italic;font-size:24px;line-height:1;color:var(--rust-deep)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:8px;border:1.5px solid var(--ink);
+  background:transparent;color:var(--ink);font-size:15px;font-weight:600;cursor:pointer;text-decoration:none}
+.btn-main{background:var(--rust-btn);border-color:var(--rust-btn);color:#fff;padding:14px 20px;font-size:16.5px;width:100%}
+.btn-main:disabled{background:var(--line);border-color:var(--line);color:var(--ink-3);cursor:not-allowed}
+.row-btns{display:flex;flex-wrap:wrap;gap:10px}
+.file{position:relative;overflow:hidden}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* the shifts: one line each on a wide screen, two on a phone */
+.grid-h,.shift{display:grid;grid-template-columns:minmax(0,2fr) 76px minmax(0,1.4fr) minmax(0,1.8fr) 36px;gap:8px;align-items:center}
+.grid-h{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding:0 2px}
+.shifts{display:flex;flex-direction:column;gap:8px}
+.shift input,.shift select{width:100%;min-width:0;padding:8px 9px;border:1px solid var(--line);border-radius:6px;background:var(--white);color:var(--ink);font-size:15px}
+.shift .del{width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--ink-3);font-size:18px;line-height:1;cursor:pointer}
+@media (max-width:640px){
+  .grid-h{display:none}
+  .shift{grid-template-columns:minmax(0,1fr) 76px;grid-template-areas:"who del" "day g" "role role";padding:10px;border:1px solid var(--line);border-radius:8px}
+  .shift .del{justify-self:end}
+  .shift .who{grid-area:who} .shift .g{grid-area:g} .shift .day{grid-area:day} .shift .role{grid-area:role} .shift .del{grid-area:del}
+  .shift input,.shift select{font-size:16px}
+}
+.count{font-size:14px;color:var(--ink-3)}
+
+/* checks */
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.checks li{padding:8px 12px;border-radius:6px;font-size:14.5px}
+.checks .error{background:var(--err-bg);color:var(--err-ink)}
+.checks .warn{background:var(--warn-bg);color:var(--warn-ink)}
+.checks .ok{background:var(--ok-bg);color:var(--ok-ink)}
+.checks b{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;margin-right:2px}
+
+/* the result */
+.result{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.result li{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-top:1px solid var(--line-soft);font-size:14.5px}
+.result li:first-child{border-top:0}
+.result .t{font-weight:600;color:var(--ink)}
+.result .t span{font-weight:400;color:var(--ink-3)}
+.result .c{color:var(--ink-2)}
+.then{font-size:14.5px;color:var(--ink-2)}
+.then ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+</style>
+</head>
+<body>
+<header class="head"><div class="in">
+  <a class="back" href="./">&larr; Back to the app</a>
+  <span class="eyebrow">For the Student Kitchen Manager</span>
+  <h1>Make the <em>cover lists</em></h1>
+  <p class="note">Enter who works which day and in which role. Every shift's cover list is then written for you by the rules, ready to upload as <b>shift_cover_list.csv</b>.</p>
+</div></header>
+
+<main><div class="in">
+  <section class="panel">
+    <div class="step"><span class="n">1</span><h2>Start from</h2></div>
+    <div class="row-btns">
+      <button type="button" class="btn" id="from-current">The current list</button>
+      <label class="btn file">A spreadsheet file (.csv)<input type="file" id="from-file" accept=".csv,text/csv"></label>
+    </div>
+    <p class="note">A spreadsheet needs Student, Gender, Shift day and Role columns. Any other columns, such as old cover lists, are ignored. Your work is saved on this device as you go.</p>
+    <p class="note" id="source-msg" role="status"></p>
+  </section>
+
+  <section class="panel">
+    <div class="step"><span class="n">2</span><h2>The shifts</h2></div>
+    <p class="note">One line for each shift. A student who works three days has three lines. Gender is used only for the Buckets &amp; Composting rule (women only). It never appears in the app.</p>
+    <div class="grid-h" aria-hidden="true"><span>Student</span><span>Gender</span><span>Day</span><span>Role</span><span></span></div>
+    <div class="shifts" id="shifts"></div>
+    <div class="row-btns"><button type="button" class="btn" id="add">+ Add a shift</button></div>
+    <p class="count" id="count"></p>
+    <datalist id="names"></datalist>
+    <datalist id="roles"></datalist>
+  </section>
+
+  <section class="panel">
+    <div class="step"><span class="n">3</span><h2>Checks</h2></div>
+    <ul class="checks" id="checks"></ul>
+  </section>
+
+  <section class="panel">
+    <div class="step"><span class="n">4</span><h2>The cover lists</h2></div>
+    <p class="note">For each shift: everyone not working that day, those with the fewest shifts first (ties in alphabetical order). Only women are listed for Buckets &amp; Composting.</p>
+    <ul class="result" id="result"></ul>
+  </section>
+
+  <section class="panel">
+    <div class="step"><span class="n">5</span><h2>Download and upload</h2></div>
+    <button type="button" class="btn-main" id="download" disabled>Download shift_cover_list.csv</button>
+    <div class="then">
+      Then put it in the app's files on GitHub, replacing the old one:
+      <ol>
+        <li>Open the app's files and click <b>Add file → Upload files</b>.</li>
+        <li>Drag in <b>shift_cover_list.csv</b>. If your computer renamed it, for example to <i>shift_cover_list (1).csv</i>, rename it back first.</li>
+        <li>Click <b>Commit changes</b>, wait about 2 minutes, then check the bottom of the app.</li>
+      </ol>
+      The full steps are in <b>HOW-TO-UPDATE.md</b>, step 4.
+    </div>
+  </section>
+</div></main>
+
+<script src="kitchen.js"></script>
+<script>
+(function () {
+  "use strict";
+  var KEY = "kitchen.maker", ROLES = ["Shift Leader", "Pots & Pans", "Buckets & Composting"];
+  var rows = [];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(rows)); } catch (e) {} }
+  function load() {
+    try { var r = JSON.parse(localStorage.getItem(KEY) || "null"); if (r && r.length !== undefined) return r; } catch (e) {}
+    return null;
+  }
+
+  /* the editor: redrawn only when lines are added, removed or replaced, so
+     typing never loses its place */
+  function drawShifts() {
+    $("shifts").innerHTML = rows.map(function (r, i) {
+      return '<div class="shift" data-i="' + i + '">' +
+        '<input class="who" data-f="who" list="names" aria-label="Student, line ' + (i + 1) + '" placeholder="Student" value="' + esc(r.who) + '">' +
+        '<select class="g" data-f="gender" aria-label="Gender, line ' + (i + 1) + '">' +
+          ['', 'F', 'M'].map(function (g) { return '<option value="' + g + '"' + (r.gender === g ? " selected" : "") + ">" + (g || "–") + "</option>"; }).join("") + "</select>" +
+        '<select class="day" data-f="day" aria-label="Day, line ' + (i + 1) + '"><option value="">Day…</option>' +
+          KC.DAYS.map(function (d) { return '<option' + (r.day === d ? " selected" : "") + ">" + d + "</option>"; }).join("") +
+          (r.day && KC.DAYS.indexOf(r.day) < 0 ? '<option selected value="' + esc(r.day) + '">' + esc(r.day) + "</option>" : "") + "</select>" +
+        '<input class="role" data-f="role" list="roles" aria-label="Role, line ' + (i + 1) + '" placeholder="Role" value="' + esc(r.role) + '">' +
+        '<button type="button" class="del" data-del="' + i + '" aria-label="Remove line ' + (i + 1) + '">&times;</button></div>';
+    }).join("");
+    update();
+  }
+
+  /* everything that follows from the lines: suggestions, checks, result */
+  function update() {
+    var names = {}, roles = {};
+    rows.forEach(function (r) { if (r.who) names[r.who] = 1; if (r.role) roles[r.role] = 1; });
+    ROLES.forEach(function (r) { roles[r] = 1; });
+    $("names").innerHTML = Object.keys(names).sort().map(function (n) { return '<option value="' + esc(n) + '">'; }).join("");
+    $("roles").innerHTML = Object.keys(roles).map(function (n) { return '<option value="' + esc(n) + '">'; }).join("");
+    var students = Object.keys(names).length;
+    $("count").textContent = rows.length + " shift" + (rows.length === 1 ? "" : "s") + ", " + students + " student" + (students === 1 ? "" : "s") + ".";
+
+    var problems = KC.checkSchedule(rows), errors = problems.filter(function (p) { return p.level === "error"; });
+    $("checks").innerHTML = problems.length ? problems.map(function (p) {
+      return '<li class="' + p.level + '"><b>' + (p.level === "error" ? "Fix" : "Check") + "</b> " + esc(p.text) + "</li>";
+    }).join("") : '<li class="ok"><b>OK</b> Everything checks out.</li>';
+
+    var dl = $("download");
+    if (errors.length) {
+      $("result").innerHTML = '<li class="note">Fix the problems in step 3 and the cover lists appear here.</li>';
+      dl.disabled = true; dl.textContent = "Fix the problems above first";
+      return;
+    }
+    var shifts = KC.makeCoverLists(rows);
+    $("result").innerHTML = shifts.map(function (s) {
+      return '<li><span class="t">' + esc(s.who) + " · " + s.day + " <span>" + esc(s.role) + "</span></span>" +
+        '<span class="c">' + (s.cover.length ? s.cover.length + ": " + esc(s.cover.join(", ")) : "No one can cover this shift.") + "</span></li>";
+    }).join("");
+    dl.disabled = false; dl.textContent = "Download shift_cover_list.csv";
+  }
+
+  function replace(newRows, msg) {
+    if (rows.length && !window.confirm("Replace the " + rows.length + " shifts already here?")) return;
+    rows = newRows; save(); drawShifts();
+    $("source-msg").textContent = msg;
+  }
+
+  $("shifts").addEventListener("input", edit);
+  $("shifts").addEventListener("change", edit);
+  function edit(e) {
+    var f = e.target.getAttribute("data-f"), line = e.target.closest ? e.target.closest(".shift") : null;
+    if (!f || !line) return;
+    var r = rows[+line.getAttribute("data-i")];
+    r[f] = e.target.value;
+    save(); update();
+  }
+  /* tidy names once a field is left, so "Beth " and "Beth" are one student */
+  $("shifts").addEventListener("focusout", function (e) {
+    var f = e.target.getAttribute("data-f");
+    if (f !== "who" && f !== "role") return;
+    var r = rows[+e.target.closest(".shift").getAttribute("data-i")];
+    r[f] = e.target.value = e.target.value.trim();
+    save(); update();
+  });
+  $("shifts").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-del]") : null;
+    if (!b) return;
+    rows.splice(+b.getAttribute("data-del"), 1); save(); drawShifts();
+  });
+  $("add").addEventListener("click", function () {
+    rows.push({ who: "", gender: "", day: "", role: "" });
+    save(); drawShifts();
+    var inputs = document.querySelectorAll(".shift .who");
+    inputs[inputs.length - 1].focus();
+  });
+
+  $("from-current").addEventListener("click", function () {
+    $("source-msg").textContent = "Loading the current list…";
+    fetch(KC.DATA_FILE, { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error();
+      return r.text();
+    }).then(function (text) {
+      var s = KC.readSchedule(text);
+      if (s.problems.length) { $("source-msg").textContent = s.problems[0].text; return; }
+      replace(s.rows, "Loaded the current list: " + s.rows.length + " shifts.");
+    }).catch(function () { $("source-msg").textContent = "The current list couldn't be loaded. Open this page from the app's web address."; });
+  });
+  $("from-file").addEventListener("change", function () {
+    var file = this.files && this.files[0], input = this;
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var s = KC.readSchedule(String(reader.result));
+      if (s.problems.length) $("source-msg").textContent = file.name + ": " + s.problems[0].text;
+      else replace(s.rows, "Loaded " + file.name + ": " + s.rows.length + " shifts.");
+      input.value = "";
+    };
+    reader.readAsText(file);
+  });
+
+  $("download").addEventListener("click", function () {
+    if (KC.checkSchedule(rows).some(function (p) { return p.level === "error"; })) return;
+    var blob = new Blob([KC.toCSV(KC.makeCoverLists(rows))], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = KC.DATA_FILE;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  rows = load() || [];
+  if (rows.length) $("source-msg").textContent = "Picked up where you left off: " + rows.length + " shifts.";
+  else $("source-msg").textContent = "Choose where to start.";
+  drawShifts();
+})();
+</script>
+</body>
+</html>
