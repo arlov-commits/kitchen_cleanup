@@ -1,15 +1,15 @@
 /* Kitchen Cleanup, offline.
    The whole app is a handful of static files, so the service worker keeps a
    copy of all of them. A file added to the app must be added to SHELL too,
-   or an installed copy will not have it offline. The page and roster.csv are
+   or an installed copy will not have it offline. The page and shift_cover_list.csv are
    fetched fresh whenever there is a network (racing a 2.5-second timer, so a
    slow connection cannot hang the launch), so edits to either show up without
    touching this file. Bump CACHE only to make every client drop its copy. */
-var CACHE = "kitchen-v1";
+var CACHE = "kitchen-v2";
 var SHELL = [
   "./",
   "index.html",
-  "roster.csv",
+  "shift_cover_list.csv",
   "manifest.webmanifest",
   "icons/icon.svg",
   "icons/icon-32.png",
@@ -58,7 +58,7 @@ self.addEventListener("fetch", function (e) {
   if (url.origin !== location.origin) return;
 
   if (req.mode === "navigate") { e.respondWith(fresh(req, "index.html")); return; }
-  if (/\/roster\.csv$/.test(url.pathname)) { e.respondWith(fresh(req, "roster.csv")); return; }
+  if (/\/shift_cover_list\.csv$/.test(url.pathname)) { e.respondWith(fresh(req, "shift_cover_list.csv")); return; }
 
   /* Everything else (fonts, icons) never changes at its URL: cache first. */
   e.respondWith(caches.match(req, { ignoreSearch: true }).then(function (hit) {

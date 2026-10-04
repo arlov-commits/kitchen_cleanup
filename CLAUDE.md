@@ -14,28 +14,28 @@ and the tab shell from the second.
 
 - `index.html` is the whole app: markup, CSS and vanilla **ES5** in one
   file. No build step and no dependencies. There are three tabs, chosen by
-  hash: `#shifts`, `#callout` and `#policies`. In-page jumps (`data-jump`)
-  scroll the pane and don't touch the hash, because the hash names the tab.
-- `roster.csv` is the shift mapping. It is **fetched**, so unlike the meal
-  app this one needs to be served, and over `file://` My shifts shows a
-  message. Columns: `name` (required, unique), `phone` (optional), then
-  one column per day (`Mon`…`Sun`, matched on the first three letters).
-  A blank day cell means not working. `buildRoster()` checks the rows and
-  the footer reports any problems.
-- Backups for a day are everyone not working that day. Don't add any other
-  rule without asking.
-- `CONFIG` at the top of the script holds the shift time and the two
-  managers' contacts. A value that is still `[BRACKETED]` is shown as a
-  placeholder, never as a link.
+  hash: `#shifts`, `#callout` and `#policies`.
+- `shift_cover_list.csv` is the shift data, exported from the user's
+  spreadsheet: `Student`, `Shift day`, `Role`, `# who can cover`, and
+  `Can be asked to cover (fewest shifts first)`. It is **fetched**, so
+  the app must be served. The cover list is curated: show it exactly as
+  written and in that order, and never work out cover from who is free.
+  "On with you" is the other rows on the same day.
+- **It is information, not a tool.** Each tab shows everything at once,
+  phone first. Don't add collapsing sections, toggles, in-card links or
+  buttons, a whole-team view, phone numbers or call buttons. The user
+  ruled these out.
+- `CONFIG` at the top of the script holds the shift time and the contacts
+  (names and emails only). A `[BRACKETED]` value is a placeholder.
 - The Policies tab is **placeholder sample text** until the user supplies
   the real policies. Keep the "Sample text" notice until then.
 - It is an installable PWA. A file added to the app must also go in `SHELL`
-  in `sw.js`. The page and `roster.csv` are served network-first, and
+  in `sw.js`. The page and `shift_cover_list.csv` are served network-first, and
   everything else cache-first.
 - `icons/icon.svg` is the icon source. Re-render every PNG from it with
   Playwright, and never edit a PNG.
-- The user's name is in `localStorage` under `kitchen.me`, and the chosen
-  call-out path under `kitchen.path`. Wrap every access in try/catch.
+- The user's name is in `localStorage` under `kitchen.me`. Wrap every
+  access in try/catch.
 
 ## The shell
 
@@ -48,17 +48,16 @@ and the tab shell from the second.
 
 ## Look
 
-- Each day has one hue (`k0` Mon … `k6` Sun) everywhere it appears.
-  `--c` is the fill, `--ci` the ink for text and filled chips, and `--cw`
-  the wash. Never set an accent fill as text. Use its ink.
+- Each day has one hue (`k0` Mon … `k6` Sun). `--c` is the fill, `--ci`
+  the ink for text, and `--cw` the wash. Never set an accent fill as text.
+  Use its ink.
 - Rust (`--rust`) is for fills. Use `--rust-deep` for rust text on light
   backgrounds.
-- No entrance motion. Hover effects only under `@media (hover:hover)`.
+- No shadows, no hover effects, no motion.
 
 ## Verify before committing
 
 Serve the repo root (`python3 -m http.server`) and check with Playwright
-(Chromium is preinstalled) at 320px, 375px and 1280px wide. Check the name
-picker, a chosen name, Call out (phone toggle and desktop side-by-side) and
-Policies. Watch for page errors and sideways scroll, and confirm the tab bar
-sits inside the viewport. Measure any new colour pair against WCAG AA.
+(Chromium is preinstalled) at 320px, 375px and 1280px wide. Check the empty
+name state, a chosen name, Call out and Policies. Watch for page errors and
+sideways scroll, and confirm the tab bar sits inside the viewport. Measure any new colour pair against WCAG AA.
