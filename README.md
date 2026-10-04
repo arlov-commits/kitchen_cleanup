@@ -103,4 +103,12 @@ follow the poster: Planned in teal, Sick in orange, and Covered in green.
 The 30-minute question is a gold diamond.
 
 There are no shadows, no hover effects and no motion.
+
+**Appearance.** The footer has a **Light · Dark · Auto** switch, kept on
+the phone as `kitchen.theme`. **Auto** is the default and goes by the
+phone's clock: dark from 7 pm to 7 am, checked every minute and whenever
+the app comes back on screen. Dark mode uses the same layout on a
+blue-black ground. Text colours are lighter, and anything with white text
+on it (the path headers, the portal button, the badge) keeps its
+light-mode depth. Every text colour meets WCAG AA in both modes.
 Every text colour meets WCAG AA.

@@ -64,6 +64,13 @@ and the tab shell from the second.
 - Rust (`--rust`) is for fills. Use `--rust-deep` for rust text on light
   backgrounds.
 - No shadows, no hover effects, no motion.
+- Two modes, light and dark, set as `data-theme` on `<html>` by
+  `window.kitchenTheme()` in a script in `<head>`, before the page paints.
+  The footer switch offers Light, Dark and Auto (`kitchen.theme`; absent
+  means Auto, which is dark from 7 pm to 7 am by the clock, not the
+  system setting). Dark tokens are in `:root[data-theme="dark"]`. Use the
+  tokens, never a raw colour. A fill under white text uses `--cf`/`-f` or
+  `--rust-btn`, never an ink. Measure both modes.
 
 ## Verify before committing
 

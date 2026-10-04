@@ -6,6 +6,23 @@
 <title>Kitchen Cleanup</title>
 <meta name="description" content="Your kitchen cleanup shifts and who can cover them, what to do when you can't make a shift, and where to submit your timesheet.">
 <meta name="theme-color" content="#ffffff">
+<script>
+/* Appearance, set before the page paints so it never flashes the wrong one.
+   Light, Dark, or Auto (the default): dark from 7 pm to 7 am by this
+   phone's clock. The choice is kept in localStorage as kitchen.theme. */
+window.kitchenTheme = function () {
+  var m = null;
+  try { m = localStorage.getItem("kitchen.theme"); } catch (e) {}
+  if (m !== "light" && m !== "dark") m = "auto";
+  var h = new Date().getHours();
+  var dark = m === "dark" || (m === "auto" && (h < 7 || h >= 19));
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", dark ? "#1b2028" : "#ffffff");
+  return m;
+};
+window.kitchenTheme();
+</script>
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -46,6 +63,8 @@
   --rust-on-dark:#d66a48; /* rust as text on near-black */
   --gold:#e0a93f;
   --oxblood:#6a0f1f;      /* Today and Tomorrow on a shift */
+  --rust-btn:#8c2f12;     /* rust under white text: the portal button, the badge */
+  --yes-ink:#1d4a2a; --no-ink:#5a2a18;
   /* One hue per weekday (Mon first): a fill, a deeper ink for text, a wash. */
   --k0:#b8431c; --k0-ink:#8c2f12; --k0-w:rgba(184,67,28,.09);   /* rust   */
   --k1:#0c8599; --k1-ink:#0b7285; --k1-w:rgba(12,133,153,.10);  /* teal   */
@@ -54,6 +73,8 @@
   --k4:#d6336c; --k4-ink:#c2255c; --k4-w:rgba(214,51,108,.08);  /* pink   */
   --k5:#e8590c; --k5-ink:#b8420b; --k5-w:rgba(232,89,12,.09);   /* orange */
   --k6:#559986; --k6-ink:#386a5b; --k6-w:rgba(85,153,134,.12);  /* sage   */
+  /* -f: a day's hue as a fill under white text, the same in both modes */
+  --k0-f:#8c2f12; --k1-f:#0b7285; --k2-f:#6741d9; --k3-f:#24733a; --k4-f:#c2255c; --k5-f:#b8420b; --k6-f:#386a5b;
   --display:'Playfair Display',Georgia,'Times New Roman',serif;
   --body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC",sans-serif;
   --cjk:'PingFang TC','Apple LiGothic Medium','Microsoft JhengHei',serif;
@@ -61,6 +82,32 @@
   --gutter:16px;
 }
 @media (min-width:640px){:root{--gutter:28px}}
+/* Dark: the same anatomy on a blue-black ground. Text inks lighten; fills
+   under white text keep their light-mode depth. */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --white:#1b2028;        /* surfaces: heads, panels, bars */
+  --cream:#12161c;        /* the page */
+  --dark:#0b0e12;         /* the footer */
+  --ink:#eceef1;
+  --ink-body:#d8dbe0;
+  --ink-2:#c3c7ce;
+  --ink-3:#9aa0a9;
+  --on-dark:#b8bcc3;
+  --line:#2e353f;
+  --line-soft:#262c35;
+  --rust-deep:#ec8a66;    /* rust as text */
+  --oxblood:#f08b98;
+  --rust-btn:#a33a17;
+  --yes-ink:#b2f2bb; --no-ink:#ffc9b5;
+  --k0:#d0582c; --k0-ink:#f0906b; --k0-w:rgba(240,144,107,.14);
+  --k1:#1098ad; --k1-ink:#4fd1e3; --k1-w:rgba(79,209,227,.13);
+  --k2:#845ef7; --k2-ink:#b9a2fd; --k2-w:rgba(185,162,253,.14);
+  --k3:#37b24d; --k3-ink:#7ee08f; --k3-w:rgba(126,224,143,.13);
+  --k4:#e64980; --k4-ink:#f78fb3; --k4-w:rgba(247,143,179,.13);
+  --k5:#f76707; --k5-ink:#ffa94d; --k5-w:rgba(255,169,77,.13);
+  --k6:#63a995; --k6-ink:#8fd0bd; --k6-w:rgba(143,208,189,.14);
+}
 
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--white)}
@@ -73,13 +120,13 @@ a{color:var(--rust-deep);text-decoration-thickness:1px;text-underline-offset:3px
 :focus-visible{outline:2px solid var(--rust-deep);outline-offset:2px;border-radius:2px}
 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-.k0{--c:var(--k0);--ci:var(--k0-ink);--cw:var(--k0-w)}
-.k1{--c:var(--k1);--ci:var(--k1-ink);--cw:var(--k1-w)}
-.k2{--c:var(--k2);--ci:var(--k2-ink);--cw:var(--k2-w)}
-.k3{--c:var(--k3);--ci:var(--k3-ink);--cw:var(--k3-w)}
-.k4{--c:var(--k4);--ci:var(--k4-ink);--cw:var(--k4-w)}
-.k5{--c:var(--k5);--ci:var(--k5-ink);--cw:var(--k5-w)}
-.k6{--c:var(--k6);--ci:var(--k6-ink);--cw:var(--k6-w)}
+.k0{--c:var(--k0);--ci:var(--k0-ink);--cw:var(--k0-w);--cf:var(--k0-f)}
+.k1{--c:var(--k1);--ci:var(--k1-ink);--cw:var(--k1-w);--cf:var(--k1-f)}
+.k2{--c:var(--k2);--ci:var(--k2-ink);--cw:var(--k2-w);--cf:var(--k2-f)}
+.k3{--c:var(--k3);--ci:var(--k3-ink);--cw:var(--k3-w);--cf:var(--k3-f)}
+.k4{--c:var(--k4);--ci:var(--k4-ink);--cw:var(--k4-w);--cf:var(--k4-f)}
+.k5{--c:var(--k5);--ci:var(--k5-ink);--cw:var(--k5-w);--cf:var(--k5-f)}
+.k6{--c:var(--k6);--ci:var(--k6-ink);--cw:var(--k6-w);--cf:var(--k6-f)}
 
 /* ------------------------------------------------------------- type */
 h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:-.01em;line-height:1.14;color:var(--ink);margin:0;text-wrap:balance}
@@ -139,7 +186,7 @@ p{margin:0}
 @media (max-width:359px){.bn-item{font-size:11px;letter-spacing:0;padding-left:2px;padding-right:2px}}
 /* the Sunday reminder: a "1" bubble on the Submit Timesheet tab's icon */
 .ico{position:relative;display:inline-flex}
-.badge{position:absolute;top:-6px;right:-9px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--rust-deep);color:#fff;
+.badge{position:absolute;top:-6px;right:-9px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--rust-btn);color:#fff;
   font-size:11px;font-weight:700;line-height:17px;text-align:center;letter-spacing:0;box-shadow:0 0 0 2px var(--white)}
 .nav-item .ico:has(.badge){margin-right:8px}
 .nav-item:focus-visible,.bn-item:focus-visible{outline:2px solid var(--rust-deep);outline-offset:-3px}
@@ -200,7 +247,7 @@ p{margin:0}
 
 /* ------------------------------------------------------- Call out */
 .path{display:flex;flex-direction:column}
-.path-h{display:flex;align-items:center;gap:12px;background:var(--ci);color:#fff;border-radius:10px 10px 0 0;padding:12px 16px}
+.path-h{display:flex;align-items:center;gap:12px;background:var(--cf);color:#fff;border-radius:10px 10px 0 0;padding:12px 16px}
 .path-h h2{color:#fff;font-size:21px}
 .path-h .nav-icon{background-color:#fff;width:24px;height:24px}
 .steps{list-style:none;margin:0;padding:16px 16px 18px;background:var(--white);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;
@@ -219,13 +266,13 @@ p{margin:0}
 .branch{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .br{border-radius:8px;padding:9px 12px;font-size:14.5px}
 .br b{font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
-.br.yes{background:var(--k3-w);color:#1d4a2a}
+.br.yes{background:var(--k3-w);color:var(--yes-ink)}
 .br.yes b{color:var(--k3-ink)}
-.br.no{background:var(--k0-w);color:#5a2a18}
+.br.no{background:var(--k0-w);color:var(--no-ink)}
 .br.no b{color:var(--k0-ink)}
 .step.done{counter-increment:none;padding-bottom:0}
 .step.done::after{display:none}
-.step.done::before{content:"";background:var(--k3-ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/18px no-repeat}
+.step.done::before{content:"";background:var(--k3-f) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/18px no-repeat}
 .step.done .t{font-family:var(--display);font-size:21px;color:var(--k3-ink);letter-spacing:.02em}
 .after{border-left:4px solid var(--rust);border-radius:4px 10px 10px 4px}
 .motto{text-align:center;font-family:var(--display);font-weight:600;font-size:clamp(22px,6vw,28px);line-height:1.2;
@@ -242,7 +289,7 @@ p{margin:0}
 .due .big{font-family:var(--display);font-size:clamp(30px,9vw,40px);font-weight:600;line-height:1.1;color:var(--ink)}
 .due .big em{font-style:italic;color:var(--rust-deep)}
 .portal{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px 20px;border-radius:10px;
-  background:var(--rust-deep);color:#fff;font-size:17px;font-weight:600;text-decoration:none;text-align:center}
+  background:var(--rust-btn);color:#fff;font-size:17px;font-weight:600;text-decoration:none;text-align:center}
 .portal .arr{font-size:20px;line-height:1}
 .portal-url{text-align:center;font-size:14px;color:var(--ink-3);margin-top:-8px}
 
@@ -252,6 +299,14 @@ p{margin:0}
 .foot .brand{color:#fff;font-size:17px}
 .foot .brand .cjk{color:var(--rust-on-dark);font-size:18px}
 .foot .warn{color:#ffd9a0}
+/* appearance switch */
+.theme{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:8px}
+.theme .lbl{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark)}
+.seg{display:inline-flex;border:1px solid #3a414c;border-radius:30px;padding:3px;gap:2px}
+.seg button{border:0;background:none;border-radius:30px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--on-dark);cursor:pointer}
+.seg button[aria-pressed="true"]{background:#ffffff;color:#14181f}
+.seg button:focus-visible{outline:2px solid var(--rust-on-dark);outline-offset:2px}
+.theme-note{font-size:13px;color:#8a8d93}
 
 .msg{border-left:4px solid var(--gold);border-radius:4px 10px 10px 4px}
 </style>
@@ -355,6 +410,15 @@ p{margin:0}
           <span class="brand"><span class="cjk" lang="zh" aria-hidden="true">淨</span>Kitchen Cleanup</span>
           <p id="data-status">Shift list: loading…</p>
           <p>Your name is saved on this phone only.</p>
+          <div class="theme">
+            <span class="lbl" id="theme-lbl">Appearance</span>
+            <div class="seg" role="group" aria-labelledby="theme-lbl">
+              <button type="button" data-theme-set="light">Light</button>
+              <button type="button" data-theme-set="dark">Dark</button>
+              <button type="button" data-theme-set="auto">Auto</button>
+            </div>
+          </div>
+          <p class="theme-note" id="theme-note">Auto: dark from 7 pm to 7 am.</p>
         </div>
       </footer>
     </div>
@@ -587,8 +651,24 @@ p{margin:0}
   document.querySelector(".portal").addEventListener("click", function () {
     store.set(TS_KEY, dateKey(new Date())); drawNavs();
   });
-  /* an app left open overnight picks up Sunday when it comes back on screen */
-  document.addEventListener("visibilitychange", function () { if (!document.hidden) drawNavs(); });
+  /* an app left open overnight picks up Sunday, and the hour, when it comes back on screen */
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) { drawNavs(); drawTheme(); } });
+
+  /* ------------------------------------------------------ appearance */
+  function drawTheme() {
+    var m = window.kitchenTheme(), btns = document.querySelectorAll("[data-theme-set]");
+    for (var i = 0; i < btns.length; i++) btns[i].setAttribute("aria-pressed", btns[i].getAttribute("data-theme-set") === m ? "true" : "false");
+    $("theme-note").hidden = m !== "auto";
+  }
+  document.querySelector(".seg").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-theme-set]") : null;
+    if (!b) return;
+    var m = b.getAttribute("data-theme-set");
+    if (m === "auto") store.del("kitchen.theme"); else store.set("kitchen.theme", m);
+    drawTheme();
+  });
+  setInterval(drawTheme, 60000);   /* Auto turns over at 7 am and 7 pm */
+  drawTheme();
 
   /* ------------------------------------------------------------ start */
   route(); renderAll();
