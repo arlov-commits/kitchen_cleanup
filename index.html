@@ -511,7 +511,8 @@ p{margin:0}
     var body = $("shifts-body");
     if (loadError) {
       body.innerHTML = '<div class="panel msg"><b>The shift list didn\'t load.</b><p class="note">' + esc(loadError) +
-        "</p><p class=\"note\">Open the app from its web address. A page opened straight off the disk can't read the list.</p></div>";
+        "</p><p class=\"note\">" + (location.protocol === "file:" ? "Open the app from its web address. A page opened straight off the disk can't read the list." :
+        "Close the app and open it again. If it still doesn't load, tell the Kitchen Manager.") + "</p></div>";
       return;
     }
     if (!data) { body.innerHTML = '<p class="note">Loading the shift list…</p>'; return; }
