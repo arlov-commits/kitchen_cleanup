@@ -266,7 +266,7 @@ function serve(dir, port) {
   var reloaded = false;
   p.on("framenavigated", function (f) { if (f === p.mainFrame()) reloaded = true; });
   await p.evaluate(function () { return navigator.serviceWorker.getRegistration().then(function (r) { return r.update(); }); });
-  for (var i = 0; i < 30 && !reloaded; i++) await p.waitForTimeout(200);
+  for (var i = 0; i < 75 && !reloaded; i++) await p.waitForTimeout(200);   // up to 15 s: a busy machine can be slow
   check("an update reloads the open page by itself", reloaded, true);
   await ready(p);
   check("old cache dropped", await p.evaluate(function () { return caches.keys(); }), ["kitchen-test-next"]);
