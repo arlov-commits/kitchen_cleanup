@@ -30,9 +30,13 @@ and the tab shell from the second.
   these rules that writes `tests/expected-cover-lists.csv`. Change both
   together, and regenerate after any data change. Rules belong in the
   CSVs, never hard-coded.
-- "Can cover for you" shows each backup's own shifts in brackets
-  (`worksText()`). My availability groups each day by the role you'd cover
-  as, naming the shift's role when it differs.
+- "Can cover for you" shows each backup as a bold name, then their shifts
+  (`worksHTML()`): each role as a quiet label followed by day tags (`.dp`)
+  in that day's hue. My availability groups each day by the role you'd
+  cover as: a small label (`.ar`), with the names under it (`.an`).
+  **Substitute lists and My availability never say "Shift Leader"**: they
+  use the covered-as role (Pots & Pans). The user was explicit. Only the
+  shift's own card header and "On with you" show Shift Leader.
 - "On with you" shows only the shift's own work group, and is left out
   when empty. Roles are shown as written ("Shift Leader"). Never
   highlight one. Role order on cards is `roles.csv` row order.

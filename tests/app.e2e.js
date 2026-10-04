@@ -31,13 +31,25 @@ var ROWS = rowsOf("tests/expected-cover-lists.csv").map(function (r) {
 });
 var ROLE = {};
 rowsOf("roles.csv").forEach(function (r, i) { ROLE[r[0]] = { group: r[1] || r[0], as: r[2] || r[0], rank: i }; });
-/* "Pots & Pans Wed, Thu; Recycling Mon": what a student works */
+/* "Pots & Pans: Wed Thu | Recycling: Mon": what a student works, each role as
+   it's covered (a Shift Leader shift counts as Pots & Pans) */
 function worksOf(name) {
   var by = {};
-  ROWS.forEach(function (r) { if (r.who === name) (by[r.role] = by[r.role] || []).push(DAYS.indexOf(r.day)); });
+  ROWS.forEach(function (r) {
+    if (r.who !== name) return;
+    var as = ROLE[r.role].as, d = DAYS.indexOf(r.day);
+    by[as] = by[as] || [];
+    if (by[as].indexOf(d) < 0) by[as].push(d);
+  });
   return Object.keys(by).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (role) {
-    return role + " " + by[role].sort().map(function (d) { return DAYS[d].slice(0, 3); }).join(", ");
-  }).join("; ");
+    return role + ": " + by[role].sort().map(function (d) { return DAYS[d].slice(0, 3); }).join(" ");
+  }).join(" | ");
+}
+/* the same, read off a backup's line in the page */
+function worksOnPage(li) {
+  return [].map.call(li.querySelectorAll(".wk"), function (g) {
+    return g.querySelector(".wr").textContent + ": " + [].map.call(g.querySelectorAll(".dp"), function (d) { return d.textContent; }).join(" ");
+  }).join(" | ");
 }
 function crewOf(who, day, role) {
   return ROWS.filter(function (r) { return r.day === day && r.who !== who && ROLE[r.role].group === ROLE[role].group; })
@@ -101,8 +113,14 @@ function serve(dir, port) {
   await p.click(".shift >> nth=0 >> summary");
   check("backups open: lead text", await text(p, ".shift >> nth=0 >> .cover-lead"), "Can cover for you");
   check("backups open: list in the reference order", await p.$$eval(".shift:first-of-type .cover .cn", function (l) { return l.map(function (x) { return x.textContent; }); }), mine[0].cover);
-  check("backups open: each with what they work", await p.$$eval(".shift:first-of-type .cover li", function (l) { return l.map(function (x) { return x.textContent; }); }),
-    mine[0].cover.map(function (c) { return c + " (" + worksOf(c) + ")"; }));
+  check("backups open: each with what they work (role labels, day tags)", await p.$$eval(".shift:first-of-type .cover li", function (l, fn) {
+    var works = new Function("return " + fn)();
+    return l.map(function (x) { return x.querySelector(".cn").textContent + " = " + works(x); });
+  }, worksOnPage.toString()), mine[0].cover.map(function (c) { return c + " = " + worksOf(c); }));
+  check("day tags carry their day's colour", await p.$$eval(".shift:first-of-type .cover .dp", function (t) {
+    var k = { Mon: "k0", Tue: "k1", Wed: "k2", Thu: "k3", Fri: "k4", Sat: "k5", Sun: "k6" };
+    return t.every(function (x) { return x.classList.contains(k[x.textContent]); });
+  }), true);
   check("summary unchanged when open", await text(p, ".shift >> nth=0 >> summary"), "SHIFT BACKUPS · " + mine[0].cover.length);
   var page1 = await p.$eval(".pane", function (e) { return e.innerText; });
   check("no Student Leader anywhere", /student leader/i.test(page1), false);
@@ -123,6 +141,9 @@ function serve(dir, port) {
      "Thursday: (none)"]);
   check("Recycling with two on: shows the other", (await crews("Adrian"))[0], "Monday: Vayu");
   await p.click(".shift:nth-of-type(2) summary");
+  check("no Shift Leader in any substitute list or in My availability", await p.evaluate(function () {
+    return [].some.call(document.querySelectorAll(".cover, #avail"), function (e) { return /shift leader/i.test(e.textContent); });
+  }), false);
   check("Shift Leader card: covered as Pots & Pans, leaderless", await text(p, ".shift:nth-of-type(2) .cover-lead"), "Can cover for you, as Pots & Pans. The shift goes without a Shift Leader.");
   check("Lunch Monitor: no On with you", await crews("Shuxing"), ["Monday: (none)", "Thursday: (none)"]);
   check("Kitchen never lists Recycling or Lunch Monitor", (await crews("Huiyi"))[0].indexOf("Adrian") < 0 && (await crews("Huiyi"))[0].indexOf("Shuxing") < 0, true);
@@ -133,14 +154,20 @@ function serve(dir, port) {
   ROWS.forEach(function (r) {
     if (r.cover.indexOf("Aryashree") < 0) return;
     var as = ROLE[r.role].as, day = avail[r.day] = avail[r.day] || {};
-    (day[as] = day[as] || []).push(r.who + (r.role !== as ? " (" + r.role + ")" : ""));
+    (day[as] = day[as] || []).push(r.who);
   });
   var wantAvail = DAYS.filter(function (d) { return avail[d]; }).map(function (d) {
-    return d + " " + Object.keys(avail[d]).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (as) {
-      return "As " + as + " for " + avail[d][as].sort().join(", ");
-    }).join(" ");
+    return d + " | " + Object.keys(avail[d]).sort(function (a, b) { return ROLE[a].rank - ROLE[b].rank; }).map(function (as) {
+      return "As " + as + ": " + avail[d][as].sort().join(", ");
+    }).join(" | ");
   });
-  check("availability rows", await p.$$eval(".avail-list li", function (l) { return l.map(function (x) { return x.innerText.replace(/\s+/g, " ").trim(); }); }), wantAvail);
+  check("availability rows: day, then each role you'd cover as, then names", await p.$$eval(".avail-list li", function (l) {
+    return l.map(function (x) {
+      return x.querySelector(".d").textContent + " | " + [].map.call(x.querySelectorAll(".ag"), function (g) {
+        return g.querySelector(".ar").textContent + ": " + g.querySelector(".an").textContent;
+      }).join(" | ");
+    });
+  }), wantAvail);
   check("availability: wrong-info line", await text(p, "#avail .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Art).");
   check("band shown", await p.$eval("#avail", function (e) { return e.hidden; }), false);
 

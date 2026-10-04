@@ -275,11 +275,22 @@ p{margin:0}
 /* the day in ink with a small dot in its hue: calm on the sage */
 .avail-list .d{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:18px;font-weight:600;color:var(--ink)}
 .avail-list .d::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
-.avail-list .f{font-size:14.5px;color:var(--ink-2);padding-left:17px}
+/* under each day: the role you'd cover as (a small label), then the names */
+.avail-list .ag{display:flex;flex-direction:column;gap:1px;padding-left:17px;margin-top:6px}
+.avail-list .ar{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--band-accent)}
+.avail-list .an{font-size:15px;color:var(--ink)}
 .cover{margin:0;padding:0 0 0 1.6em;font-size:15px}
-/* beside each backup, the shifts they work, so you know what a swap means */
-.cover .cm{font-size:13.5px;color:var(--ink-3)}
-.cover li{padding:2px 0;break-inside:avoid}
+/* each backup: the name on its own line, then what they work, as role
+   labels each followed by day tags in that day's colour */
+.cover li{padding:8px 0 9px;border-top:1px solid var(--line-soft)}
+.cover li:first-child{border-top:0;padding-top:2px}
+.cover .cn{display:block;font-weight:600;color:var(--ink)}
+.cover .cw{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px}
+.wk{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.wr{font-size:13.5px;color:var(--ink-3);margin-right:2px}
+.dp{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1;
+  padding:4px 7px;border-radius:30px;background:var(--cw);color:var(--ci)}
+
 .cover li::marker{color:var(--ci);font-weight:600;font-size:13px}
 
 /* ------------------------------------------------------- Call out */
@@ -721,7 +732,7 @@ p{margin:0}
           '<details class="backups"><summary><span>Shift Backups · ' + s.cover.length + "</span></summary>" +
           (s.cover.length ? '<p class="cover-lead">Can cover for you' +
             (s.as !== s.role ? ", as " + esc(s.as) + ". The shift goes without a " + esc(s.role) + "." : "") + '</p><ol class="cover">' +
-            s.cover.map(function (c) { return '<li><span class="cn">' + esc(c) + '</span> <span class="cm">(' + esc(worksText(c)) + ")</span></li>"; }).join("") + "</ol>" :
+            s.cover.map(function (c) { return '<li><span class="cn">' + esc(c) + '</span><span class="cw">' + worksHTML(c) + "</span></li>"; }).join("") + "</ol>" :
             '<p class="cover-lead">No one is listed to cover this shift yet.</p>') + "</details>" +
           "</section>";
       }).join("");
@@ -729,23 +740,27 @@ p{margin:0}
     $("avail").hidden = false;
   }
 
-  /* "Pots & Pans Wed, Thu; Buckets & Composting Fri": the shifts a student
-     works, by role in roles.csv order */
-  function worksText(name) {
+  /* What a backup works, so whoever asks knows what a swap would mean:
+     each role (as it's covered: a Shift Leader shift shows as Pots & Pans)
+     followed by its days as tags in each day's colour. */
+  function worksHTML(name) {
     var by = {}, order = [];
     data.shifts.forEach(function (x) {
       if (x.who !== name) return;
-      if (!by[x.role]) { by[x.role] = []; order.push(x.role); }
-      by[x.role].push(x.day);
+      if (!by[x.as]) { by[x.as] = []; order.push(x.as); }
+      if (by[x.as].indexOf(x.day) < 0) by[x.as].push(x.day);
     });
     order.sort(function (a, b) { return roleRank(a) - roleRank(b); });
     return order.map(function (r) {
-      return r + " " + by[r].sort().map(function (d) { return DAYS[d].slice(0, 3); }).join(", ");
-    }).join("; ");
+      return '<span class="wk"><span class="wr">' + esc(r) + "</span>" + by[r].sort().map(function (d) {
+        return '<span class="dp k' + d + '">' + DAYS[d].slice(0, 3) + "</span>";
+      }).join("") + "</span>";
+    }).join("");
   }
 
-  /* The days this student appears in someone's backup list: for whom, and
-     as which role they'd be covering. */
+  /* The days this student appears in someone's backup list: as which role
+     they'd be covering (a Shift Leader's shift counts as Pots & Pans), and
+     for whom. */
   function availability() {
     var days = [];
     data.shifts.forEach(function (s) {
@@ -757,10 +772,8 @@ p{margin:0}
     days.forEach(function (byRole, d) {
       if (!byRole) return;
       var lines = Object.keys(byRole).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
-        var who = byRole[as].sort(function (a, b) { return a.who.localeCompare(b.who); }).map(function (s) {
-          return esc(s.who) + (s.role !== as ? " (" + esc(s.role) + ")" : "");
-        });
-        return '<span class="f">As ' + esc(as) + " for " + who.join(", ") + "</span>";
+        var who = byRole[as].map(function (s) { return s.who; }).sort(function (a, b) { return a.localeCompare(b); });
+        return '<div class="ag"><span class="ar">As ' + esc(as) + '</span><span class="an">' + who.map(esc).join(", ") + "</span></div>";
       });
       rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + "</span>" + lines.join("") + "</li>");
     });

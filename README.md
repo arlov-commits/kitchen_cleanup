@@ -58,8 +58,10 @@ role (gender, Only does and training all allow it), the list goes:
 Each tier is fewest shifts first, then alphabetical. After them come
 students already working that day in the role's same-day backup roles, in
 the listed order (Lunch Monitor last). Each backup is shown with the
-shifts they work. **My availability** shows, by day, which role you'd
-cover and for whom. **On with you** shows only the shift's own work group.
+shifts they work: their name in bold, then each role as a quiet label
+followed by day tags in each day's colour. **My availability** shows, by
+day, which role you'd cover (a small label) and for whom. Neither ever
+says "Shift Leader". A Shift Leader's shift shows as Pots & Pans. **On with you** shows only the shift's own work group.
 The full rules, in plain words, are in HANDOFF.md under "How the cover
 lists are worked out".
 

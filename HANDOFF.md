@@ -136,11 +136,13 @@ alphabetical order. Then, last of all:
 So Buckets & Composting and Pots & Pans never cover each other on the
 same day.
 
-**What students see.** Each backup's own shifts are shown next to their
-name, for example *Beth (Pots & Pans Wed, Thu)*, so whoever's asking knows
-what a swap would mean. In **My availability**, each day says which role
-you'd be covering and for whom, for example *As Pots & Pans for Adam,
-Ivwananji (Shift Leader)*.
+**What students see.** Each backup is shown with their own shifts under
+their name: each role, followed by its days as small tags in that day's
+colour. So whoever's asking knows what a swap would mean. In **My
+availability**, each day shows the role you'd be covering as a small
+label, with the names under it. Substitute lists never say "Shift
+Leader": a Shift Leader's shift is shown as Pots & Pans, because that's
+what the substitute does.
 
 `tests/expected-cover-lists.csv` holds every shift's list as worked out
 by a second, independent copy of these rules, and the app is tested
