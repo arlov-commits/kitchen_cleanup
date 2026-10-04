@@ -45,6 +45,7 @@
   --rust-deep:#8c2f12;    /* rust as text on light, always this, not --rust */
   --rust-on-dark:#d66a48; /* rust as text on near-black */
   --gold:#e0a93f;
+  --oxblood:#6a0f1f;      /* Today and Tomorrow on a shift */
   /* One hue per weekday (Mon first): a fill, a deeper ink for text, a wash. */
   --k0:#b8431c; --k0-ink:#8c2f12; --k0-w:rgba(184,67,28,.09);   /* rust   */
   --k1:#0c8599; --k1-ink:#0b7285; --k1-w:rgba(12,133,153,.10);  /* teal   */
@@ -164,8 +165,7 @@ p{margin:0}
 .shift-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
 .shift-h h2{color:var(--ci)}
 .role{font-size:15px;font-weight:600;color:var(--ink)}
-.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:30px;
-  background:var(--cw);color:var(--ci);vertical-align:4px;margin-left:8px;font-family:var(--body)}
+.when{flex-basis:100%;font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--oxblood);margin-bottom:-4px}
 .part{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid var(--line-soft)}
 .crew{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .crew li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:15px}
@@ -477,14 +477,15 @@ p{margin:0}
     if (!data) { body.innerHTML = '<p class="note">Loading the shift list…</p>'; return; }
     if (!me) { body.innerHTML = '<p class="note">Choose your name above to see your shifts and who can cover them.</p>'; return; }
 
-    var today = (new Date().getDay() + 6) % 7;
+    var today = (new Date().getDay() + 6) % 7, tomorrow = (today + 1) % 7;
     var mine = data.shifts.filter(function (s) { return s.who === me; }).sort(function (a, b) { return a.day - b.day; });
     body.innerHTML = '<p class="lead">' + mine.length + " shift" + (mine.length === 1 ? "" : "s") + " a week.</p>" +
       mine.map(function (s) {
         var crew = data.shifts.filter(function (x) { return x.day === s.day && x.who !== me; })
           .sort(function (a, b) { return roleRank(a.role) - roleRank(b.role) || a.who.localeCompare(b.who); });
         return '<section class="panel shift k' + s.day + '">' +
-          '<div class="shift-h"><h2>' + DAYS[s.day] + (s.day === today ? '<span class="tag">Today</span>' : "") + "</h2>" +
+          '<div class="shift-h">' + (s.day === today ? '<span class="when">Today</span>' : s.day === tomorrow ? '<span class="when">Tomorrow</span>' : "") +
+          "<h2>" + DAYS[s.day] + "</h2>" +
           (s.role ? '<span class="role">' + esc(roleName(s.role)) + "</span>" : "") + "</div>" +
           '<div class="part"><h4>On with you</h4><ul class="crew">' +
           (crew.length ? crew.map(function (x) {

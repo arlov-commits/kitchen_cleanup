@@ -16,7 +16,7 @@ dependencies. Served over the web, it installs as an app on a phone.
 
 | Tab | What it shows |
 | --- | --- |
-| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day and your role, and who else is on that day with their roles, the Shift Leader first and Buckets & Composting last. Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. |
+| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day (marked **Today** or **Tomorrow** in oxblood when it is) and your role, and who else is on that day with their roles, the Shift Leader first and Buckets & Composting last. Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. |
 | **Call out** | The substitute-replacement steps from the poster: **Planned Absence**, then **Sick or Unexpected Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
 | **Submit Timesheet** | The deadline, Sunday at 5 pm, and a button to the timesheet portal at drbu.edu/timesheet. |
 
