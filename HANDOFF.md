@@ -92,9 +92,10 @@ file. Keep this up to date. The person taking over relies on it.
 - Students who don't work that day can cover it. List those with the
   fewest shifts first; students with the same number of shifts go in
   alphabetical order.
-- Some students aren't asked to cover **Buckets & Composting** shifts.
-  When this page was written, that was Adam, Adrian and Vayu.
-  *Reason: (to be filled in by whoever knows it).*
+- **Buckets & Composting is for women only.** Men are never given that
+  role and never listed to cover it. That's what the **Gender** column
+  (F or M) in the shift list is for. The app checks it and flags any
+  mistake in the footer.
 
 ---
 

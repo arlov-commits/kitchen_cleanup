@@ -387,10 +387,10 @@ p{margin:0}
     <div class="path k1">
       <div class="path-h"><span class="nav-icon" style="--icon:var(--nv-shifts)" aria-hidden="true"></span><h2>Planned Absence</h2></div>
       <ol class="steps">
-        <li class="step"><span class="t">Get Kitchen Manager approval at least 1 week ahead.</span></li>
+        <li class="step"><span class="t">Get Student Kitchen Manager approval at least 1 week ahead.</span></li>
         <li class="step"><span class="t">Call your backups to arrange a substitute.</span>
           <span class="s">Your backups for each shift are listed on My shifts, in the order to ask them.</span></li>
-        <li class="step"><span class="t">Your substitute confirms with the Kitchen Manager.</span></li>
+        <li class="step"><span class="t">Your substitute confirms with the Student Kitchen Manager.</span></li>
         <li class="step done"><span class="t">Covered</span></li>
       </ol>
     </div>
@@ -400,13 +400,13 @@ p{margin:0}
       <ol class="steps">
         <li class="step"><span class="t">Act as soon as you feel unwell, even if you're unsure.</span>
           <span class="s">Don't wait for the shift.</span></li>
-        <li class="step"><span class="t">Email the Kitchen Manager and Work Study Manager.</span></li>
+        <li class="step"><span class="t">Email the Student Kitchen Manager and Work Study Manager.</span></li>
         <li class="step"><span class="t">Phone your backups. Call, don't just text.</span>
           <span class="s">Your backups are listed on My shifts.</span></li>
         <li class="step ask"><span class="t">Did someone say yes within 30 minutes?</span>
           <div class="branch">
-            <p class="br yes"><b>Yes</b>Your substitute confirms with the Kitchen Manager.</p>
-            <p class="br no"><b>No</b>Call the Kitchen Manager directly.</p>
+            <p class="br yes"><b>Yes</b>Your substitute confirms with the Student Kitchen Manager.</p>
+            <p class="br no"><b>No</b>Call the Student Kitchen Manager directly.</p>
           </div>
         </li>
         <li class="step done"><span class="t">Covered</span></li>
@@ -466,8 +466,7 @@ p{margin:0}
   "use strict";
 
   /* ---------------------------------------------------------- settings
-     Shown as written. */
-  /* Defaults only. The real values come from settings.csv, which the
+     Defaults only. The real values come from settings.csv, which the
      Student Kitchen Manager edits each year; these are used if it can't be
      read. */
   var CONFIG = {
@@ -504,7 +503,7 @@ p{margin:0}
 
   /* -------------------------------------------------------- the data */
   function parseCSV(text) {
-    text = text.replace(/^﻿/, "");
+    text = text.replace(/^\uFEFF/, "");
     var rows = [], row = [], f = "", q = false, i, c;
     for (i = 0; i < text.length; i++) {
       c = text.charAt(i);
@@ -528,31 +527,46 @@ p{margin:0}
     return -1;
   }
 
-  /* One row per shift: Student, Shift day, Role, # who can cover, and the
-     names who can be asked to cover, in the order to ask them. The list is
-     used exactly as written. */
+  /* Buckets & Composting is for women only. */
+  function womenOnly(role) { return /bucket/i.test(role); }
+
+  /* One row per shift: Student, Gender, Shift day, Role, # who can cover,
+     and the names who can be asked to cover, in the order to ask them. The
+     cover list is used exactly as written; the checks below only report
+     problems in the footer, for whoever keeps the file. Gender (F or M) is
+     never shown; it is only checked against Buckets & Composting. */
   function buildData(text) {
     var rows = parseCSV(text), out = { shifts: [], names: [], problems: [] };
     if (!rows.length) { out.problems.push(DATA_FILE + " is empty."); return out; }
     var head = rows[0].map(function (h) { return h.trim().toLowerCase(); });
     function col(test) { for (var i = 0; i < head.length; i++) if (test(head[i])) return i; return -1; }
     var cS = col(function (h) { return h === "student" || h === "name"; }),
+        cG = col(function (h) { return h === "gender"; }),
         cD = col(function (h) { return h.indexOf("day") >= 0; }),
         cR = col(function (h) { return h === "role"; }),
         cN = col(function (h) { return h.charAt(0) === "#"; }),
         cC = col(function (h) { return h.indexOf("can be asked") === 0 || h.indexOf("cover (") >= 0; });
     if (cS < 0 || cD < 0 || cC < 0) { out.problems.push(DATA_FILE + " needs Student, Shift day and cover columns."); return out; }
-    var seen = {}, count = {};
+    if (cG < 0) out.problems.push("Add a Gender column (F or M) so Buckets & Composting lists can be checked.");
+    /* null-prototype maps, so a name like "constructor" is just a name */
+    var seen = Object.create(null), count = Object.create(null), gender = Object.create(null), works = Object.create(null);
     rows.slice(1).forEach(function (r, n) {
       var who = (r[cS] || "").trim(), d = dayIndex(r[cD]), line = n + 2;
       if (!who) { out.problems.push("Line " + line + " has no student."); return; }
       if (d < 0) { out.problems.push("Line " + line + ": \"" + (r[cD] || "") + "\" isn't a day."); return; }
+      if (seen[who + "|" + d]) { out.problems.push(who + " is listed twice on " + DAYS[d] + "."); return; }
+      seen[who + "|" + d] = true;
+      if (cG >= 0) {
+        var g = (r[cG] || "").trim().toUpperCase().charAt(0);
+        if (g !== "F" && g !== "M") out.problems.push("Line " + line + ": " + who + "'s gender should be F or M.");
+        else if (gender[who] && gender[who] !== g) out.problems.push(who + " is marked " + gender[who] + " on one row and " + g + " on another.");
+        else gender[who] = g;
+      }
       var cover = (r[cC] || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean);
       var stated = cN >= 0 ? parseInt(r[cN], 10) : NaN;
       if (!isNaN(stated) && stated !== cover.length) out.problems.push(who + " (" + DAYS[d] + ") says " + stated + " can cover but lists " + cover.length + ".");
-      if (seen[who + "|" + d]) out.problems.push(who + " is listed twice on " + DAYS[d] + ".");
-      seen[who + "|" + d] = true;
       count[who] = (count[who] || 0) + 1;
+      works[who + "|" + d] = true;
       out.shifts.push({ who: who, day: d, role: cR >= 0 ? (r[cR] || "").trim() : "", cover: cover });
     });
     out.names = Object.keys(count).sort(function (a, b) { return a.localeCompare(b); });
@@ -560,14 +574,19 @@ p{margin:0}
       if (count[n] < 2 || count[n] > 4) out.problems.push(n + " has " + count[n] + " shift" + (count[n] === 1 ? "" : "s") + " (expected 2 to 4).");
     });
     out.shifts.forEach(function (s) {
-      s.cover.forEach(function (c) { if (!count[c]) out.problems.push("\"" + c + "\" (in " + s.who + "'s " + DAYS[s.day] + " list) isn't a student on the list."); });
+      var where = s.who + "'s " + DAYS[s.day] + " cover list";
+      if (womenOnly(s.role) && gender[s.who] === "M") out.problems.push(s.who + " is on Buckets & Composting on " + DAYS[s.day] + ", which is for women only.");
+      s.cover.forEach(function (c) {
+        if (!count[c]) out.problems.push("\"" + c + "\" (in " + where + ") isn't a student on the list.");
+        else if (c === s.who) out.problems.push(where + " includes " + c + ".");
+        else if (works[c + "|" + s.day]) out.problems.push(c + " is in " + where + " but also works on " + DAYS[s.day] + ".");
+        else if (womenOnly(s.role) && gender[c] === "M") out.problems.push(c + " is in " + where + ", but Buckets & Composting is for women only.");
+      });
     });
     return out;
   }
 
   /* -------------------------------------------------------- My shifts */
-  /* The list calls it Student Leader; the crew calls it Shift Leader. */
-  function roleName(r) { return r.replace(/student leader/i, "Shift Leader"); }
   /* On with you: the Shift Leader first, Buckets & Composting last. */
   function roleRank(r) { return /leader/i.test(r) ? 0 : /bucket/i.test(r) ? 2 : 1; }
 
@@ -587,7 +606,7 @@ p{margin:0}
     if (loadError) {
       body.innerHTML = '<div class="panel msg"><b>The shift list didn\'t load.</b><p class="note">' + esc(loadError) +
         "</p><p class=\"note\">" + (location.protocol === "file:" ? "Open the app from its web address. A page opened straight off the disk can't read the list." :
-        "Close the app and open it again. If it still doesn't load, tell the Kitchen Manager.") + "</p></div>";
+        "Close the app and open it again. If it still doesn't load, tell the Student Kitchen Manager.") + "</p></div>";
       return;
     }
     if (!data) { body.innerHTML = '<p class="note">Loading the shift list…</p>'; return; }
@@ -602,13 +621,14 @@ p{margin:0}
         return '<section class="panel shift k' + s.day + '">' +
           '<div class="shift-h"><h2>' + DAYS[s.day] +
           (s.day === today ? '<span class="when">Today</span>' : s.day === tomorrow ? '<span class="when tmrw">Tomorrow</span>' : "") + "</h2>" +
-          (s.role ? '<span class="role">' + esc(roleName(s.role)) + "</span>" : "") + "</div>" +
+          (s.role ? '<span class="role">' + esc(s.role) + "</span>" : "") + "</div>" +
           '<div class="part"><h4>On with you</h4><ul class="crew">' +
           (crew.length ? crew.map(function (x) {
-            return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(roleName(x.role)) + "</span></li>";
+            return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(x.role) + "</span></li>";
           }).join("") : '<li class="note">Just you.</li>') + "</ul></div>" +
           '<details class="backups"><summary><span>Shift Backups · ' + s.cover.length + "</span></summary>" +
-          '<p class="cover-lead">Can cover for you</p><ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol></details>" +
+          (s.cover.length ? '<p class="cover-lead">Can cover for you</p><ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol>" :
+            '<p class="cover-lead">No one is listed to cover this shift yet.</p>') + "</details>" +
           "</section>";
       }).join("");
     $("avail-in").innerHTML = availability();
@@ -640,10 +660,12 @@ p{margin:0}
   /* settings.csv: two columns, Setting and Value. Rows are matched by the
      Setting text, so their order doesn't matter. */
   function applySettings(text) {
-    var rows = parseCSV(text), seen = {};
-    rows.slice(1).forEach(function (r) {
+    var rows = parseCSV(text), seen = Object.create(null);
+    if (rows.length && (rows[0][0] || "").trim().toLowerCase() === "setting") rows = rows.slice(1);
+    rows.forEach(function (r) {
       var key = (r[0] || "").trim().toLowerCase(), val = (r[1] || "").trim();
       if (!key) return;
+      if (seen[key]) { settingsProblems.push("\"" + r[0].trim() + "\" is listed twice; the last one is used."); }
       seen[key] = true;
       if (key === "student kitchen manager" || key === "work study manager") {
         if (!val) { settingsProblems.push(r[0].trim() + " is empty."); return; }

@@ -99,20 +99,24 @@ works three days has three rows. The columns are:
 | Column | What goes in it | Example |
 | --- | --- | --- |
 | **Student** | The student's name. Spell it the same way every time it appears. | `Beth` |
+| **Gender** | `F` or `M`. It's never shown in the app. It's only used to check the Buckets & Composting rule. Use the same letter on every row for that student. | `F` |
 | **Shift day** | The day of the week, in full. | `Wednesday` |
-| **Role** | Their job on that shift. | `Pots & Pans`, `Buckets & Composting` or `Student Leader` |
+| **Role** | Their job on that shift. | `Shift Leader`, `Pots & Pans` or `Buckets & Composting` |
 | **# who can cover** | How many names are in the last column. | `8` |
 | **Can be asked to cover (fewest shifts first)** | The students who can cover this shift, separated by commas, in the order they should be asked. | `Adam, Amelia, Huiyi, Ivwananji` |
 
-The app shows `Student Leader` as "Shift Leader". Write `Student Leader`
-in the file.
+The app shows each role exactly as you write it.
 
 **Making each cover list:** follow the **Cover-list rules** in
 `HANDOFF.md`. The person who handed over to you will have gone through
 them with you. In short:
 - list the students who **don't** work that day;
 - put those with the **fewest shifts first**;
-- leave out anyone the rules say not to ask for that role.
+- **Buckets & Composting is for women only**: never put a man on it, and
+  never list a man to cover it.
+
+If you get any of this wrong, the yellow "Check…" note at the bottom of
+the app will say so (see step 5).
 
 The app builds everything else from these rows: the list of names to
 choose from, "On with you", and "My availability".
@@ -182,8 +186,10 @@ Each cover list is inside "quote marks". Keep the quote marks.
    - If that's all it says, everything is fine.
    - If there's **yellow text starting "Check…"**, it tells you what to
      fix. For example: *"Beth has 1 shift (expected 2 to 4)"*, *"'Bethh'
-     isn't a student on the list"*, or *"The timesheet portal link should
-     start with https://"*. Fix the file and upload it again.
+     isn't a student on the list"*, *"Adam is in Nita's Tuesday cover list,
+     but Buckets & Composting is for women only"*, or *"The timesheet
+     portal link should start with https://"*. Fix the file and upload it
+     again.
 4. Choose a student's name and check that their shifts look right.
 
 If the app says **"The shift list didn't load"**, the file's name is

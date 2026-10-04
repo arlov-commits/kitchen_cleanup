@@ -44,20 +44,27 @@ One row per shift, as exported from the spreadsheet:
 | Column | What it is |
 | --- | --- |
 | `Student` | The student's name, written the same way everywhere. |
+| `Gender` | `F` or `M`. Never shown in the app. It's only used to check the Buckets & Composting rule. |
 | `Shift day` | `Monday` … `Sunday`. |
-| `Role` | For example `Pots & Pans`, `Buckets & Composting` or `Student Leader`. |
+| `Role` | For example `Shift Leader`, `Pots & Pans` or `Buckets & Composting`. |
 | `# who can cover` | How many names are in the next column. Used only as a check. |
 | `Can be asked to cover (fewest shifts first)` | The names, comma-separated, in the order to ask them. |
 
 The app shows the cover list **exactly as written**, in that order. It
 doesn't work out who is free by itself. "On with you" is everyone else who
-has a row on the same day. The file says "Student Leader", and the app
-shows it as "Shift Leader".
+has a row on the same day. Roles are shown exactly as written.
+
+**Buckets & Composting is for women only.** Men are never put on it and
+never listed to cover it.
 
 The footer checks the file and names anything that looks wrong:
 - a count that doesn't match its list;
-- a name in a cover list that isn't a student;
-- a student listed twice on one day;
+- a name in a cover list that isn't a student, the shift's own student,
+  or someone already working that day;
+- a man on, or listed to cover, a Buckets & Composting shift;
+- a missing or unrecognised gender, or one that differs between a
+  student's rows;
+- a student listed twice on one day (the second row is ignored);
 - a student with fewer than 2 or more than 4 shifts.
 
 The browser console shows the same warnings.
@@ -100,6 +107,23 @@ The footer has an **Install as app** button. In Chrome and Edge it opens
 the browser's own install prompt. Safari on iPhone has no prompt, so there
 the button explains how to add the app from the Share menu. The button is
 hidden once the app is installed.
+
+## Tests
+
+```
+node tests/data.test.js                          # the data functions, against the real files
+NODE_PATH=$(npm root -g) node tests/app.e2e.js   # every screen in Chromium (needs Playwright)
+```
+
+`data.test.js` lifts each data function out of `index.html` by name, so
+it always tests the code that ships. `app.e2e.js` serves the repo and
+drives the whole app:
+- picking a name, the shift cards, backups and My availability;
+- the tabs, the Sunday badge, settings and load errors;
+- the theme button and Install as app;
+- the layout at 320, 375 and 1280px in both modes;
+- offline use, and the service worker reloading an open page when the
+  app updates.
 
 ## Running it
 

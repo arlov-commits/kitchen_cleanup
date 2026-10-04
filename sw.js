@@ -10,7 +10,7 @@
    The new worker then replaces the old one and reloads any page the old one
    left open, so no phone is stuck on an old page asking for files that are
    gone. */
-var CACHE = "kitchen-v11";
+var CACHE = "kitchen-v13";
 var SHELL = [
   "./",
   "index.html",
@@ -41,19 +41,24 @@ self.addEventListener("install", function (e) {
 
 self.addEventListener("activate", function (e) {
   var update = false;
-  e.waitUntil(caches.keys().then(function (keys) {
+  var ready = caches.keys().then(function (keys) {
     return Promise.all(keys.map(function (k) {
       if (k === CACHE) return null;
       update = true;
       return caches.delete(k);
     }));
-  }).then(function () { return self.clients.claim(); }).then(function () {
-    /* An update, not a first install: reload the pages the old version drew. */
+  }).then(function () { return self.clients.claim(); });
+  e.waitUntil(ready);
+  /* An update, not a first install: reload the pages the old version drew.
+     This must stay outside waitUntil. A reload is a fetch, and this worker
+     can't answer fetches until it has finished activating, so waiting on
+     the reload inside activation would leave both waiting for ever. */
+  ready.then(function () {
     if (!update) return;
     return self.clients.matchAll({ type: "window" }).then(function (wins) {
-      return Promise.all(wins.map(function (w) { return w.navigate ? w.navigate(w.url).catch(function () {}) : null; }));
+      wins.forEach(function (w) { if (w.navigate) w.navigate(w.url).catch(function () {}); });
     });
-  }));
+  });
 });
 
 /* Network first, with the cached copy if the network fails, errors or is slow. */

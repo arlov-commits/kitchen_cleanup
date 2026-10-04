@@ -16,13 +16,19 @@ and the tab shell from the second.
   file. No build step and no dependencies. There are three tabs, chosen by
   hash: `#shifts`, `#callout` and `#timesheet`.
 - `shift_cover_list.csv` is the shift data, exported from the user's
-  spreadsheet: `Student`, `Shift day`, `Role`, `# who can cover`, and
-  `Can be asked to cover (fewest shifts first)`. It is **fetched**, so
+  spreadsheet: `Student`, `Gender` (F/M), `Shift day`, `Role`,
+  `# who can cover`, and `Can be asked to cover (fewest shifts first)`. It is **fetched**, so
   the app must be served. The cover list is curated: show it exactly as
   written and in that order, and never work out cover from who is free.
   "On with you" is the other rows on the same day, Shift Leader first and
-  Buckets & Composting last. The list says "Student Leader"; the app shows
-  "Shift Leader" (`roleName()`), never highlighted.
+  Buckets & Composting last. Roles are shown exactly as written; the
+  leader role is "Shift Leader" in the data itself. Never highlight it.
+- **Gender is for checks only, never shown.** Buckets & Composting is for
+  women only (`womenOnly()`). `buildData()` flags a man on that role or
+  in its cover list, plus bad or inconsistent gender, self or same-day
+  names in a cover list, duplicates and shift counts, all in the footer.
+- The managers are named consistently everywhere: "Student Kitchen
+  Manager" (never just "Kitchen Manager") and "Work Study Manager".
 - **It is information, not a tool.** Each tab shows everything at once,
   phone first. Don't add toggles, in-card links or buttons, a whole-team
   view, phone numbers or call buttons, or a shift time. The user ruled
@@ -60,6 +66,9 @@ and the tab shell from the second.
   a button to https://www.drbu.edu/timesheet. On a Sunday its tab carries a "1"
   bubble until that button is pressed that day (`kitchen.timesheet` holds
   the date it was pressed).
+- The service worker's self-update reloads open pages from **outside**
+  `activate`'s `waitUntil`. A reload is a fetch the worker can't answer
+  until activation finishes, so waiting on it inside deadlocks the app.
 - It is an installable PWA. A file added to the app must also go in `SHELL`
   in `sw.js`. The page and `shift_cover_list.csv` are served network-first,
   and everything else cache-first. Bump `CACHE` in `sw.js` whenever
@@ -101,7 +110,10 @@ and the tab shell from the second.
 
 ## Verify before committing
 
-Serve the repo root (`python3 -m http.server`) and check with Playwright
+Run both test files (README › Tests). `node tests/data.test.js` covers
+every data function; `tests/app.e2e.js` covers every screen and the
+service worker. Add checks for anything new. Then serve the repo root
+(`python3 -m http.server`) and look with Playwright
 (Chromium is preinstalled) at 320px, 375px and 1280px wide. Check the empty
 name state, a chosen name with its backups closed and open, Call out and
 Submit Timesheet. Watch for page errors and
