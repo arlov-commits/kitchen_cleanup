@@ -27,10 +27,12 @@ and the tab shell from the second.
   phone first. Don't add toggles, in-card links or buttons, a whole-team
   view, phone numbers or call buttons, or a shift time. The user ruled
   these out. The one exception the user asked for: each shift's backups
-  are a closed `<details>` titled "Shift Backups" that reads "Can cover
-  for you" when open.
-- `CONFIG` at the top of the script holds the contacts (names and emails
-  only). A `[BRACKETED]` value is a placeholder.
+  are a closed `<details>` always titled "Shift Backups · N", with "Can
+  cover for you" as body text above the list.
+- Under the shift cards, in its own section, "My availability" lists the
+  days the student appears in someone's cover list, and for whom.
+- `CONFIG` at the top of the script holds the contacts: role and name
+  only, no emails or phone numbers.
 - The third tab, Submit Timesheet, gives the deadline (Sunday, 5 pm) and
   a button to https://www.drbu.edu/timesheet. On a Sunday its tab carries a "1"
   bubble until that button is pressed that day (`kitchen.timesheet` holds

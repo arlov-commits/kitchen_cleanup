@@ -92,7 +92,6 @@ p{margin:0}
 .eyebrow{display:block;font-family:var(--display);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--rust-deep);font-weight:600}
 .lead{font-size:16.5px;color:var(--ink-2)}
 .note{font-size:14.5px;color:var(--ink-3)}
-.ph{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;color:var(--ink-3)}
 
 /* ------------------------------------------------------------ shell */
 /* One viewport tall; only .pane scrolls, and the tab bar is the last child
@@ -184,10 +183,17 @@ p{margin:0}
 .backups>summary::after{content:"";flex:0 0 auto;width:9px;height:9px;margin-right:4px;border-right:2px solid var(--ci);border-bottom:2px solid var(--ci);
   transform:translateY(-2px) rotate(45deg)}
 .backups[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
-.backups .opened,.backups[open] .closed{display:none}
-.backups[open] .opened{display:inline}
-.backups[open]>summary{color:var(--ink-3)}
+.backups .cover-lead{font-size:15px;color:var(--ink-2);margin-bottom:6px}
 .backups .cover{margin-bottom:4px}
+/* my availability: its own section under the shift cards */
+.avail{display:flex;flex-direction:column;gap:14px;margin-top:16px;padding-top:28px;border-top:2px solid var(--line)}
+.avail-h{display:flex;flex-direction:column;gap:6px}
+.avail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.avail-list li{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.avail-list li:first-child{padding-top:0}
+.avail-list li:last-child{border-bottom:0;padding-bottom:0}
+.avail-list .d{font-family:var(--display);font-size:19px;font-weight:600;color:var(--ci)}
+.avail-list .f{font-size:14.5px;color:var(--ink-2)}
 .cover{margin:0;padding:0 0 0 1.6em;columns:2;column-gap:20px;font-size:15px}
 .cover li{padding:2px 0;break-inside:avoid}
 .cover li::marker{color:var(--ci);font-weight:600;font-size:13px}
@@ -361,11 +367,11 @@ p{margin:0}
   "use strict";
 
   /* ---------------------------------------------------------- settings
-     Shown as written. A value still in [BRACKETS] is a placeholder. */
+     Shown as written. */
   var CONFIG = {
     contacts: [
-      { role: "Kitchen Manager", name: "Sheng Xiu", email: "[EMAIL]" },
-      { role: "Work Study Manager", name: "Nahelia", email: "[EMAIL]" }
+      { role: "Student Kitchen Manager", name: "Art" },
+      { role: "Work Study Manager", name: "Nahelia" }
     ]
   };
   var DATA_FILE = "shift_cover_list.csv";
@@ -497,17 +503,35 @@ p{margin:0}
           (crew.length ? crew.map(function (x) {
             return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(roleName(x.role)) + "</span></li>";
           }).join("") : '<li class="note">Just you.</li>') + "</ul></div>" +
-          '<details class="backups"><summary><span><span class="closed">Shift Backups</span><span class="opened">Can cover for you</span> · ' +
-          s.cover.length + "</span></summary>" +
-          '<ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol></details>" +
+          '<details class="backups"><summary><span>Shift Backups · ' + s.cover.length + "</span></summary>" +
+          '<p class="cover-lead">Can cover for you</p><ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol></details>" +
           "</section>";
-      }).join("");
+      }).join("") + availability();
+  }
+
+  /* The days this student appears in someone's backup list, and for whom. */
+  function availability() {
+    var days = [];
+    data.shifts.forEach(function (s) {
+      if (s.cover.indexOf(me) < 0) return;
+      (days[s.day] = days[s.day] || []).push(s.who);
+    });
+    var rows = [];
+    days.forEach(function (who, d) {
+      if (!who) return;
+      who.sort(function (a, b) { return a.localeCompare(b); });
+      rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + '</span><span class="f">Backup for ' + who.map(esc).join(", ") + "</span></li>");
+    });
+    return '<section class="avail"><div class="avail-h"><span class="eyebrow">My availability</span>' +
+      "<h2>When you may be <em>asked to cover</em></h2>" +
+      '<p class="note">You\'re listed as a backup on these days, so someone on that shift may ask you to cover for them.</p></div>' +
+      '<div class="panel">' + (rows.length ? '<ul class="avail-list">' + rows.join("") + "</ul>" :
+        '<p class="note">You\'re not listed as a backup on any day.</p>') + "</div></section>";
   }
 
   function renderContacts() {
     $("contacts").innerHTML = CONFIG.contacts.map(function (c) {
-      var mail = c.email ? (/^\[.*\]$/.test(c.email) ? '<span class="ph">' + esc(c.email) + "</span>" : esc(c.email)) : "";
-      return '<li><span class="eyebrow">' + esc(c.role) + '</span><span class="nm">' + esc(c.name) + "</span>" + (mail ? "<span>" + mail + "</span>" : "") + "</li>";
+      return '<li><span class="eyebrow">' + esc(c.role) + '</span><span class="nm">' + esc(c.name) + "</span></li>";
     }).join("");
   }
 
