@@ -467,13 +467,17 @@ p{margin:0}
 
   /* ---------------------------------------------------------- settings
      Shown as written. */
+  /* Defaults only. The real values come from settings.csv, which the
+     Student Kitchen Manager edits each year; these are used if it can't be
+     read. */
   var CONFIG = {
     contacts: [
       { role: "Student Kitchen Manager", name: "Art" },
       { role: "Work Study Manager", name: "Nahelia" }
-    ]
+    ],
+    portal: "https://www.drbu.edu/timesheet"
   };
-  var DATA_FILE = "shift_cover_list.csv";
+  var DATA_FILE = "shift_cover_list.csv", SETTINGS_FILE = "settings.csv", settingsProblems = [];
 
   var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   var TABS = [
@@ -633,6 +637,32 @@ p{margin:0}
   }
 
 
+  /* settings.csv: two columns, Setting and Value. Rows are matched by the
+     Setting text, so their order doesn't matter. */
+  function applySettings(text) {
+    var rows = parseCSV(text), seen = {};
+    rows.slice(1).forEach(function (r) {
+      var key = (r[0] || "").trim().toLowerCase(), val = (r[1] || "").trim();
+      if (!key) return;
+      seen[key] = true;
+      if (key === "student kitchen manager" || key === "work study manager") {
+        if (!val) { settingsProblems.push(r[0].trim() + " is empty."); return; }
+        CONFIG.contacts.forEach(function (c) { if (c.role.toLowerCase() === key) c.name = val; });
+      } else if (key === "timesheet portal link") {
+        if (/^https?:\/\/\S+$/i.test(val)) CONFIG.portal = val;
+        else settingsProblems.push("The timesheet portal link should start with https://");
+      } else settingsProblems.push("\"" + r[0].trim() + "\" isn't a setting the app knows.");
+    });
+    ["student kitchen manager", "work study manager", "timesheet portal link"].forEach(function (k) {
+      if (!seen[k]) settingsProblems.push("The \"" + k.replace(/\b\w/g, function (c) { return c.toUpperCase(); }) + "\" row is missing.");
+    });
+  }
+  function renderPortal() {
+    var a = document.querySelector(".portal");
+    a.href = CONFIG.portal;
+    document.querySelector(".portal-url").textContent = CONFIG.portal.replace(/^https?:\/\/(www\.)?/i, "").replace(/\/$/, "");
+  }
+
   function renderContacts() {
     $("contacts").innerHTML = CONFIG.contacts.map(function (c) {
       return '<li><span class="eyebrow">' + esc(c.role) + '</span><span class="nm">' + esc(c.name) + "</span></li>";
@@ -644,10 +674,11 @@ p{margin:0}
     if (loadError) { el.innerHTML = '<span class="warn">Shift list: not loaded.</span>'; return; }
     if (!data) return;
     el.innerHTML = "Shift list: " + data.names.length + " students, " + data.shifts.length + " shifts a week." +
-      (data.problems.length ? ' <span class="warn">Check ' + DATA_FILE + ": " + esc(data.problems.join(" ")) + "</span>" : "");
+      (data.problems.length ? ' <span class="warn">Check ' + DATA_FILE + ": " + esc(data.problems.join(" ")) + "</span>" : "") +
+      (settingsProblems.length ? ' <span class="warn">Check ' + SETTINGS_FILE + ": " + esc(settingsProblems.join(" ")) + "</span>" : "");
   }
 
-  function renderAll() { renderPicker(); renderShifts(); renderContacts(); renderStatus(); }
+  function renderAll() { renderPicker(); renderShifts(); renderContacts(); renderPortal(); renderStatus(); }
 
   $("me").addEventListener("change", function () {
     me = this.value;
@@ -740,6 +771,12 @@ p{margin:0}
 
   /* ------------------------------------------------------------ start */
   route(); renderAll();
+
+  fetch(SETTINGS_FILE, { cache: "no-cache" }).then(function (r) {
+    if (!r.ok) throw new Error();
+    return r.text();
+  }).then(function (text) { applySettings(text); renderAll(); })
+    .catch(function () { settingsProblems.push("It couldn't be read, so the built-in names and link are shown."); renderAll(); });
 
   fetch(DATA_FILE, { cache: "no-cache" }).then(function (r) {
     if (!r.ok) throw new Error(DATA_FILE + " answered " + r.status + ".");

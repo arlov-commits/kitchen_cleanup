@@ -3,17 +3,19 @@
    copy of all of them. A file added to the app must be added to SHELL too,
    or an installed copy will not have it offline. The page and
    shift_cover_list.csv are fetched fresh whenever there is a network (racing
-   a 2.5-second timer, so a slow connection cannot hang the launch).
+   a 2.5-second timer, so a slow connection cannot hang the launch), and so
+   is settings.csv. Editing either CSV needs no change here.
 
    Bump CACHE whenever index.html, the data file's name or this file changes.
    The new worker then replaces the old one and reloads any page the old one
    left open, so no phone is stuck on an old page asking for files that are
    gone. */
-var CACHE = "kitchen-v10";
+var CACHE = "kitchen-v11";
 var SHELL = [
   "./",
   "index.html",
   "shift_cover_list.csv",
+  "settings.csv",
   "manifest.webmanifest",
   "icons/icon.svg",
   "icons/icon-32.png",
@@ -77,7 +79,8 @@ self.addEventListener("fetch", function (e) {
   if (url.origin !== location.origin) return;
 
   if (req.mode === "navigate") { e.respondWith(fresh(req, "index.html")); return; }
-  if (/\/shift_cover_list\.csv$/.test(url.pathname)) { e.respondWith(fresh(req, "shift_cover_list.csv")); return; }
+  var csv = url.pathname.match(/\/(shift_cover_list|settings)\.csv$/);
+  if (csv) { e.respondWith(fresh(req, csv[1] + ".csv")); return; }
 
   /* Everything else (fonts, icons) never changes at its URL: cache first. */
   e.respondWith(caches.match(req, { ignoreSearch: true }).then(function (hit) {

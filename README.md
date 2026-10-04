@@ -1,5 +1,12 @@
 # Kitchen Cleanup 淨
 
+> **Looking after the app?** Start with **[HOW-TO-UPDATE.md](HOW-TO-UPDATE.md)**.
+> It covers changing the managers' names, the timesheet link and each
+> semester's shift list. No code needed.
+> **Handing it over?** Read **[HANDOFF.md](HANDOFF.md)**.
+>
+> The app: https://arlov-commits.github.io/kitchen_cleanup/
+
 A quick reference for work study students on the kitchen cleanup crew: your
 shifts and who can cover them, what to do when you can't make a shift, and
 where to submit your timesheet.
@@ -50,20 +57,24 @@ The footer checks the file and names anything that looks wrong:
 
 The browser console shows the same warnings.
 
-## The contacts
+## The settings: `settings.csv`
 
-These are in `CONFIG`, near the top of the `<script>` in `index.html`:
+The names and the link that change from year to year live in their own
+small file, so whoever looks after the app never has to open
+`index.html`:
 
-```js
-var CONFIG = {
-  contacts: [
-    { role: "Student Kitchen Manager", name: "Art" },
-    { role: "Work Study Manager", name: "Nahelia" }
-  ]
-};
+```
+Setting,Value
+Student Kitchen Manager,Art
+Work Study Manager,Nahelia
+Timesheet portal link,https://www.drbu.edu/timesheet
 ```
 
-Names and roles only: no emails or phone numbers.
+Rows are matched by the Setting text, in any order. The footer flags an
+empty name, a link that doesn't start with `https://`, an unknown or
+missing row, or a file that can't be read. If the file can't be read, the
+defaults in `CONFIG` in `index.html` are used. Names only: no emails or
+phone numbers.
 
 ## Files
 
@@ -71,6 +82,9 @@ Names and roles only: no emails or phone numbers.
 | --- | --- |
 | `index.html` | The whole app. |
 | `shift_cover_list.csv` | The shifts, roles and cover lists. Read when the app opens. |
+| `settings.csv` | The two managers' names and the timesheet portal link. Read when the app opens. |
+| `HOW-TO-UPDATE.md` | Step-by-step guide for whoever looks after the app, written for someone who has never used GitHub. |
+| `HANDOFF.md` | How to hand the app to the next manager, and the one decision about where it lives. |
 | `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
 | `fonts/` | Inter and Playfair Display, self-hosted, with their SIL Open Font Licenses. |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |
