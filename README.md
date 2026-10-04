@@ -1,11 +1,16 @@
 # Kitchen Cleanup 淨
 
-> **Looking after the app?** Start with **[HOW-TO-UPDATE.md](HOW-TO-UPDATE.md)**.
-> It covers changing the managers' names, the timesheet link and each
-> semester's shift list. No code needed.
-> **Handing it over?** Read **[HANDOFF.md](HANDOFF.md)**.
+> **Taking the app over, or looking after it?** Start with
+> **[HOW-TO-UPDATE.md](HOW-TO-UPDATE.md)**. It covers changing the
+> managers' names, the timesheet link and each semester's shift list. No
+> code needed.
+> **Handing it over to the next person?** Read **[HANDOFF.md](HANDOFF.md)**.
 >
-> The app: https://arlov-commits.github.io/kitchen_cleanup/
+> **The app:** https://arlov-commits.github.io/kitchen_cleanup/
+> **Its files:** https://github.com/arlov-commits/kitchen_cleanup
+>
+> *These two links are the only place the guides take them from. Update
+> them here if the app ever moves (see HANDOFF.md).*
 
 A quick reference for work study students on the kitchen cleanup crew: your
 shifts and who can cover them, what to do when you can't make a shift, and
@@ -83,8 +88,8 @@ phone numbers.
 | `index.html` | The whole app. |
 | `shift_cover_list.csv` | The shifts, roles and cover lists. Read when the app opens. |
 | `settings.csv` | The two managers' names and the timesheet portal link. Read when the app opens. |
-| `HOW-TO-UPDATE.md` | Step-by-step guide for whoever looks after the app, written for someone who has never used GitHub. |
-| `HANDOFF.md` | How to hand the app to the next manager, and the one decision about where it lives. |
+| `HOW-TO-UPDATE.md` | For whoever is taking the app over or looking after it, written for someone who has never used GitHub. |
+| `HANDOFF.md` | For whoever is handing it over: the steps, the handover log, the cover-list rules, and the one-time move into a shared organization. |
 | `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
 | `fonts/` | Inter and Playfair Display, self-hosted, with their SIL Open Font Licenses. |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |

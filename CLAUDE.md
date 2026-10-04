@@ -45,9 +45,14 @@ and the tab shell from the second.
   `applySettings()` matches rows by Setting text and reports problems in
   the footer. `CONFIG` in `index.html` only holds the defaults used if
   the file can't be read. Names only: no emails or phone numbers.
-- **Handoff.** The app is maintained by non-technical students who edit
-  only the two CSV files on the GitHub website. `HOW-TO-UPDATE.md` (for
-  them) and `HANDOFF.md` (for the outgoing person) describe that. Keep
+- **Handoff.** The app passes down each year between non-technical
+  students who edit only the two CSV files on the GitHub website.
+  `HOW-TO-UPDATE.md` is for whoever is receiving or looking after it.
+  `HANDOFF.md` is for whoever is handing over, and holds the handover log
+  and the cover-list rules. Both are written for any generation: name no
+  particular person, and take the live links only from the top of the
+  README. The intended lineage is a free GitHub organization with two
+  owners (the Student Kitchen Manager and the Work Study Manager). Keep
   both in step with any change to the CSV formats, the settings, or what
   the footer checks. Anything that would need a successor to edit
   `index.html` belongs in `settings.csv` instead.

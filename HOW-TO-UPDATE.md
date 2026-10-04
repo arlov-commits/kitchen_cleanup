@@ -1,14 +1,15 @@
-# How to update the Kitchen Cleanup app
+# Looking after the Kitchen Cleanup app
 
-**For:** the Student Kitchen Manager or Work Study Manager who looks after
-the app. You don't need to know anything about code. You'll only ever
-change **two files**, and both work like a small spreadsheet.
+**For: whoever is taking the app over.** That's you if someone has just
+handed it to you, usually because you're the new Student Kitchen Manager.
 
-**The app:** https://arlov-commits.github.io/kitchen_cleanup/
-**Its files:** https://github.com/arlov-commits/kitchen_cleanup
+You don't need to know anything about code. You'll only ever change **two
+files**, and both work like a small spreadsheet. When it's your turn to
+hand over, **`HANDOFF.md`** tells you how.
 
-> If the person before you moved the app (see `HANDOFF.md`), both links
-> will be different. Use the ones they give you.
+**The app's links** are at the top of the **README**, the page GitHub
+shows when you open the app's files. The person handing over will send you
+the files link.
 
 ---
 
@@ -21,9 +22,8 @@ change **two files**, and both work like a small spreadsheet.
 | The timesheet portal link | `settings.csv` |
 | Which students are on the crew, their shift days and roles, and who can cover each shift | `shift_cover_list.csv` |
 
-**Don't change any other file.** Everything else is the app itself. If
-something else needs changing, see "Something else needs changing" at the
-end.
+**Don't change any other file**, except to add a line to the handover log
+in `HANDOFF.md`. Everything else is the app itself.
 
 ---
 
@@ -41,18 +41,17 @@ It's free.
 6. GitHub emails you a code. Type it in.
 7. If it asks questions about how you'll use GitHub, you can skip them.
 
-Write down your username and send it to the person handing over to you.
-They'll invite you to the app's files.
+**Send your username to the person handing over.** They'll invite you.
 
 ## 2. Accept the invitation (once)
 
-1. Look for an email from GitHub saying you've been invited to
-   **kitchen_cleanup**. It may take a few minutes to arrive, and it may go
-   to your spam folder.
-2. Click **View invitation**, then **Accept invitation**.
+1. Look for an email from GitHub inviting you to join an
+   **organization**. It may take a few minutes, and it may go to your
+   spam folder.
+2. Click the button in the email, then **Join** (or **Accept**).
 
-No email? Sign in to GitHub and go to the app's files link at the top of
-this page. The invitation shows there too.
+No email? Sign in to GitHub and open the files link you were sent. The
+invitation shows there too.
 
 The invitation runs out after 7 days. If it does, ask for a new one.
 
@@ -62,11 +61,11 @@ The invitation runs out after 7 days. If it does, ask for a new one.
 
 This is a small change, made straight on the GitHub website.
 
-1. Sign in to GitHub and open the app's files link at the top of this page.
+1. Sign in to GitHub and open the app's files.
 2. Click **settings.csv** in the list of files.
 3. Click the **pencil icon** (✏️, "Edit this file") at the top right of
    the file.
-4. You'll see this:
+4. You'll see something like this:
 
    ```
    Setting,Value
@@ -75,8 +74,8 @@ This is a small change, made straight on the GitHub website.
    Timesheet portal link,https://www.drbu.edu/timesheet
    ```
 
-5. Change only the text **after the comma**. For example, change `Art` to
-   your own name.
+5. Change only the text **after the comma**. For example, put your own
+   name after `Student Kitchen Manager,`.
    - Leave the words before the comma exactly as they are.
    - Don't put a comma inside a name.
    - The link must start with `https://`.
@@ -108,13 +107,12 @@ works three days has three rows. The columns are:
 The app shows `Student Leader` as "Shift Leader". Write `Student Leader`
 in the file.
 
-**Making each cover list:**
-- List the students who **don't** work on that day.
-- Put the students with the **fewest shifts first**. Students with the
-  same number of shifts go in alphabetical order.
-- Some students aren't asked to cover **Buckets & Composting** shifts.
-  Last semester that was Adam, Adrian and Vayu. Ask the person before you
-  who this applies to, and leave those students out of those shifts' lists.
+**Making each cover list:** follow the **Cover-list rules** in
+`HANDOFF.md`. The person who handed over to you will have gone through
+them with you. In short:
+- list the students who **don't** work that day;
+- put those with the **fewest shifts first**;
+- leave out anyone the rules say not to ask for that role.
 
 The app builds everything else from these rows: the list of names to
 choose from, "On with you", and "My availability".
@@ -198,15 +196,18 @@ with the right name, or upload your backup.
 
 - **Undo:** upload the backup file you downloaded in 4a, the same way
   as in 4e.
-- **Stuck:** ask the person who handed over to you. The files keep a full
-  history of every change, so nothing is ever lost.
+- **Stuck:** ask the other owner (the Work Study Manager, or the Student
+  Kitchen Manager if that's not you), or the person who handed over to
+  you. GitHub keeps every earlier version of every file, so nothing is
+  ever lost.
 
 ---
 
-## 7. Passing it on
+## 7. When it's your turn to hand over
 
-When it's your turn to hand over, read `HANDOFF.md`. It explains how to
-give the next person access. Then give them this page.
+Open **`HANDOFF.md`**. It's written for you then: how to give the next
+person access, what to go through with them, and what to add to the
+handover log. Then send them the files link and point them to this page.
 
 ---
 
