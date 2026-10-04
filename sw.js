@@ -2,19 +2,21 @@
    The whole app is a handful of static files, so the service worker keeps a
    copy of all of them. A file added to the app must be added to SHELL too,
    or an installed copy will not have it offline. The page and
-   shift_cover_list.csv are fetched fresh whenever there is a network (racing
-   a 2.5-second timer, so a slow connection cannot hang the launch), and so
-   is settings.csv. Editing either CSV needs no change here.
+   the four CSV files (shifts, students, roles, settings) are fetched fresh
+   whenever there is a network (racing a 2.5-second timer, so a slow
+   connection cannot hang the launch). Editing a CSV needs no change here.
 
    Bump CACHE whenever index.html, the data file's name or this file changes.
    The new worker then replaces the old one and reloads any page the old one
    left open, so no phone is stuck on an old page asking for files that are
    gone. */
-var CACHE = "kitchen-v15";
+var CACHE = "kitchen-v16";
 var SHELL = [
   "./",
   "index.html",
-  "shift_cover_list.csv",
+  "shifts.csv",
+  "students.csv",
+  "roles.csv",
   "settings.csv",
   "manifest.webmanifest",
   "icons/icon.svg",
@@ -84,7 +86,7 @@ self.addEventListener("fetch", function (e) {
   if (url.origin !== location.origin) return;
 
   if (req.mode === "navigate") { e.respondWith(fresh(req, "index.html")); return; }
-  var csv = url.pathname.match(/\/(shift_cover_list|settings)\.csv$/);
+  var csv = url.pathname.match(/\/(shifts|students|roles|settings)\.csv$/);
   if (csv) { e.respondWith(fresh(req, csv[1] + ".csv")); return; }
 
   /* Everything else (fonts, icons) never changes at its URL: cache first. */

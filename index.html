@@ -476,7 +476,9 @@ p{margin:0}
     ],
     portal: "https://www.drbu.edu/timesheet"
   };
-  var DATA_FILE = "shift_cover_list.csv", SETTINGS_FILE = "settings.csv", settingsProblems = [];
+  /* the shift files: who works when, who each student is, and the role rules */
+  var FILES = { shifts: "shifts.csv", students: "students.csv", roles: "roles.csv" };
+  var SETTINGS_FILE = "settings.csv", settingsProblems = [];
 
   var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   var TABS = [
@@ -527,68 +529,134 @@ p{margin:0}
     return -1;
   }
 
-  /* Buckets & Composting is for women only. */
-  function womenOnly(role) { return /bucket/i.test(role); }
+  /* ------------------------------------------------- reading the files */
+  function lower(s) { return (s || "").trim().toLowerCase(); }
+  function header(rows, file, need, problems) {
+    var head = (rows[0] || []).map(lower), col = {};
+    Object.keys(need).forEach(function (k) {
+      col[k] = -1;
+      for (var i = 0; i < head.length; i++) if (need[k].test(head[i])) { col[k] = i; break; }
+    });
+    var missing = Object.keys(need).filter(function (k) { return col[k] < 0; });
+    if (!rows.length) problems.push(file + " is empty.");
+    else if (missing.length) problems.push(file + " is missing a column: " + missing.join(", ") + ".");
+    return rows.length && !missing.length ? col : null;
+  }
+  function cell(r, i) { return (r[i] || "").trim(); }
+  /* "Recycling; Lunch Monitor" -> ["recycling", "lunch monitor"] */
+  function list(v) { return (v || "").split(/[;,]/).map(lower).filter(Boolean); }
+  /* F, Female, Woman … -> "F"; M, Male, Man … -> "M" */
+  function personGender(v) { v = lower(v); return /^(f|wom|girl)/.test(v) ? "F" : /^(m|man|men|boy)/.test(v) ? "M" : ""; }
+  /* a role's gender setting: Any, Women only or Men only */
+  function roleGender(v) {
+    v = lower(v);
+    if (!v || /^(any|all|either|both|everyone)/.test(v)) return "any";
+    return /^(f|wom|girl)/.test(v) ? "F" : /^(m|man|men|boy)/.test(v) ? "M" : null;
+  }
+  function yes(v) { return /^(y|yes|true|1)$/.test(lower(v)); }
 
-  /* One row per shift: Student, Gender, Shift day, Role, # who can cover,
-     and the names who can be asked to cover, in the order to ask them. The
-     cover list is used exactly as written; the checks below only report
-     problems in the footer, for whoever keeps the file. Gender (F or M) is
-     never shown; it is only checked against Buckets & Composting. */
-  function buildData(text) {
-    var rows = parseCSV(text), out = { shifts: [], names: [], problems: [] };
-    if (!rows.length) { out.problems.push(DATA_FILE + " is empty."); return out; }
-    var head = rows[0].map(function (h) { return h.trim().toLowerCase(); });
-    function col(test) { for (var i = 0; i < head.length; i++) if (test(head[i])) return i; return -1; }
-    var cS = col(function (h) { return h === "student" || h === "name"; }),
-        cG = col(function (h) { return h === "gender"; }),
-        cD = col(function (h) { return h.indexOf("day") >= 0; }),
-        cR = col(function (h) { return h === "role"; }),
-        cN = col(function (h) { return h.charAt(0) === "#"; }),
-        cC = col(function (h) { return h.indexOf("can be asked") === 0 || h.indexOf("cover (") >= 0; });
-    if (cS < 0 || cD < 0 || cC < 0) { out.problems.push(DATA_FILE + " needs Student, Shift day and cover columns."); return out; }
-    if (cG < 0) out.problems.push("Add a Gender column (F or M) so Buckets & Composting lists can be checked.");
-    /* null-prototype maps, so a name like "constructor" is just a name */
-    var seen = Object.create(null), count = Object.create(null), gender = Object.create(null), works = Object.create(null);
+  /* roles.csv: one row per role. Its row order is the order of roles on the
+     shift cards. Roles in the same work group work side by side, so "On
+     with you" shows only your own group (blank = the role is its own
+     group). */
+  function readRoles(text, problems) {
+    var rows = parseCSV(text), F = FILES.roles, roles = { order: [], by: Object.create(null) };
+    var col = header(rows, F, { role: /^role/, group: /group/, gender: /^gender/, trained: /^trained/, same: /^same/ }, problems);
+    if (!col) return roles;
     rows.slice(1).forEach(function (r, n) {
-      var who = (r[cS] || "").trim(), d = dayIndex(r[cD]), line = n + 2;
-      if (!who) { out.problems.push("Line " + line + " has no student."); return; }
-      if (d < 0) { out.problems.push("Line " + line + ": \"" + (r[cD] || "") + "\" isn't a day."); return; }
-      if (seen[who + "|" + d]) { out.problems.push(who + " is listed twice on " + DAYS[d] + "."); return; }
+      var name = cell(r, col.role), key = lower(name), line = F + " line " + (n + 2) + ": ";
+      if (!name) return;
+      if (roles.by[key]) { problems.push(line + name + " is listed twice."); return; }
+      var g = roleGender(cell(r, col.gender));
+      if (g === null) { problems.push(line + name + "'s gender should be Any, Women only or Men only."); g = "any"; }
+      roles.by[key] = { name: name, group: lower(cell(r, col.group)) || key, gender: g, trained: yes(cell(r, col.trained)),
+                        same: list(cell(r, col.same)), rank: roles.order.length };
+      roles.order.push(key);
+    });
+    roles.order.forEach(function (k) {
+      roles.by[k].same.forEach(function (x) { if (!roles.by[x]) problems.push(F + ": " + roles.by[k].name + "'s same-day backups name \"" + x + "\", which isn't a role."); });
+    });
+    return roles;
+  }
+
+  /* students.csv: one row per student: gender, the roles they're limited to
+     (blank = any), and any roles they're trained for. */
+  function readStudents(text, roles, problems) {
+    var rows = parseCSV(text), F = FILES.students, people = Object.create(null);
+    var col = header(rows, F, { who: /^(student|name)/, gender: /^gender/, only: /^only/, trained: /^trained/ }, problems);
+    if (!col) return people;
+    rows.slice(1).forEach(function (r, n) {
+      var who = cell(r, col.who), line = F + " line " + (n + 2) + ": ";
+      if (!who) return;
+      if (people[who]) { problems.push(line + who + " is listed twice."); return; }
+      var g = personGender(cell(r, col.gender));
+      if (!g) problems.push(line + who + "'s gender should be F or M.");
+      var p = { gender: g, only: list(cell(r, col.only)), trained: list(cell(r, col.trained)) };
+      p.only.concat(p.trained).forEach(function (x) { if (!roles.by[x]) problems.push(line + who + ": \"" + x + "\" isn't a role in " + FILES.roles + "."); });
+      people[who] = p;
+    });
+    return people;
+  }
+
+  /* Can this student do (or cover) this role? Gender, their limits, and
+     training all have to allow it. */
+  function canDo(p, role) {
+    if (!p || !role) return false;
+    if (role.gender !== "any" && p.gender !== role.gender) return false;
+    if (p.only.length && p.only.indexOf(lower(role.name)) < 0) return false;
+    if (role.trained && p.trained.indexOf(lower(role.name)) < 0) return false;
+    return true;
+  }
+
+  /* The whole shift list, with every cover list worked out by the rules:
+     first everyone not working that day who can do the role, fewest shifts
+     first and then alphabetical; then, last of all, anyone working that day
+     in one of the role's same-day backup roles, in the order listed. */
+  function buildData(shiftsText, studentsText, rolesText) {
+    var out = { shifts: [], names: [], problems: [], roleRank: Object.create(null) };
+    var P = out.problems, F = FILES.shifts;
+    var roles = readRoles(rolesText, P), people = readStudents(studentsText, roles, P);
+    roles.order.forEach(function (k) { out.roleRank[roles.by[k].name] = roles.by[k].rank; });
+    var rows = parseCSV(shiftsText), col = header(rows, F, { who: /^(student|name)/, day: /day/, role: /^role/ }, P);
+    if (!col) return out;
+    var seen = Object.create(null), count = Object.create(null), noRow = Object.create(null);
+    rows.slice(1).forEach(function (r, n) {
+      var who = cell(r, col.who), d = dayIndex(r[col.day]), role = roles.by[lower(r[col.role])], line = F + " line " + (n + 2) + ": ";
+      if (!who) { if (r.join("").trim()) P.push(line + "no student."); return; }
+      if (d < 0) { P.push(line + "\"" + cell(r, col.day) + "\" isn't a day."); return; }
+      if (!role) { P.push(line + "\"" + cell(r, col.role) + "\" isn't a role in " + FILES.roles + "."); return; }
+      if (seen[who + "|" + d]) { P.push(line + who + " is on " + DAYS[d] + " twice."); return; }
       seen[who + "|" + d] = true;
-      if (cG >= 0) {
-        var g = (r[cG] || "").trim().toUpperCase().charAt(0);
-        if (g !== "F" && g !== "M") out.problems.push("Line " + line + ": " + who + "'s gender should be F or M.");
-        else if (gender[who] && gender[who] !== g) out.problems.push(who + " is marked " + gender[who] + " on one row and " + g + " on another.");
-        else gender[who] = g;
-      }
-      var cover = (r[cC] || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean);
-      var stated = cN >= 0 ? parseInt(r[cN], 10) : NaN;
-      if (!isNaN(stated) && stated !== cover.length) out.problems.push(who + " (" + DAYS[d] + ") says " + stated + " can cover but lists " + cover.length + ".");
+      if (!people[who]) { if (!noRow[who]) P.push(who + " isn't in " + FILES.students + "."); noRow[who] = true; }
+      else if (!canDo(people[who], role)) P.push(line + who + " can't do " + role.name + " (check gender, Only does and Trained for).");
       count[who] = (count[who] || 0) + 1;
-      works[who + "|" + d] = true;
-      out.shifts.push({ who: who, day: d, role: cR >= 0 ? (r[cR] || "").trim() : "", cover: cover });
+      out.shifts.push({ who: who, day: d, role: role.name, group: role.group, r: role });
     });
     out.names = Object.keys(count).sort(function (a, b) { return a.localeCompare(b); });
     out.names.forEach(function (n) {
-      if (count[n] < 2 || count[n] > 4) out.problems.push(n + " has " + count[n] + " shift" + (count[n] === 1 ? "" : "s") + " (expected 2 to 4).");
+      if (count[n] < 2 || count[n] > 4) P.push(n + " has " + count[n] + " shift" + (count[n] === 1 ? "" : "s") + " (expected 2 to 4).");
     });
+    Object.keys(people).forEach(function (n) { if (!count[n]) P.push(n + " is in " + FILES.students + " but has no shifts."); });
+
+    var byFew = function (a, b) { return count[a] - count[b] || a.localeCompare(b); };
     out.shifts.forEach(function (s) {
-      var where = s.who + "'s " + DAYS[s.day] + " cover list";
-      if (womenOnly(s.role) && gender[s.who] === "M") out.problems.push(s.who + " is on Buckets & Composting on " + DAYS[s.day] + ", which is for women only.");
-      s.cover.forEach(function (c) {
-        if (!count[c]) out.problems.push("\"" + c + "\" (in " + where + ") isn't a student on the list.");
-        else if (c === s.who) out.problems.push(where + " includes " + c + ".");
-        else if (works[c + "|" + s.day]) out.problems.push(c + " is in " + where + " but also works on " + DAYS[s.day] + ".");
-        else if (womenOnly(s.role) && gender[c] === "M") out.problems.push(c + " is in " + where + ", but Buckets & Composting is for women only.");
+      var working = Object.create(null);
+      out.shifts.forEach(function (x) { if (x.day === s.day) working[x.who] = lower(x.role); });
+      var cover = out.names.filter(function (n) { return !(n in working) && canDo(people[n], s.r); }).sort(byFew);
+      s.r.same.forEach(function (sameRole) {
+        cover = cover.concat(out.names.filter(function (n) {
+          return n !== s.who && working[n] === sameRole && canDo(people[n], s.r);
+        }).sort(byFew));
       });
+      s.cover = cover;
+      delete s.r;
     });
     return out;
   }
 
   /* -------------------------------------------------------- My shifts */
-  /* On with you: the Shift Leader first, Buckets & Composting last. */
-  function roleRank(r) { return /leader/i.test(r) ? 0 : /bucket/i.test(r) ? 2 : 1; }
+  /* On with you: roles in roles.csv's order, then alphabetical. */
+  function roleRank(r) { return data && r in data.roleRank ? data.roleRank[r] : 99; }
 
   function renderPicker() {
     var sel = $("me");
@@ -616,16 +684,16 @@ p{margin:0}
     var mine = data.shifts.filter(function (s) { return s.who === me; }).sort(function (a, b) { return a.day - b.day; });
     body.innerHTML = '<p class="lead">' + mine.length + " shift" + (mine.length === 1 ? "" : "s") + " a week.</p>" +
       mine.map(function (s) {
-        var crew = data.shifts.filter(function (x) { return x.day === s.day && x.who !== me; })
+        /* only your own work group; left out when no one else in it is on */
+        var crew = data.shifts.filter(function (x) { return x.day === s.day && x.group === s.group && x.who !== me; })
           .sort(function (a, b) { return roleRank(a.role) - roleRank(b.role) || a.who.localeCompare(b.who); });
         return '<section class="panel shift k' + s.day + '">' +
           '<div class="shift-h"><h2>' + DAYS[s.day] +
           (s.day === today ? '<span class="when">Today</span>' : s.day === tomorrow ? '<span class="when tmrw">Tomorrow</span>' : "") + "</h2>" +
           (s.role ? '<span class="role">' + esc(s.role) + "</span>" : "") + "</div>" +
-          '<div class="part"><h4>On with you</h4><ul class="crew">' +
-          (crew.length ? crew.map(function (x) {
+          (crew.length ? '<div class="part"><h4>On with you</h4><ul class="crew">' + crew.map(function (x) {
             return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(x.role) + "</span></li>";
-          }).join("") : '<li class="note">Just you.</li>') + "</ul></div>" +
+          }).join("") + "</ul></div>" : "") +
           '<details class="backups"><summary><span>Shift Backups · ' + s.cover.length + "</span></summary>" +
           (s.cover.length ? '<p class="cover-lead">Can cover for you</p><ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol>" :
             '<p class="cover-lead">No one is listed to cover this shift yet.</p>') + "</details>" +
@@ -696,7 +764,7 @@ p{margin:0}
     if (loadError) { el.innerHTML = '<span class="warn">Shift list: not loaded.</span>'; return; }
     if (!data) return;
     el.innerHTML = "Shift list: " + data.names.length + " students, " + data.shifts.length + " shifts a week." +
-      (data.problems.length ? ' <span class="warn">Check ' + DATA_FILE + ": " + esc(data.problems.join(" ")) + "</span>" : "") +
+      (data.problems.length ? ' <span class="warn">Check the shift files: ' + esc(data.problems.join(" ")) + "</span>" : "") +
       (settingsProblems.length ? ' <span class="warn">Check ' + SETTINGS_FILE + ": " + esc(settingsProblems.join(" ")) + "</span>" : "");
   }
 
@@ -800,12 +868,15 @@ p{margin:0}
   }).then(function (text) { applySettings(text); renderAll(); })
     .catch(function () { settingsProblems.push("It couldn't be read, so the built-in names and link are shown."); renderAll(); });
 
-  fetch(DATA_FILE, { cache: "no-cache" }).then(function (r) {
-    if (!r.ok) throw new Error(DATA_FILE + " answered " + r.status + ".");
-    return r.text();
-  }).then(function (text) {
-    data = buildData(text);
-    if (data.problems.length && window.console) console.warn(DATA_FILE + ": " + data.problems.join(" "));
+  function get(file) {
+    return fetch(file, { cache: "no-cache" }).then(function (r) {
+      if (!r.ok) throw new Error(file + " answered " + r.status + ".");
+      return r.text();
+    });
+  }
+  Promise.all([get(FILES.shifts), get(FILES.students), get(FILES.roles)]).then(function (t) {
+    data = buildData(t[0], t[1], t[2]);
+    if (data.problems.length && window.console) console.warn("Shift files: " + data.problems.join(" "));
     if (me && data.names.indexOf(me) < 0) { me = ""; store.del(ME_KEY); }
     renderAll();
   }).catch(function (err) {

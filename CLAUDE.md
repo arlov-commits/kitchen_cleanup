@@ -15,18 +15,20 @@ and the tab shell from the second.
 - `index.html` is the whole app: markup, CSS and vanilla **ES5** in one
   file. No build step and no dependencies. There are three tabs, chosen by
   hash: `#shifts`, `#callout` and `#timesheet`.
-- `shift_cover_list.csv` is the shift data, exported from the user's
-  spreadsheet: `Student`, `Gender` (F/M), `Shift day`, `Role`,
-  `# who can cover`, and `Can be asked to cover (fewest shifts first)`. It is **fetched**, so
-  the app must be served. The cover list is curated: show it exactly as
-  written and in that order, and never work out cover from who is free.
-  "On with you" is the other rows on the same day, Shift Leader first and
-  Buckets & Composting last. Roles are shown exactly as written; the
-  leader role is "Shift Leader" in the data itself. Never highlight it.
-- **Gender is for checks only, never shown.** Buckets & Composting is for
-  women only (`womenOnly()`). `buildData()` flags a man on that role or
-  in its cover list, plus bad or inconsistent gender, self or same-day
-  names in a cover list, duplicates and shift counts, all in the footer.
+- **The shift files** are `shifts.csv` (Student, Shift day, Role),
+  `students.csv` (Student, Gender F/M, Only does, Trained for) and
+  `roles.csv` (Role, Work group, Gender Any/Women only/Men only, Trained
+  students only, Same-day backups). They are fetched, so the app must be
+  served. **The app works out every cover list** (`buildData()`): first
+  everyone not working that day who can do the role (`canDo()`: gender,
+  Only does, training), fewest shifts then A–Z; then students working that
+  day in the role's same-day backup roles, in order. The user's own
+  hand-made lists are `tests/expected-cover-lists.csv` and must keep
+  matching exactly. Rules belong in the CSVs, never hard-coded.
+- "On with you" shows only the shift's own work group, and is left out
+  when empty. Roles are shown as written ("Shift Leader"). Never
+  highlight one. Role order on cards is `roles.csv` row order.
+- Gender is for the rules only, never shown.
 - The managers are named consistently everywhere: "Student Kitchen
   Manager" (never just "Kitchen Manager") and "Work Study Manager".
 - **It is information, not a tool.** Each tab shows everything at once,
@@ -55,7 +57,7 @@ and the tab shell from the second.
   students who edit only the two CSV files on the GitHub website.
   `HOW-TO-UPDATE.md` is for whoever is receiving or looking after it.
   `HANDOFF.md` is for whoever is handing over, and holds the handover log
-  and the cover-list rules. Both are written for any generation: name no
+  and "How the cover lists are worked out". Both are written for any generation: name no
   particular person, and take the live links only from the top of the
   README. The intended lineage is a free GitHub organization with two
   owners (the Student Kitchen Manager and the Work Study Manager). Keep
@@ -70,7 +72,7 @@ and the tab shell from the second.
   `activate`'s `waitUntil`. A reload is a fetch the worker can't answer
   until activation finishes, so waiting on it inside deadlocks the app.
 - It is an installable PWA. A file added to the app must also go in `SHELL`
-  in `sw.js`. The page and `shift_cover_list.csv` are served network-first,
+  in `sw.js`. The page and the four CSVs are served network-first,
   and everything else cache-first. Bump `CACHE` in `sw.js` whenever
   `index.html` or `sw.js` changes: the new worker then reloads any page
   the old one left open, so no phone sticks on an old version.

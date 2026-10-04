@@ -17,14 +17,25 @@ function check(label, got, want) {
 }
 function truthy(label, v) { check(label, !!v, true); }
 
-/* the expected answers, worked out here from the CSV independently of the app */
-function readCSV(file) {
-  return fs.readFileSync(path.join(ROOT, file), "utf8").replace(/^﻿/, "").trim().split(/\r?\n/).slice(1).map(function (line) {
-    var m = line.match(/^([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),"?([^"]*)"?$/);
-    return { who: m[1], gender: m[2], day: m[3], role: m[4], cover: m[6].split(",").map(function (s) { return s.trim(); }).filter(Boolean) };
+/* The expected answers, independent of the app's code: the cover lists
+   come from tests/expected-cover-lists.csv (worked out by hand), and the
+   work groups and role order straight from roles.csv. */
+function rowsOf(file) {
+  return fs.readFileSync(path.join(ROOT, file), "utf8").replace(/^\uFEFF/, "").trim().split(/\r?\n/).slice(1).map(function (line) {
+    var m = line.match(/^([^,]*),([^,]*),([^,]*),"?([^"]*)"?/);
+    return [m[1], m[2], m[3], m[4]];
   });
 }
-var ROWS = readCSV("shift_cover_list.csv");
+var ROWS = rowsOf("tests/expected-cover-lists.csv").map(function (r) {
+  return { who: r[0], day: r[1], role: r[2], cover: r[3].split(",").map(function (s) { return s.trim(); }).filter(Boolean) };
+});
+var ROLE = {};
+rowsOf("roles.csv").forEach(function (r, i) { ROLE[r[0]] = { group: r[1] || r[0], rank: i }; });
+function crewOf(who, day, role) {
+  return ROWS.filter(function (r) { return r.day === day && r.who !== who && ROLE[r.role].group === ROLE[role].group; })
+    .sort(function (a, b) { return ROLE[a.role].rank - ROLE[b.role].rank || a.who.localeCompare(b.who); })
+    .map(function (r) { return r.who + "|" + r.role; });
+}
 var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 function serve(dir, port) {
@@ -43,7 +54,8 @@ function serve(dir, port) {
     var p = await ctx.newPage();
     p.on("pageerror", function (e) { errors.push(e.message); });
     if (opts.time) await p.clock.setFixedTime(new Date(opts.time));
-    if (opts.data) await p.route("**/shift_cover_list.csv", function (r) { return opts.data === 404 ? r.fulfill({ status: 404, body: "" }) : r.fulfill({ body: opts.data }); });
+    if (opts.data) await p.route("**/shifts.csv", function (r) { return opts.data === 404 ? r.fulfill({ status: 404, body: "" }) : r.fulfill({ body: opts.data }); });
+    if (opts.students) await p.route("**/students.csv", function (r) { return r.fulfill({ body: opts.students }); });
     if (opts.settings) await p.route("**/settings.csv", function (r) { return opts.settings === 404 ? r.fulfill({ status: 404, body: "" }) : r.fulfill({ body: opts.settings }); });
     await ctx.route("https://www.drbu.edu/**", function (r) { return r.fulfill({ body: "portal" }); });
     return p;
@@ -74,10 +86,7 @@ function serve(dir, port) {
   check("cards: Today / Tomorrow", cards.map(function (c) { return c.when + (c.tmrw ? "(outlined)" : ""); }), ["Today", "Tomorrow(outlined)", ""]);
   check("cards: own role", cards.map(function (c) { return c.role; }), mine.map(function (r) { return r.role; }));
   cards.forEach(function (c) {
-    var crew = ROWS.filter(function (r) { return r.day === c.day && r.who !== "Aryashree"; });
-    var rank = function (r) { return /leader/i.test(r.role) ? 0 : /bucket/i.test(r.role) ? 2 : 1; };
-    crew.sort(function (a, b) { return rank(a) - rank(b) || a.who.localeCompare(b.who); });
-    check("crew on " + c.day + ": leader first, buckets last", c.crew, crew.map(function (r) { return r.who + "|" + r.role; }));
+    check("on with you, " + c.day + ": own work group, in roles.csv order", c.crew, crewOf("Aryashree", c.day, c.role));
   });
   check("backups closed by default", cards.map(function (c) { return c.open; }), [false, false, false]);
   check("backups summary", cards.map(function (c) { return c.summary; }), mine.map(function (r) { return "SHIFT BACKUPS · " + r.cover.length; }));
@@ -88,6 +97,24 @@ function serve(dir, port) {
   var page1 = await p.$eval(".pane", function (e) { return e.innerText; });
   check("no Student Leader anywhere", /student leader/i.test(page1), false);
   check("gender never shown", /\bgender\b|\(M\)|\(F\)/i.test(page1), false);
+
+  /* On with you, by work group */
+  async function crews(who) {
+    await p.selectOption("#me", who);
+    return p.$$eval(".shift", function (cs) {
+      return cs.map(function (c) {
+        return c.querySelector("h2").firstChild.textContent + ": " + (c.querySelector(".crew") ? [].map.call(c.querySelectorAll(".crew li"), function (l) { return l.children[0].textContent; }).join(", ") : "(none)");
+      });
+    });
+  }
+  check("Recycling alone: no On with you; Kitchen days list only Kitchen", await crews("Adam"),
+    ["Monday: " + crewOf("Adam", "Monday", "Pots & Pans").map(function (x) { return x.split("|")[0]; }).join(", "),
+     "Tuesday: " + crewOf("Adam", "Tuesday", "Pots & Pans").map(function (x) { return x.split("|")[0]; }).join(", "),
+     "Thursday: (none)"]);
+  check("Recycling with two on: shows the other", (await crews("Adrian"))[0], "Monday: Vayu");
+  check("Lunch Monitor: no On with you", await crews("Shuxing"), ["Monday: (none)", "Thursday: (none)"]);
+  check("Kitchen never lists Recycling or Lunch Monitor", (await crews("Huiyi"))[0].indexOf("Adrian") < 0 && (await crews("Huiyi"))[0].indexOf("Shuxing") < 0, true);
+  await p.selectOption("#me", "Aryashree");
 
   /* My availability */
   var avail = {};
@@ -104,7 +131,7 @@ function serve(dir, port) {
   check("name cleared", await p.evaluate(function () { return localStorage.getItem("kitchen.me"); }), null);
   await p.evaluate(function () { localStorage.setItem("kitchen.me", "Ghost"); }); await p.reload(); await ready(p);
   check("unknown saved name dropped", [await p.inputValue("#me"), await p.evaluate(function () { return localStorage.getItem("kitchen.me"); })], ["", null]);
-  check("footer: clean data", await text(p, "#data-status"), "Shift list: 14 students, 30 shifts a week.");
+  check("footer: clean data", await text(p, "#data-status"), "Shift list: 17 students, 41 shifts a week.");
 
   /* ------------------------------------------------------------- tabs */
   await p.selectOption("#me", "Beth");
@@ -173,15 +200,16 @@ function serve(dir, port) {
   truthy("data missing: message", /The shift list didn't load\..*answered 404.*Close the app and open it again.*Student Kitchen Manager/.test(await text(p, "#shifts-body")));
   check("data missing: picker disabled, footer", [await p.$eval("#me", function (e) { return e.disabled; }), await text(p, "#data-status")], [true, "Shift list: not loaded."]);
   await p.context().close();
-  var bad = "Student,Gender,Shift day,Role,# who can cover,Can be asked to cover (fewest shifts first)\nAnn,F,Monday,Buckets & Composting,0,\nAnn,F,Tuesday,Pots & Pans,1,Dan\nDan,M,Wednesday,Pots & Pans,1,Ann\nDan,M,Thursday,Pots & Pans,0,\n";
-  p = await page({ data: bad });
+  var badShifts = "Student,Shift day,Role\nAnn,Monday,Lunch Monitor\nAnn,Tuesday,Pots & Pans\nDan,Wednesday,Pots & Pans\nDan,Thursday,Pots & Pans\n";
+  var badStudents = "Student,Gender,Only does,Trained for\nAnn,F,,Lunch Monitor\nDan,M,,\n";
+  p = await page({ data: badShifts, students: badStudents });
   await p.goto(BASE); await ready(p); await p.selectOption("#me", "Ann");
   check("empty cover list message", await p.$eval(".shift:first-of-type .cover-lead", function (e) { return e.textContent; }), "No one is listed to cover this shift yet.");
-  check("data problems: footer clean when valid", /Check shift_cover_list/.test(await text(p, "#data-status")), false);
+  check("data problems: footer clean when valid", /Check the shift files/.test(await text(p, "#data-status")), false);
   await p.context().close();
-  p = await page({ data: bad.replace("Monday,Buckets & Composting,0,", "Monday,Buckets & Composting,1,Dan") });
+  p = await page({ data: badShifts.replace("Ann,Monday,Lunch Monitor", "Ann,Monday,Buckets & Composting").replace("Dan,Thursday,Pots & Pans", "Dan,Thursday,Buckets & Composting"), students: badStudents });
   await p.goto(BASE); await ready(p);
-  truthy("data problems: footer warns", /Check shift_cover_list\.csv: Dan is in Ann's Monday cover list, but Buckets & Composting is for women only\./.test(await text(p, "#data-status")));
+  truthy("data problems: footer warns", /Check the shift files: shifts\.csv line 5: Dan can't do Buckets & Composting/.test(await text(p, "#data-status")));
   await p.context().close();
 
   /* ----------------------------------------------------- appearance */
@@ -248,7 +276,7 @@ function serve(dir, port) {
 
   /* ------------------------------------ offline, and self-updating */
   var tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kitchen-"));
-  ["index.html", "sw.js", "settings.csv", "shift_cover_list.csv", "manifest.webmanifest"].forEach(function (f) { fs.copyFileSync(path.join(ROOT, f), path.join(tmp, f)); });
+  ["index.html", "sw.js", "settings.csv", "shifts.csv", "students.csv", "roles.csv", "manifest.webmanifest"].forEach(function (f) { fs.copyFileSync(path.join(ROOT, f), path.join(tmp, f)); });
   ["fonts", "icons"].forEach(function (d) { fs.cpSync(path.join(ROOT, d), path.join(tmp, d), { recursive: true }); });
   var server2 = await serve(tmp, PORT + 1), BASE2 = "http://localhost:" + (PORT + 1) + "/";
   var ctx = await browser.newContext({ viewport: { width: 375, height: 780 } });
@@ -260,7 +288,7 @@ function serve(dir, port) {
   await p.reload(); await ready(p);
   await ctx.setOffline(true);
   await p.reload(); await ready(p);
-  check("works offline", [await text(p, "#data-status"), (await p.$$eval("#me option", function (o) { return o.length; })) - 1], ["Shift list: 14 students, 30 shifts a week.", 14]);
+  check("works offline", [await text(p, "#data-status"), (await p.$$eval("#me option", function (o) { return o.length; })) - 1], ["Shift list: 17 students, 41 shifts a week.", 17]);
   await ctx.setOffline(false);
   fs.writeFileSync(path.join(tmp, "sw.js"), fs.readFileSync(path.join(tmp, "sw.js"), "utf8").replace(/CACHE = "[^"]+"/, 'CACHE = "kitchen-test-next"'));
   var reloaded = false;

@@ -3,8 +3,8 @@
 **For: whoever is taking the app over.** That's you if someone has just
 handed it to you, usually because you're the new Student Kitchen Manager.
 
-You don't need to know anything about code. You'll only ever change **two
-files**, and both work like a small spreadsheet. When it's your turn to
+You don't need to know anything about code. You'll only ever change a few
+small files, and each one works like a spreadsheet. When it's your turn to
 hand over, **`HANDOFF.md`** tells you how.
 
 **The app's links** are at the top of the **README**, the page GitHub
@@ -20,7 +20,13 @@ the files link.
 | The Student Kitchen Manager's name | `settings.csv` |
 | The Work Study Manager's name | `settings.csv` |
 | The timesheet portal link | `settings.csv` |
-| Which students are on the crew, their shift days and roles, and who can cover each shift | `shift_cover_list.csv` |
+| Who works which day, in which role | `shifts.csv` |
+| Who the students are: gender, and any roles they're limited to or trained for | `students.csv` |
+| The rules for each role: gender, training, work group, same-day backups (rarely) | `roles.csv` |
+
+**You never write the cover lists.** The app works out who can cover each
+shift from these files, by the rules in **"How the cover lists are worked
+out"** in `HANDOFF.md`.
 
 **Don't change any other file**, except to add a line to the handover log
 in `HANDOFF.md`. Everything else is the app itself.
@@ -87,92 +93,100 @@ Then follow **5. Check that it worked**.
 
 ---
 
-## 4. Put in a new semester's shift list
+## 4. Put in a new semester's shifts
 
-Do this at the start of each semester, or whenever the crew changes.
+Do this at the start of each semester, or whenever the crew changes. The
+app works out every cover list for you, so all you do is say who works
+when, and who each student is.
 
-### What's in the file
+### The three files
 
-`shift_cover_list.csv` has **one row for each shift**. A student who
-works three days has three rows. The columns are:
+**`shifts.csv`**: one row for each shift. A student who works three days
+has three rows.
 
 | Column | What goes in it | Example |
 | --- | --- | --- |
-| **Student** | The student's name. Spell it the same way every time it appears. | `Beth` |
-| **Gender** | `F` or `M`. It's never shown in the app. It's only used to check the Buckets & Composting rule. Use the same letter on every row for that student. | `F` |
-| **Shift day** | The day of the week, in full. | `Wednesday` |
-| **Role** | Their job on that shift. | `Shift Leader`, `Pots & Pans` or `Buckets & Composting` |
-| **# who can cover** | How many names are in the last column. | `8` |
-| **Can be asked to cover (fewest shifts first)** | The students who can cover this shift, separated by commas, in the order they should be asked. | `Adam, Amelia, Huiyi, Ivwananji` |
+| **Student** | The student's name, spelled the same way everywhere | `Beth` |
+| **Shift day** | The day, in full | `Wednesday` |
+| **Role** | Exactly as it's written in `roles.csv` | `Pots & Pans` |
 
-The app shows each role exactly as you write it.
+**`students.csv`**: one row for each student.
 
-**Making each cover list:** follow the **Cover-list rules** in
-`HANDOFF.md`. The person who handed over to you will have gone through
-them with you. In short:
-- list the students who **don't** work that day;
-- put those with the **fewest shifts first**;
-- **Buckets & Composting is for women only**: never put a man on it, and
-  never list a man to cover it.
+| Column | What goes in it | Example |
+| --- | --- | --- |
+| **Student** | Their name, spelled as in `shifts.csv` | `Ben Kong` |
+| **Gender** | `F` or `M`. It's never shown in the app. | `M` |
+| **Only does** | Leave blank, unless the student can only do certain roles. Then list them, separated by `;` | `Recycling` |
+| **Trained for** | Any roles that need training (see `roles.csv`), separated by `;` | `Lunch Monitor` |
 
-If you get any of this wrong, the yellow "Check…" note at the bottom of
-the app will say so (see step 5).
+**`roles.csv`**: the rules for each role. You'll rarely need to change it.
+See **"Changing a rule"** below.
 
-The app builds everything else from these rows: the list of names to
-choose from, "On with you", and "My availability".
+### Step by step, with Google Sheets
 
-### The easiest way: Google Sheets
+Do this for each file you change, usually `shifts.csv`, and
+`students.csv` when someone joins or leaves.
 
 **a) Download the current file. This is also your backup.**
-
-1. On GitHub, click **shift_cover_list.csv**.
-2. Click the **download icon** ("Download raw file") at the top right of
-   the file.
-3. Keep this file. If anything goes wrong, you can upload it again to put
-   things back.
+1. On GitHub, click the file, for example **shifts.csv**.
+2. Click the **download icon** ("Download raw file") at the top right.
+3. Keep it. If anything goes wrong, upload it again to put things back.
 
 **b) Open it in Google Sheets.**
-
 1. Go to **https://sheets.google.com** and start a **Blank** spreadsheet.
-2. Click **File → Import → Upload**, and choose the file you downloaded.
-3. Under "Import location", choose **Replace spreadsheet**. Click
-   **Import data**.
+2. **File → Import → Upload**, and choose the file.
+3. Choose **Replace spreadsheet**, then **Import data**.
 
 **c) Make your changes.**
-
 - Keep the first row (the column names) exactly as it is.
-- One row per shift. Delete the rows for students who have left, and add
-  rows for new ones.
+- Someone left: delete their rows in `shifts.csv` and their row in
+  `students.csv`.
+- Someone new: add a row in `students.csv`, and a row in `shifts.csv` for
+  each day they work.
 - Don't leave empty rows in the middle.
 
-**d) Download it as a CSV file.**
-
-1. Click **File → Download → Comma Separated Values (.csv)**.
-2. **Rename the downloaded file to exactly `shift_cover_list.csv`.**
-   Google gives it a longer name, such as
-   `Untitled spreadsheet - shift_cover_list.csv`. The app only reads a file
-   with exactly the right name.
+**d) Download it as CSV.**
+1. **File → Download → Comma Separated Values (.csv)**.
+2. **Rename the download to exactly the original name**, such as
+   `shifts.csv`. Google adds words to it, for example `Untitled
+   spreadsheet - shifts.csv`. The app only reads the exact name.
 
 **e) Upload it to GitHub.**
+1. Open the app's files and click **Add file → Upload files**.
+2. Drag in your file, or click **choose your files**. You can upload
+   several files at once.
+3. Click the green **Commit changes** button. Files with the same name are
+   replaced.
 
-1. Open the app's files on GitHub.
-2. Click **Add file → Upload files**.
-3. Drag your `shift_cover_list.csv` onto the page, or click **choose your
-   files** and pick it.
-4. Click the green **Commit changes** button.
-
-Because the name is the same, it replaces the old file.
-
-> **Using Excel instead?** Save with **File → Save As**, and choose
-> **CSV UTF-8 (Comma delimited)** as the type. Then upload it the same way.
+> **Using Excel instead?** **File → Save As**, type **CSV UTF-8 (Comma
+> delimited)**. Then upload the same way.
 
 ### A small fix, such as a misspelled name
 
-You can do this straight on GitHub, as in step 3. Open
-`shift_cover_list.csv`, click the **pencil icon**, fix the text, and commit.
-Each cover list is inside "quote marks". Keep the quote marks.
+Do it straight on GitHub, as in step 3: open the file, click the
+**pencil icon**, fix the text, and commit. If you rename a student, change
+their name in **both** `shifts.csv` and `students.csv`.
 
----
+### Changing a rule
+
+`roles.csv` has one row for each role:
+
+| Column | What it means | Choices |
+| --- | --- | --- |
+| **Role** | The role's name, as used in the other files | |
+| **Work group** | Roles in the same group work side by side. "On with you" shows only your own group. | for example `Kitchen`, `Recycling`, `Lunch Monitor` |
+| **Gender** | Who can do it, and so who can cover it | `Any`, `Women only` or `Men only` |
+| **Trained students only** | `Yes` means only students with this role under **Trained for** can do or cover it | `Yes` or `No` |
+| **Same-day backups (asked last)** | Roles whose students, even when already working that day, can cover this role, but only after everyone else. Listed in order, separated by `;` | for example `Recycling; Lunch Monitor` |
+
+For example:
+- To let anyone do Recycling, change its **Gender** to `Any`.
+- To limit a student to two roles, put both under **Only does** in
+  `students.csv`, for example `Pots & Pans; Shift Leader`.
+- To train someone as a lunch monitor, add `Lunch Monitor` under their
+  **Trained for**.
+
+The row order in `roles.csv` is also the order roles appear on the cards.
 
 ## 5. Check that it worked
 
@@ -182,26 +196,27 @@ Each cover list is inside "quote marks". Keep the quote marks.
 2. Open the app. If it's installed on your phone, close it fully and
    open it again.
 3. **Scroll to the very bottom.** The dark footer says something like
-   *"Shift list: 14 students, 30 shifts a week."*
+   *"Shift list: 17 students, 41 shifts a week."*
    - If that's all it says, everything is fine.
    - If there's **yellow text starting "Check…"**, it tells you what to
-     fix. For example: *"Beth has 1 shift (expected 2 to 4)"*, *"'Bethh'
-     isn't a student on the list"*, *"Adam is in Nita's Tuesday cover list,
-     but Buckets & Composting is for women only"*, or *"The timesheet
-     portal link should start with https://"*. Fix the file and upload it
-     again.
+     fix. For example: *"Bethh isn't in students.csv"*, *"Beth has 1
+     shift (expected 2 to 4)"*, *"shifts.csv line 5: Adam can't do Buckets
+     & Composting"*, *"'Mopping' isn't a role in roles.csv"*, or *"The
+     timesheet portal link should start with https://"*. Fix the file and
+     upload it again.
 4. Choose a student's name and check that their shifts look right.
 
-If the app says **"The shift list didn't load"**, the file's name is
-probably wrong. It must be exactly `shift_cover_list.csv`. Upload it again
-with the right name, or upload your backup.
+If the app says **"The shift list didn't load"**, a file's name is
+probably wrong. The message names the file. The files must be called
+exactly `shifts.csv`, `students.csv` and `roles.csv`. Upload it again with
+the right name, or upload your backup.
 
 ---
 
 ## 6. If something goes wrong
 
-- **Undo:** upload the backup file you downloaded in 4a, the same way
-  as in 4e.
+- **Undo:** upload the backup you downloaded in 4a, the same way as in
+  4e.
 - **Stuck:** ask the other owner (the Work Study Manager, or the Student
   Kitchen Manager if that's not you), or the person who handed over to
   you. GitHub keeps every earlier version of every file, so nothing is

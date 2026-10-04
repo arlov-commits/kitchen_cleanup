@@ -55,12 +55,14 @@ the app.
 3. **Practice run.** They change the Student Kitchen Manager's name in
    `settings.csv` to their own (`HOW-TO-UPDATE.md`, step 3), then check the
    app (step 5).
-4. **New shift list.** If the crew is changing, they put in the new list
-   (step 4) while you watch, and check the footer shows no yellow
-   "Check…" text.
-5. **Pass on what isn't written in the files.** Go through the **Handover
-   log** below together, especially **Cover-list rules**. Explain anything
-   that has changed, and add it to the log.
+4. **New shifts.** If the crew is changing, they update `shifts.csv` and
+   `students.csv` (`HOW-TO-UPDATE.md`, step 4) while you watch, and check
+   the footer shows no yellow "Check…" text.
+5. **Go through the rules.** Read **"How the cover lists are worked
+   out"** below together. Point out the students with special settings
+   in `students.csv`: anyone limited under **Only does**, and who is
+   trained as a lunch monitor. Explain anything that has changed, and add
+   it to the log.
 6. **Their phone.** They open the app and tap **Install as app** at the
    bottom.
 7. **Second owner.** Make sure the Work Study Manager is still an owner.
@@ -84,18 +86,44 @@ Each person handing over adds a line. Newest at the bottom.
 | --- | --- | --- | --- |
 | *(first handover)* | | | |
 
-### Cover-list rules
+### How the cover lists are worked out
 
-Rules for building each shift's cover list that aren't obvious from the
-file. Keep this up to date. The person taking over relies on it.
+The app works out every shift's cover list itself, from `shifts.csv`,
+`students.csv` and `roles.csv`. Nobody types the lists. Changing a rule
+means changing one of those files (`HOW-TO-UPDATE.md`, "Changing a rule").
 
-- Students who don't work that day can cover it. List those with the
-  fewest shifts first; students with the same number of shifts go in
-  alphabetical order.
-- **Buckets & Composting is for women only.** Men are never given that
-  role and never listed to cover it. That's what the **Gender** column
-  (F or M) in the shift list is for. The app checks it and flags any
-  mistake in the footer.
+**Three work groups.** Kitchen (Shift Leader, Pots & Pans, Buckets &
+Composting), Recycling, and Lunch Monitor work separately. "On with you"
+on a shift card shows only your own group, and is left out when no one
+else in your group is on that day. That's why a Recycling or Lunch Monitor
+card usually has no "On with you".
+
+**Who can cover a shift.** A student can cover a role only if they could
+do it themselves:
+- **Gender:** Recycling is men only. Buckets & Composting and Lunch
+  Monitor are women only. Shift Leader and Pots & Pans are anyone. Men's
+  and women's roles therefore never cover each other.
+- **Limits:** a student with roles under **Only does** covers only those.
+  Ben Kong does Recycling only, so he's only ever a backup for Recycling.
+- **Training:** Lunch Monitor is for trained students only, the ones
+  with Lunch Monitor under **Trained for**. Lunch monitors cover each
+  other's lunch shifts, and no one else can.
+
+**The order.**
+1. Everyone **not working that day** who can do the role, those with the
+   fewest shifts first, then in alphabetical order.
+2. Last of all, students **already working that day** in the role's
+   **same-day backups**, in the order listed:
+   - Pots & Pans and Shift Leader: Recycling, then Lunch Monitor at the
+     very end.
+   - Buckets & Composting: Lunch Monitor at the very end.
+   - Recycling and Lunch Monitor: none.
+
+   So Buckets & Composting and Pots & Pans never cover each other on the
+   same day.
+
+When this page was written, these rules reproduced the Student Kitchen
+Manager's own hand-made lists exactly (`tests/expected-cover-lists.csv`).
 
 ---
 

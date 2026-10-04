@@ -28,7 +28,7 @@ dependencies. Served over the web, it installs as an app on a phone.
 
 | Tab | What it shows |
 | --- | --- |
-| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day (with a **Today** or **Tomorrow** pill beside it when it is) and your role, and who else is on that day with their roles, the Shift Leader first and Buckets & Composting last. Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. At the foot, in a full-width sage band above the footer, **My availability** lists the days the student is a backup on, and for whom, with a line to email the Student Kitchen Manager (Art) if anything is wrong. |
+| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day (with a **Today** or **Tomorrow** pill beside it when it is) and your role, and who else from your work group is on that day, with their roles, in `roles.csv` order (left out when no one else in your group is on). Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. At the foot, in a full-width sage band above the footer, **My availability** lists the days the student is a backup on, and for whom, with a line to email the Student Kitchen Manager (Art) if anything is wrong. |
 | **Call out** | The substitute-replacement steps from the poster: **Planned Absence**, then **Sick or Unexpected Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
 | **Submit Timesheet** | The deadline, Sunday at 5 pm, and a button to the timesheet portal at drbu.edu/timesheet. On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). |
 
@@ -37,35 +37,33 @@ There are no phone numbers and no call buttons in the app.
 The chosen name is kept in this browser only (`localStorage`, key
 `kitchen.me`). To change it, pick a different name from the list.
 
-## The shift list: `shift_cover_list.csv`
+## The shift files
 
-One row per shift, as exported from the spreadsheet:
+The app reads three files and works out every cover list itself. Nobody
+types the lists.
 
-| Column | What it is |
-| --- | --- |
-| `Student` | The student's name, written the same way everywhere. |
-| `Gender` | `F` or `M`. Never shown in the app. It's only used to check the Buckets & Composting rule. |
-| `Shift day` | `Monday` … `Sunday`. |
-| `Role` | For example `Shift Leader`, `Pots & Pans` or `Buckets & Composting`. |
-| `# who can cover` | How many names are in the next column. Used only as a check. |
-| `Can be asked to cover (fewest shifts first)` | The names, comma-separated, in the order to ask them. |
+| File | One row per | Columns |
+| --- | --- | --- |
+| `shifts.csv` | shift | Student, Shift day, Role |
+| `students.csv` | student | Student, Gender (F/M, never shown), Only does (roles they're limited to, `;`-separated, blank = any), Trained for (`;`-separated) |
+| `roles.csv` | role, in card order | Role, Work group, Gender (Any / Women only / Men only), Trained students only (Yes/No), Same-day backups (asked last, `;`-separated, in order) |
 
-The app shows the cover list **exactly as written**, in that order. It
-doesn't work out who is free by itself. "On with you" is everyone else who
-has a row on the same day. Roles are shown exactly as written.
+**A cover list** is everyone not working that day who can do the role
+(gender, Only does and training all allow it), fewest shifts first, then
+alphabetical. After them come students already working that day in one of
+the role's same-day backup roles, in the listed order. **On with you**
+shows only the shift's own work group. The full rules, in plain words,
+are in HANDOFF.md under "How the cover lists are worked out".
+`tests/expected-cover-lists.csv` holds the Student Kitchen Manager's
+hand-made lists, which the shipped files reproduce exactly.
 
-**Buckets & Composting is for women only.** Men are never put on it and
-never listed to cover it.
-
-The footer checks the file and names anything that looks wrong:
-- a count that doesn't match its list;
-- a name in a cover list that isn't a student, the shift's own student,
-  or someone already working that day;
-- a man on, or listed to cover, a Buckets & Composting shift;
-- a missing or unrecognised gender, or one that differs between a
-  student's rows;
-- a student listed twice on one day (the second row is ignored);
-- a student with fewer than 2 or more than 4 shifts.
+The footer checks all three files and names anything that looks wrong:
+- a missing column, or a role or student that isn't defined;
+- a student who can't do their own role (gender, Only does, training);
+- a bad gender or yes/no value, or a role or student listed twice;
+- a student twice on one day (the second row is ignored);
+- a student with fewer than 2 or more than 4 shifts, or in
+  `students.csv` with no shifts.
 
 The browser console shows the same warnings.
 
@@ -93,10 +91,10 @@ phone numbers.
 | File | What it is |
 | --- | --- |
 | `index.html` | The whole app. |
-| `shift_cover_list.csv` | The shifts, roles and cover lists. Read when the app opens. |
+| `shifts.csv`, `students.csv`, `roles.csv` | The shift files: who works when, who the students are, and the role rules. The app works out the cover lists from them. |
 | `settings.csv` | The two managers' names and the timesheet portal link. Read when the app opens. |
 | `HOW-TO-UPDATE.md` | For whoever is taking the app over or looking after it, written for someone who has never used GitHub. |
-| `HANDOFF.md` | For whoever is handing it over: the steps, the handover log, the cover-list rules, and the one-time move into a shared organization. |
+| `HANDOFF.md` | For whoever is handing it over: the steps, the handover log, how the cover lists are worked out, and the one-time move into a shared organization. |
 | `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
 | `fonts/` | Inter and Playfair Display, self-hosted, with their SIL Open Font Licenses. |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |
@@ -116,9 +114,12 @@ NODE_PATH=$(npm root -g) node tests/app.e2e.js   # every screen in Chromium (nee
 ```
 
 `data.test.js` lifts each data function out of `index.html` by name, so
-it always tests the code that ships. `app.e2e.js` serves the repo and
+it always tests the code that ships. It checks every cover list against
+`tests/expected-cover-lists.csv`, then flips each setting in `roles.csv`
+and `students.csv` to see that the lists change as they should. `app.e2e.js` serves the repo and
 drives the whole app:
-- picking a name, the shift cards, backups and My availability;
+- picking a name, the shift cards, work groups, backups and My
+  availability;
 - the tabs, the Sunday badge, settings and load errors;
 - the theme button and Install as app;
 - the layout at 320, 375 and 1280px in both modes;
