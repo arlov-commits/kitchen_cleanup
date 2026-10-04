@@ -29,8 +29,12 @@ and the tab shell from the second.
   these out. The one exception the user asked for: each shift's backups
   are a closed `<details>` always titled "Shift Backups · N", with "Can
   cover for you" as body text above the list.
-- Under the shift cards, in its own section, "My availability" lists the
-  days the student appears in someone's cover list, and for whom.
+- Under the shift cards, "My availability" lists the days the student
+  appears in someone's cover list, and for whom, then a line to tell the
+  Student Kitchen Manager (from `CONFIG.contacts`) if anything is wrong.
+  It is a full-width band (`.band`, `--band`) between the cards and the
+  footer: warm sand in light mode and warm brown in dark mode, so it is
+  distinct from both the page and the footer. Keep it short.
 - `CONFIG` at the top of the script holds the contacts: role and name
   only, no emails or phone numbers.
 - The third tab, Submit Timesheet, gives the deadline (Sunday, 5 pm) and
