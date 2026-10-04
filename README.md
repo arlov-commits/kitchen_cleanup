@@ -16,7 +16,7 @@ dependencies. Served over the web, it installs as an app on a phone.
 
 | Tab | What it shows |
 | --- | --- |
-| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day (marked **Today** or **Tomorrow** in oxblood when it is) and your role, and who else is on that day with their roles, the Shift Leader first and Buckets & Composting last. Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. At the foot, in a full-width sand band above the footer, **My availability** lists the days the student is a backup on, and for whom, with a line to tell Art (the Student Kitchen Manager) if anything is wrong. |
+| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day (with a **Today** or **Tomorrow** pill beside it when it is) and your role, and who else is on that day with their roles, the Shift Leader first and Buckets & Composting last. Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. At the foot, in a full-width sage band above the footer, **My availability** lists the days the student is a backup on, and for whom, with a line to email the Student Kitchen Manager (Art) if anything is wrong. |
 | **Call out** | The substitute-replacement steps from the poster: **Planned Absence**, then **Sick or Unexpected Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
 | **Submit Timesheet** | The deadline, Sunday at 5 pm, and a button to the timesheet portal at drbu.edu/timesheet. On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). |
 
@@ -75,6 +75,13 @@ Names and roles only: no emails or phone numbers.
 | `fonts/` | Inter and Playfair Display, self-hosted, with their SIL Open Font Licenses. |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |
 
+## Installing it
+
+The footer has an **Install as app** button. In Chrome and Edge it opens
+the browser's own install prompt. Safari on iPhone has no prompt, so there
+the button explains how to add the app from the Share menu. The button is
+hidden once the app is installed.
+
 ## Running it
 
 The shift list is a separate file, so the app must be **served**, not
@@ -104,8 +111,11 @@ The 30-minute question is a gold diamond.
 
 There are no shadows, no hover effects and no motion.
 
-**Appearance.** The footer has a **Light · Dark · Auto** switch, kept on
-the phone as `kitchen.theme`. **Auto** is the default and goes by the
+**Appearance.** A round icon button in the header cycles **Auto → Light →
+Dark**, kept on the phone as `kitchen.theme`. It sits at the right of each
+page's first line on a phone, and in the menu bar on a wide screen. The
+icon shows the current mode: a half-filled circle for Auto, a sun for
+Light, a moon for Dark. **Auto** is the default and goes by the
 phone's clock: dark from 7 pm to 7 am, checked every minute and whenever
 the app comes back on screen. Dark mode uses the same layout on a
 blue-black ground. Text colours are lighter, and anything with white text

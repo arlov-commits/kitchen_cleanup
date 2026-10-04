@@ -33,8 +33,12 @@ and the tab shell from the second.
   appears in someone's cover list, and for whom, then a line to tell the
   Student Kitchen Manager (from `CONFIG.contacts`) if anything is wrong.
   It is a full-width band (`.band`, `--band`) between the cards and the
-  footer: warm sand in light mode and warm brown in dark mode, so it is
-  distinct from both the page and the footer. Keep it short.
+  footer: soft sage in light mode and deep sage in dark mode, distinct from
+  the page and the footer. Days are in ink with a dot in their hue. Sand
+  and brown were tried and rejected. Keep it short.
+- Today/Tomorrow is a neutral pill beside the day name (`.when`, solid for
+  today, outlined for tomorrow, `--mark-bg`/`--mark-fg`). Oxblood text
+  above the day was tried and blended in.
 - `CONFIG` at the top of the script holds the contacts: role and name
   only, no emails or phone numbers.
 - The third tab, Submit Timesheet, gives the deadline (Sunday, 5 pm) and
@@ -48,6 +52,9 @@ and the tab shell from the second.
   the old one left open, so no phone sticks on an old version.
 - `icons/icon.svg` is the icon source. Re-render every PNG from it with
   Playwright, and never edit a PNG.
+- The footer's Install as app button uses `beforeinstallprompt` where the
+  browser offers it, and otherwise shows short instructions (iPhone:
+  Share, then Add to Home Screen). It is hidden when running installed.
 - The user's name is in `localStorage` under `kitchen.me`. Wrap every
   access in try/catch.
 
@@ -70,7 +77,8 @@ and the tab shell from the second.
 - No shadows, no hover effects, no motion.
 - Two modes, light and dark, set as `data-theme` on `<html>` by
   `window.kitchenTheme()` in a script in `<head>`, before the page paints.
-  The footer switch offers Light, Dark and Auto (`kitchen.theme`; absent
+  A round icon button (`[data-theme-btn]`, one per view head on phones and
+  one in the menu bar from 820px) cycles Auto, Light and Dark (`kitchen.theme`; absent
   means Auto, which is dark from 7 pm to 7 am by the clock, not the
   system setting). Dark tokens are in `:root[data-theme="dark"]`. Use the
   tokens, never a raw colour. A fill under white text uses `--cf`/`-f` or

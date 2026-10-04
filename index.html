@@ -62,11 +62,12 @@ window.kitchenTheme();
   --rust-deep:#8c2f12;    /* rust as text on light, always this, not --rust */
   --rust-on-dark:#d66a48; /* rust as text on near-black */
   --gold:#e0a93f;
-  --oxblood:#6a0f1f;      /* Today and Tomorrow on a shift */
+  --mark-bg:#14181f; --mark-fg:#ffffff;   /* the Today/Tomorrow marker: neutral, so no day hue swallows it */
   --rust-btn:#8c2f12;     /* rust under white text: the portal button, the badge */
   --yes-ink:#1d4a2a; --no-ink:#5a2a18;
-  --band:#f2e8de;         /* My availability: a warm sand band, edge to edge */
-  --band-line:#e2d3c4;
+  --band:#e7efeb;         /* My availability: a soft sage band, edge to edge */
+  --band-line:#c9dbd2;
+  --band-accent:#2f5f50;  /* sage as text on the band */
   /* One hue per weekday (Mon first): a fill, a deeper ink for text, a wash. */
   --k0:#b8431c; --k0-ink:#8c2f12; --k0-w:rgba(184,67,28,.09);   /* rust   */
   --k1:#0c8599; --k1-ink:#0b7285; --k1-w:rgba(12,133,153,.10);  /* teal   */
@@ -99,11 +100,12 @@ window.kitchenTheme();
   --line:#2e353f;
   --line-soft:#262c35;
   --rust-deep:#ec8a66;    /* rust as text */
-  --oxblood:#f08b98;
+  --mark-bg:#eceef1; --mark-fg:#14181f;
   --rust-btn:#a33a17;
   --yes-ink:#b2f2bb; --no-ink:#ffc9b5;
-  --band:#2a221d;
-  --band-line:#3d322b;
+  --band:#18211f;
+  --band-line:#2a3833;
+  --band-accent:#8fd0bd;
   --k0:#d0582c; --k0-ink:#f0906b; --k0-w:rgba(240,144,107,.14);
   --k1:#1098ad; --k1-ink:#4fd1e3; --k1-w:rgba(79,209,227,.13);
   --k2:#845ef7; --k2-ink:#b9a2fd; --k2-w:rgba(185,162,253,.14);
@@ -165,6 +167,9 @@ p{margin:0}
   --nv-shifts:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='2.5'/%3E%3Cpath d='M3.5 10h17M8.5 3v4M15.5 3v4'/%3E%3Cpath d='M9 15l2 2 4-4'/%3E%3C/svg%3E");
   --nv-callout:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3.5h3l1.6 4.4-2.1 1.4a11 11 0 0 0 6.2 6.2l1.4-2.1 4.4 1.6v3a2 2 0 0 1-2.1 2A16.5 16.5 0 0 1 4 5.6a2 2 0 0 1 2-2.1z'/%3E%3C/svg%3E");
   --nv-sick:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 14.2V5a2 2 0 0 1 4 0v9.2a4 4 0 1 1-4 0z'/%3E%3Cpath d='M12 9.5v6.5'/%3E%3C/svg%3E");
+  --ic-light:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6'/%3E%3C/svg%3E");
+  --ic-dark:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'%3E%3Cpath d='M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z'/%3E%3C/svg%3E");
+  --ic-auto:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.3' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='M12 3.7a8.3 8.3 0 0 1 0 16.6z' fill='black'/%3E%3C/svg%3E");
   --nv-timesheet:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");
 }
 .nav-icon{display:inline-block;width:22px;height:22px;flex-shrink:0;background-color:var(--ink-3);
@@ -175,6 +180,20 @@ p{margin:0}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:19px;color:var(--ink);text-decoration:none}
 .brand .cjk{font-family:var(--cjk);color:var(--rust-deep);font-size:20px;font-weight:500}
 .topnav{display:flex;align-items:stretch;gap:2px;height:100%}
+.top-right{display:flex;align-items:stretch;gap:12px;height:100%}
+.top-right .theme-btn{align-self:center}
+/* appearance: one round icon button that cycles Auto, Light, Dark */
+.theme-btn{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;
+  background:var(--white);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;padding:0}
+.theme-btn::before{content:"";width:20px;height:20px;background-color:currentColor;
+  -webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+.theme-btn[data-mode="light"]{--ic:var(--ic-light)}
+.theme-btn[data-mode="dark"]{--ic:var(--ic-dark)}
+.theme-btn[data-mode="auto"]{--ic:var(--ic-auto)}
+/* on a phone the button sits at the right of each view's first line; on a
+   wide screen the menu bar carries it instead */
+.head-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px;margin-top:-6px}
+@media (min-width:820px){.head-top .theme-btn{display:none}}
 .nav-item{display:flex;align-items:center;gap:8px;border-bottom:2px solid transparent;color:var(--ink-3);font-size:15px;font-weight:600;
   padding:0 14px;text-decoration:none}
 .nav-item .nav-icon{width:18px;height:18px}
@@ -221,7 +240,11 @@ p{margin:0}
 .shift-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
 .shift-h h2{color:var(--ci)}
 .role{font-size:15px;font-weight:600;color:var(--ink)}
-.when{flex-basis:100%;font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--oxblood);margin-bottom:-4px}
+.shift-h h2{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+/* Today / Tomorrow: a neutral pill beside the day, solid for today, outlined for tomorrow */
+.when{display:inline-block;font-family:var(--body);font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;line-height:1;
+  padding:6px 10px;border-radius:30px;background:var(--mark-bg);color:var(--mark-fg);border:1.5px solid var(--mark-bg)}
+.when.tmrw{background:transparent;color:var(--ink)}
 .part{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid var(--line-soft)}
 .crew{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .crew li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:15px}
@@ -241,14 +264,18 @@ p{margin:0}
 #view-shifts{display:flex;flex-direction:column}
 #view-shifts>.body{flex:1 0 auto}
 .band{background:var(--band);border-top:1px solid var(--band-line)}
-.band .in{padding-top:26px;padding-bottom:30px;display:flex;flex-direction:column;gap:14px}
+.band .in{padding-top:26px;padding-bottom:30px;display:flex;flex-direction:column;gap:12px}
+.band .eyebrow{color:var(--band-accent)}
 .band h2{font-size:22px}
+.band h2 em{color:var(--band-accent)}
 .band .note{color:var(--ink-2)}
 .avail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.avail-list li{display:flex;flex-direction:column;gap:1px;padding:10px 0;border-top:1px solid var(--band-line)}
+.avail-list li{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid var(--band-line)}
 .avail-list li:last-child{border-bottom:1px solid var(--band-line)}
-.avail-list .d{font-family:var(--display);font-size:19px;font-weight:600;color:var(--ci)}
-.avail-list .f{font-size:14.5px;color:var(--ink-2)}
+/* the day in ink with a small dot in its hue: calm on the sage */
+.avail-list .d{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:18px;font-weight:600;color:var(--ink)}
+.avail-list .d::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.avail-list .f{font-size:14.5px;color:var(--ink-2);padding-left:17px}
 .cover{margin:0;padding:0 0 0 1.6em;columns:2;column-gap:20px;font-size:15px}
 .cover li{padding:2px 0;break-inside:avoid}
 .cover li::marker{color:var(--ci);font-weight:600;font-size:13px}
@@ -307,14 +334,15 @@ p{margin:0}
 .foot .brand{color:#fff;font-size:17px}
 .foot .brand .cjk{color:var(--rust-on-dark);font-size:18px}
 .foot .warn{color:#ffd9a0}
-/* appearance switch */
-.theme{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:8px}
-.theme .lbl{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark)}
-.seg{display:inline-flex;border:1px solid #3a414c;border-radius:30px;padding:3px;gap:2px}
-.seg button{border:0;background:none;border-radius:30px;padding:6px 14px;font-size:14px;font-weight:600;color:var(--on-dark);cursor:pointer}
-.seg button[aria-pressed="true"]{background:#ffffff;color:#14181f}
-.seg button:focus-visible{outline:2px solid var(--rust-on-dark);outline-offset:2px}
-.theme-note{font-size:13px;color:#8a8d93}
+/* install as app */
+.install{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:10px}
+.install-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1.5px solid #ffffff;background:transparent;
+  color:#ffffff;font-size:15px;font-weight:600;cursor:pointer}
+.install-btn::before{content:"";width:18px;height:18px;background-color:currentColor;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14'/%3E%3C/svg%3E") center/contain no-repeat}
+.install-btn:focus-visible{outline:2px solid var(--rust-on-dark);outline-offset:2px}
+.install-help{font-size:13.5px;color:var(--on-dark);max-width:46ch}
 
 .msg{border-left:4px solid var(--gold);border-radius:4px 10px 10px 4px}
 </style>
@@ -323,7 +351,10 @@ p{margin:0}
 <div class="shell">
   <header class="topbar">
     <span class="brand"><span class="cjk" lang="zh" aria-hidden="true">淨</span>Kitchen Cleanup</span>
-    <nav class="topnav" id="top-nav" aria-label="Views"></nav>
+    <div class="top-right">
+      <nav class="topnav" id="top-nav" aria-label="Views"></nav>
+      <button type="button" class="theme-btn" data-theme-btn></button>
+    </div>
   </header>
   <div class="frame">
     <div class="pane" id="scroll">
@@ -331,7 +362,7 @@ p{margin:0}
 <!-- ============================================================ MY SHIFTS -->
 <main class="view" id="view-shifts">
   <div class="head"><div class="in">
-    <span class="eyebrow">Kitchen cleanup</span>
+    <div class="head-top"><span class="eyebrow">Kitchen cleanup</span><button type="button" class="theme-btn" data-theme-btn></button></div>
     <h1>Your <em>shifts</em></h1>
     <div class="who">
       <label for="me">Your name</label>
@@ -347,7 +378,7 @@ p{margin:0}
 <!-- ============================================================ CALL OUT -->
 <main class="view" id="view-callout" hidden>
   <div class="head"><div class="in">
-    <span class="eyebrow">Substitute shift replacement</span>
+    <div class="head-top"><span class="eyebrow">Substitute shift replacement</span><button type="button" class="theme-btn" data-theme-btn></button></div>
     <h1>Can't make your <em>shift?</em></h1>
     <p class="lead">Every shift is done in full, no matter who shows up. An uncovered absence becomes overtime for your teammates.</p>
   </div></div>
@@ -400,7 +431,7 @@ p{margin:0}
 <!-- ============================================================ TIMESHEET -->
 <main class="view" id="view-timesheet" hidden>
   <div class="head"><div class="in">
-    <span class="eyebrow">Work study hours</span>
+    <div class="head-top"><span class="eyebrow">Work study hours</span><button type="button" class="theme-btn" data-theme-btn></button></div>
     <h1>Submit your <em>timesheet</em></h1>
   </div></div>
   <div class="body"><div class="in">
@@ -419,15 +450,10 @@ p{margin:0}
           <span class="brand"><span class="cjk" lang="zh" aria-hidden="true">淨</span>Kitchen Cleanup</span>
           <p id="data-status">Shift list: loading…</p>
           <p>Your name is saved on this phone only.</p>
-          <div class="theme">
-            <span class="lbl" id="theme-lbl">Appearance</span>
-            <div class="seg" role="group" aria-labelledby="theme-lbl">
-              <button type="button" data-theme-set="light">Light</button>
-              <button type="button" data-theme-set="dark">Dark</button>
-              <button type="button" data-theme-set="auto">Auto</button>
-            </div>
+          <div class="install" id="install">
+            <button type="button" class="install-btn" id="install-btn">Install as app</button>
+            <p class="install-help" id="install-help" hidden></p>
           </div>
-          <p class="theme-note" id="theme-note">Auto: dark from 7 pm to 7 am.</p>
         </div>
       </footer>
     </div>
@@ -570,8 +596,8 @@ p{margin:0}
         var crew = data.shifts.filter(function (x) { return x.day === s.day && x.who !== me; })
           .sort(function (a, b) { return roleRank(a.role) - roleRank(b.role) || a.who.localeCompare(b.who); });
         return '<section class="panel shift k' + s.day + '">' +
-          '<div class="shift-h">' + (s.day === today ? '<span class="when">Today</span>' : s.day === tomorrow ? '<span class="when">Tomorrow</span>' : "") +
-          "<h2>" + DAYS[s.day] + "</h2>" +
+          '<div class="shift-h"><h2>' + DAYS[s.day] +
+          (s.day === today ? '<span class="when">Today</span>' : s.day === tomorrow ? '<span class="when tmrw">Tomorrow</span>' : "") + "</h2>" +
           (s.role ? '<span class="role">' + esc(roleName(s.role)) + "</span>" : "") + "</div>" +
           '<div class="part"><h4>On with you</h4><ul class="crew">' +
           (crew.length ? crew.map(function (x) {
@@ -603,7 +629,7 @@ p{margin:0}
       (rows.length ? '<p class="note">You\'re a backup on these days, so someone on that shift may ask you to cover.</p>' +
         '<ul class="avail-list">' + rows.join("") + "</ul>" :
         '<p class="note">You\'re not listed as a backup on any day.</p>') +
-      (km ? '<p class="note">Something here wrong or out of date? Let ' + esc(km.name) + ", the " + esc(km.role) + ", know.</p>" : "");
+      (km ? '<p class="note">Something here wrong or out of date? Send an email to the ' + esc(km.role) + " (" + esc(km.name) + ").</p>" : "");
   }
 
 
@@ -669,20 +695,48 @@ p{margin:0}
   document.addEventListener("visibilitychange", function () { if (!document.hidden) { drawNavs(); drawTheme(); } });
 
   /* ------------------------------------------------------ appearance */
+  var MODES = { auto: "Auto (dark 7 pm to 7 am)", light: "Light", dark: "Dark" }, NEXT = { auto: "light", light: "dark", dark: "auto" };
   function drawTheme() {
-    var m = window.kitchenTheme(), btns = document.querySelectorAll("[data-theme-set]");
-    for (var i = 0; i < btns.length; i++) btns[i].setAttribute("aria-pressed", btns[i].getAttribute("data-theme-set") === m ? "true" : "false");
-    $("theme-note").hidden = m !== "auto";
+    var m = window.kitchenTheme(), btns = document.querySelectorAll("[data-theme-btn]");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].setAttribute("data-mode", m);
+      btns[i].setAttribute("aria-label", "Appearance: " + MODES[m] + ". Tap for " + MODES[NEXT[m]] + ".");
+      btns[i].title = "Appearance: " + MODES[m];
+    }
   }
-  document.querySelector(".seg").addEventListener("click", function (e) {
-    var b = e.target.closest ? e.target.closest("[data-theme-set]") : null;
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-theme-btn]") : null;
     if (!b) return;
-    var m = b.getAttribute("data-theme-set");
+    var m = NEXT[window.kitchenTheme()];
     if (m === "auto") store.del("kitchen.theme"); else store.set("kitchen.theme", m);
     drawTheme();
   });
   setInterval(drawTheme, 60000);   /* Auto turns over at 7 am and 7 pm */
   drawTheme();
+
+  /* -------------------------------------------------- install as app */
+  /* Chrome and Edge hand over an install prompt; Safari on iPhone never
+     does, so there the button says how to add it from the Share menu. An
+     installed copy hides the button. */
+  var installPrompt = null;
+  function installed() {
+    return (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  }
+  if (installed() || location.protocol === "file:") $("install").hidden = true;
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); installPrompt = e; });
+  window.addEventListener("appinstalled", function () { $("install").hidden = true; });
+  $("install-btn").addEventListener("click", function () {
+    var help = $("install-help");
+    if (installPrompt) {
+      installPrompt.prompt();
+      installPrompt.userChoice.then(function () { installPrompt = null; });
+      return;
+    }
+    var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    help.textContent = ios ? "In Safari, tap the Share button, then Add to Home Screen." :
+      "Open your browser's menu and choose Install app or Add to Home screen.";
+    help.hidden = false;
+  });
 
   /* ------------------------------------------------------------ start */
   route(); renderAll();
