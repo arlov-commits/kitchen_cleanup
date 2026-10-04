@@ -20,7 +20,7 @@ the files link.
 | The Student Kitchen Manager's name | `settings.csv` |
 | The Work Study Manager's name | `settings.csv` |
 | The timesheet portal link | `settings.csv` |
-| Which students are on the crew, their shift days and roles, and who can cover each shift | `shift_cover_list.csv`, made with the **cover-list maker** (step 4) |
+| Which students are on the crew, their shift days and roles, and who can cover each shift | `shift_cover_list.csv` |
 
 **Don't change any other file**, except to add a line to the handover log
 in `HANDOFF.md`. Everything else is the app itself.
@@ -89,77 +89,90 @@ Then follow **5. Check that it worked**.
 
 ## 4. Put in a new semester's shift list
 
-Do this at the start of each semester, or whenever the crew changes. You
-**never write the cover lists yourself**. The **cover-list maker** writes
-them for you. Its link is at the top of the README (it's the app's link
-with `make-cover-lists.html` on the end). A laptop is easiest.
+Do this at the start of each semester, or whenever the crew changes.
 
-### a) Open the maker and start from the current list
+### What's in the file
 
-1. Open the cover-list maker.
-2. Under **1. Start from**, click **The current list**. Every shift
-   appears as a line under **2. The shifts**.
+`shift_cover_list.csv` has **one row for each shift**. A student who
+works three days has three rows. The columns are:
 
-The maker saves your work on that device as you go, so you can close it
-and come back later.
+| Column | What goes in it | Example |
+| --- | --- | --- |
+| **Student** | The student's name. Spell it the same way every time it appears. | `Beth` |
+| **Gender** | `F` or `M`. It's never shown in the app. It's only used to check the Buckets & Composting rule. Use the same letter on every row for that student. | `F` |
+| **Shift day** | The day of the week, in full. | `Wednesday` |
+| **Role** | Their job on that shift. | `Shift Leader`, `Pots & Pans` or `Buckets & Composting` |
+| **# who can cover** | How many names are in the last column. | `8` |
+| **Can be asked to cover (fewest shifts first)** | The students who can cover this shift, separated by commas, in the order they should be asked. | `Adam, Amelia, Huiyi, Ivwananji` |
 
-### b) Change the lines
+The app shows each role exactly as you write it.
 
-Each line is one shift: **Student**, **Gender** (F or M), **Day** and
-**Role**. A student who works three days has three lines.
-- **Someone left:** click **×** on each of their lines.
-- **Someone new:** click **+ Add a shift** for each day they work, and
-  fill in the line. Spell their name the same way every time.
-- **Someone changed days or roles:** change the Day or Role on their line.
+**Making each cover list:** follow the **Cover-list rules** in
+`HANDOFF.md`. The person who handed over to you will have gone through
+them with you. In short:
+- list the students who **don't** work that day;
+- put those with the **fewest shifts first**;
+- **Buckets & Composting is for women only**: never put a man on it, and
+  never list a man to cover it.
 
-Gender is only used for the Buckets & Composting rule: it's for women
-only, so the maker never lists a man to cover it. Gender never appears in
-the app.
+If you get any of this wrong, the yellow "Check…" note at the bottom of
+the app will say so (see step 5).
 
-### c) Read the checks
+The app builds everything else from these rows: the list of names to
+choose from, "On with you", and "My availability".
 
-Under **3. Checks**:
-- **Fix** (red) means something is wrong, for example a line with no day,
-  or a man on Buckets & Composting. The download stays switched off until
-  you've fixed it.
-- **Check** (yellow) is worth a look but won't stop you, for example *"Kim
-  has 1 shift"* or *"Saturday has no Shift Leader"*.
-- **OK** means everything is fine.
+### The easiest way: Google Sheets
 
-Under **4. The cover lists** you can read every shift's list before you
-download.
+**a) Download the current file. This is also your backup.**
 
-### d) Download and upload
+1. On GitHub, click **shift_cover_list.csv**.
+2. Click the **download icon** ("Download raw file") at the top right of
+   the file.
+3. Keep this file. If anything goes wrong, you can upload it again to put
+   things back.
 
-1. Click **Download shift_cover_list.csv**.
-2. On GitHub, open the app's files and click **Add file → Upload files**.
-3. Drag the downloaded file onto the page, or click **choose your files**
-   and pick it.
-   - The name must be exactly `shift_cover_list.csv`. If your computer
-     added something, such as `shift_cover_list (1).csv`, rename it first.
-4. Click the green **Commit changes** button. It replaces the old file.
+**b) Open it in Google Sheets.**
 
-Then follow **5. Check that it worked**.
+1. Go to **https://sheets.google.com** and start a **Blank** spreadsheet.
+2. Click **File → Import → Upload**, and choose the file you downloaded.
+3. Under "Import location", choose **Replace spreadsheet**. Click
+   **Import data**.
 
-> **Before a big change, keep a backup.** On GitHub, click
-> **shift_cover_list.csv**, then the **download icon** ("Download raw
-> file"). If anything goes wrong, upload that file again.
+**c) Make your changes.**
 
-### Prefer a spreadsheet?
+- Keep the first row (the column names) exactly as it is.
+- One row per shift. Delete the rows for students who have left, and add
+  rows for new ones.
+- Don't leave empty rows in the middle.
 
-You can keep the shifts in Google Sheets or Excel instead. You only need
-four columns: **Student**, **Gender**, **Shift day** and **Role**. Then:
-1. In Google Sheets: **File → Download → Comma Separated Values (.csv)**.
-   In Excel: **File → Save As**, type **CSV UTF-8 (Comma delimited)**.
-2. In the maker, click **A spreadsheet file (.csv)** and choose it.
-3. Carry on from **c)** above.
+**d) Download it as a CSV file.**
+
+1. Click **File → Download → Comma Separated Values (.csv)**.
+2. **Rename the downloaded file to exactly `shift_cover_list.csv`.**
+   Google gives it a longer name, such as
+   `Untitled spreadsheet - shift_cover_list.csv`. The app only reads a file
+   with exactly the right name.
+
+**e) Upload it to GitHub.**
+
+1. Open the app's files on GitHub.
+2. Click **Add file → Upload files**.
+3. Drag your `shift_cover_list.csv` onto the page, or click **choose your
+   files** and pick it.
+4. Click the green **Commit changes** button.
+
+Because the name is the same, it replaces the old file.
+
+> **Using Excel instead?** Save with **File → Save As**, and choose
+> **CSV UTF-8 (Comma delimited)** as the type. Then upload it the same way.
 
 ### A small fix, such as a misspelled name
 
-The easiest way is in the maker: start from the current list, fix the
-name on each of that student's lines, then download and upload as in
-**d)**. Their name in other people's cover lists is fixed at the same
-time.
+You can do this straight on GitHub, as in step 3. Open
+`shift_cover_list.csv`, click the **pencil icon**, fix the text, and commit.
+Each cover list is inside "quote marks". Keep the quote marks.
+
+---
 
 ## 5. Check that it worked
 
@@ -187,8 +200,8 @@ with the right name, or upload your backup.
 
 ## 6. If something goes wrong
 
-- **Undo:** upload the backup file you downloaded (step 4, "keep a
-  backup"), the same way as in step 4 d).
+- **Undo:** upload the backup file you downloaded in 4a, the same way
+  as in 4e.
 - **Stuck:** ask the other owner (the Work Study Manager, or the Student
   Kitchen Manager if that's not you), or the person who handed over to
   you. GitHub keeps every earlier version of every file, so nothing is

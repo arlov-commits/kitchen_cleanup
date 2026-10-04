@@ -246,73 +246,9 @@ function serve(dir, port) {
     }
   }
 
-  /* ------------------------------------------------ cover-list maker */
-  var MAKER = BASE + "make-cover-lists.html", SHIPPED = fs.readFileSync(path.join(ROOT, "shift_cover_list.csv"), "utf8");
-  p = await page({ ctx: { acceptDownloads: true } });
-  p.on("dialog", function (d) { d.accept(); });
-  await p.goto(MAKER);
-  check("maker: fresh start", [await text(p, "#source-msg"), await p.$eval("#download", function (b) { return b.disabled; })], ["Choose where to start.", true]);
-  await p.click("#from-current");
-  await p.waitForFunction(function () { return document.querySelectorAll(".shift").length === 30; });
-  check("maker: loaded the current list", [await text(p, "#source-msg"), await text(p, "#count")], ["Loaded the current list: 30 shifts.", "30 shifts, 14 students."]);
-  check("maker: checks pass", await text(p, "#checks"), "OK Everything checks out.");
-  check("maker: one result per shift", await p.$$eval("#result li", function (l) { return l.length; }), 30);
-  async function download() {
-    var d = await Promise.all([p.waitForEvent("download"), p.click("#download")]);
-    return { name: d[0].suggestedFilename(), body: fs.readFileSync(await d[0].path(), "utf8") };
-  }
-  var dl = await download();
-  check("maker: download name", dl.name, "shift_cover_list.csv");
-  check("maker: download is the shipped file, byte for byte", dl.body === SHIPPED, true);
-  var line = function (n) { return ".shift:nth-child(" + n + ")"; };
-  await p.selectOption(line(1) + " .g", "F");
-  truthy("maker: gender clash is an error", /Fix\s*Adam is marked F on one row and M on another/i.test(await text(p, "#checks")));
-  check("maker: errors block the download", [await p.$eval("#download", function (b) { return b.disabled; }), await text(p, "#download")], [true, "Fix the problems above first"]);
-  await p.selectOption(line(1) + " .g", "M");
-  await p.fill(line(1) + " .role", "Buckets & Composting");
-  truthy("maker: a man on Buckets is an error", /Adam is on Buckets & Composting on Monday, which is for women only/.test(await text(p, "#checks")));
-  await p.fill(line(1) + " .role", "Pots & Pans");
-  check("maker: fixed again", await text(p, "#checks"), "OK Everything checks out.");
-  await p.click("#add");
-  check("maker: new line focused", await p.evaluate(function () { return document.activeElement.className; }), "who");
-  await p.fill(line(31) + " .who", "Kim ");
-  await p.selectOption(line(31) + " .g", "F");
-  await p.selectOption(line(31) + " .day", "Saturday");
-  await p.fill(line(31) + " .role", "Pots & Pans");
-  await p.click("#add"); await p.click(".shift:nth-child(32) .del");        // add and remove a blank line
-  await p.locator(line(31) + " .who").blur();
-  var checks = await text(p, "#checks");
-  truthy("maker: warnings don't block", /Check\s*Kim has 1 shift \(usually 2 to 4\)\.\s*Check\s*Saturday has no Shift Leader\./i.test(checks) && !(await p.$eval("#download", function (b) { return b.disabled; })));
-  check("maker: name tidied on leaving the field", await p.inputValue(line(31) + " .who"), "Kim");
-  dl = await download();
-  var out = dl.body.split("\r\n");
-  check("maker: Kim (1 shift) heads Adam's Monday list", out[1], "Adam,M,Monday,Pots & Pans,9,\"Kim, Adrian, Beth, Irina, Lavanya, Priya, Roxanne, Tsering, Vayu\"");
-  check("maker: Kim's own row", out.filter(function (l) { return /^Kim,/.test(l); })[0], "Kim,F,Saturday,Pots & Pans,14,\"Adam, Adrian, Amelia, Beth, Huiyi, Irina, Ivwananji, Lavanya, Nita, Priya, Roxanne, Tsering, Aryashree, Vayu\"");
-  await p.reload();
-  await p.waitForFunction(function () { return document.querySelectorAll(".shift").length === 31; });
-  check("maker: draft kept on reload", await text(p, "#source-msg"), "Picked up where you left off: 31 shifts.");
-  var tmpCsv = path.join(os.tmpdir(), "schedule-" + PORT + ".csv");
-  fs.writeFileSync(tmpCsv, "\uFEFFName,Day,Gender,Role\r\nAmy,mon,female,Shift Leader\r\nAmy,Wed,F,Pots & Pans\r\nBo,Mon,M,Pots & Pans\r\nBo,Wednesday,M,Shift Leader\r\n");
-  await p.setInputFiles("#from-file", tmpCsv);
-  await p.waitForFunction(function () { return document.querySelectorAll(".shift").length === 4; });
-  check("maker: spreadsheet loaded (after confirming)", await text(p, "#source-msg"), "Loaded " + path.basename(tmpCsv) + ": 4 shifts.");
-  check("maker: its cover lists", await p.$$eval("#result li", function (l) { return l.map(function (x) { return x.innerText.replace(/\s+/g, " "); }); }),
-    ["Amy · Monday Shift Leader No one can cover this shift.", "Amy · Wednesday Pots & Pans No one can cover this shift.", "Bo · Monday Pots & Pans No one can cover this shift.", "Bo · Wednesday Shift Leader No one can cover this shift."]);
-  fs.writeFileSync(tmpCsv, "Student,Day\nAmy,Monday\n");
-  await p.setInputFiles("#from-file", tmpCsv);
-  await p.waitForFunction(function () { return /needs these columns/.test(document.getElementById("source-msg").textContent); });
-  check("maker: bad file explained, lines kept", await p.$$eval(".shift", function (l) { return l.length; }), 4);
-  fs.rmSync(tmpCsv);
-  for (var mv of [[320, 640, "light"], [1280, 900, "dark"]]) {
-    await p.setViewportSize({ width: mv[0], height: mv[1] });
-    await p.evaluate(function (t) { localStorage.setItem("kitchen.theme", t); }, mv[2]); await p.reload();
-    check("maker layout " + mv[0] + " " + mv[2], [await p.evaluate(function () { return document.documentElement.scrollWidth - innerWidth; }), await p.evaluate(function () { return document.documentElement.dataset.theme; })], [0, mv[2]]);
-  }
-  await p.context().close();
-
   /* ------------------------------------ offline, and self-updating */
   var tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kitchen-"));
-  ["index.html", "kitchen.js", "make-cover-lists.html", "sw.js", "settings.csv", "shift_cover_list.csv", "manifest.webmanifest"].forEach(function (f) { fs.copyFileSync(path.join(ROOT, f), path.join(tmp, f)); });
+  ["index.html", "sw.js", "settings.csv", "shift_cover_list.csv", "manifest.webmanifest"].forEach(function (f) { fs.copyFileSync(path.join(ROOT, f), path.join(tmp, f)); });
   ["fonts", "icons"].forEach(function (d) { fs.cpSync(path.join(ROOT, d), path.join(tmp, d), { recursive: true }); });
   var server2 = await serve(tmp, PORT + 1), BASE2 = "http://localhost:" + (PORT + 1) + "/";
   var ctx = await browser.newContext({ viewport: { width: 375, height: 780 } });
@@ -322,11 +258,8 @@ function serve(dir, port) {
   var version = fs.readFileSync(path.join(ROOT, "sw.js"), "utf8").match(/CACHE = "([^"]+)"/)[1];
   check("service worker cache", await p.evaluate(function () { return caches.keys(); }), [version]);
   await p.reload(); await ready(p);
-  await p.goto(BASE2 + "make-cover-lists.html"); await p.goto(BASE2);   // visiting the maker must not replace the app's offline copy
-  await ready(p);
   await ctx.setOffline(true);
   await p.reload(); await ready(p);
-  check("offline: still the app", await p.title(), "My shifts · Kitchen Cleanup");
   check("works offline", [await text(p, "#data-status"), (await p.$$eval("#me option", function (o) { return o.length; })) - 1], ["Shift list: 14 students, 30 shifts a week.", 14]);
   await ctx.setOffline(false);
   fs.writeFileSync(path.join(tmp, "sw.js"), fs.readFileSync(path.join(tmp, "sw.js"), "utf8").replace(/CACHE = "[^"]+"/, 'CACHE = "kitchen-test-next"'));

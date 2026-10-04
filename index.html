@@ -461,7 +461,6 @@ p{margin:0}
   <nav class="bottomnav" id="bottom-nav" aria-label="Views"></nav>
 </div>
 
-<script src="kitchen.js"></script>
 <script>
 (function () {
   "use strict";
@@ -477,9 +476,9 @@ p{margin:0}
     ],
     portal: "https://www.drbu.edu/timesheet"
   };
-  /* the data functions live in kitchen.js, shared with make-cover-lists.html */
-  var DAYS = KC.DAYS, DATA_FILE = KC.DATA_FILE, parseCSV = KC.parseCSV, buildData = KC.buildData;
-  var SETTINGS_FILE = "settings.csv", settingsProblems = [];
+  var DATA_FILE = "shift_cover_list.csv", SETTINGS_FILE = "settings.csv", settingsProblems = [];
+
+  var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   var TABS = [
     { id: "shifts", label: "My shifts", title: "My shifts" },
     { id: "callout", label: "Call out", title: "Call out" },
@@ -500,6 +499,91 @@ p{margin:0}
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
+  }
+
+  /* -------------------------------------------------------- the data */
+  function parseCSV(text) {
+    text = text.replace(/^\uFEFF/, "");
+    var rows = [], row = [], f = "", q = false, i, c;
+    for (i = 0; i < text.length; i++) {
+      c = text.charAt(i);
+      if (q) {
+        if (c === '"') { if (text.charAt(i + 1) === '"') { f += '"'; i++; } else q = false; }
+        else f += c;
+      } else if (c === '"') q = true;
+      else if (c === ",") { row.push(f); f = ""; }
+      else if (c === "\n" || c === "\r") {
+        if (c === "\r" && text.charAt(i + 1) === "\n") i++;
+        row.push(f); rows.push(row); row = []; f = "";
+      } else f += c;
+    }
+    if (f !== "" || row.length) { row.push(f); rows.push(row); }
+    return rows.filter(function (r) { return r.join("").replace(/\s/g, "") !== ""; });
+  }
+
+  function dayIndex(s) {
+    s = (s || "").trim().toLowerCase().slice(0, 3);
+    for (var i = 0; i < DAYS.length; i++) if (DAYS[i].toLowerCase().slice(0, 3) === s) return i;
+    return -1;
+  }
+
+  /* Buckets & Composting is for women only. */
+  function womenOnly(role) { return /bucket/i.test(role); }
+
+  /* One row per shift: Student, Gender, Shift day, Role, # who can cover,
+     and the names who can be asked to cover, in the order to ask them. The
+     cover list is used exactly as written; the checks below only report
+     problems in the footer, for whoever keeps the file. Gender (F or M) is
+     never shown; it is only checked against Buckets & Composting. */
+  function buildData(text) {
+    var rows = parseCSV(text), out = { shifts: [], names: [], problems: [] };
+    if (!rows.length) { out.problems.push(DATA_FILE + " is empty."); return out; }
+    var head = rows[0].map(function (h) { return h.trim().toLowerCase(); });
+    function col(test) { for (var i = 0; i < head.length; i++) if (test(head[i])) return i; return -1; }
+    var cS = col(function (h) { return h === "student" || h === "name"; }),
+        cG = col(function (h) { return h === "gender"; }),
+        cD = col(function (h) { return h.indexOf("day") >= 0; }),
+        cR = col(function (h) { return h === "role"; }),
+        cN = col(function (h) { return h.charAt(0) === "#"; }),
+        cC = col(function (h) { return h.indexOf("can be asked") === 0 || h.indexOf("cover (") >= 0; });
+    if (cS < 0 || cD < 0 || cC < 0) { out.problems.push(DATA_FILE + " needs Student, Shift day and cover columns."); return out; }
+    if (cG < 0) out.problems.push("Add a Gender column (F or M) so Buckets & Composting lists can be checked.");
+    /* null-prototype maps, so a name like "constructor" is just a name */
+    var seen = Object.create(null), count = Object.create(null), gender = Object.create(null), works = Object.create(null);
+    rows.slice(1).forEach(function (r, n) {
+      var who = (r[cS] || "").trim(), d = dayIndex(r[cD]), line = n + 2;
+      if (!who) { out.problems.push("Line " + line + " has no student."); return; }
+      if (d < 0) { out.problems.push("Line " + line + ": \"" + (r[cD] || "") + "\" isn't a day."); return; }
+      if (seen[who + "|" + d]) { out.problems.push(who + " is listed twice on " + DAYS[d] + "."); return; }
+      seen[who + "|" + d] = true;
+      if (cG >= 0) {
+        var g = (r[cG] || "").trim().toUpperCase().charAt(0);
+        if (g !== "F" && g !== "M") out.problems.push("Line " + line + ": " + who + "'s gender should be F or M.");
+        else if (gender[who] && gender[who] !== g) out.problems.push(who + " is marked " + gender[who] + " on one row and " + g + " on another.");
+        else gender[who] = g;
+      }
+      var cover = (r[cC] || "").split(",").map(function (x) { return x.trim(); }).filter(Boolean);
+      var stated = cN >= 0 ? parseInt(r[cN], 10) : NaN;
+      if (!isNaN(stated) && stated !== cover.length) out.problems.push(who + " (" + DAYS[d] + ") says " + stated + " can cover but lists " + cover.length + ".");
+      count[who] = (count[who] || 0) + 1;
+      works[who + "|" + d] = true;
+      out.shifts.push({ who: who, day: d, role: cR >= 0 ? (r[cR] || "").trim() : "", cover: cover });
+    });
+    out.names = Object.keys(count).sort(function (a, b) { return a.localeCompare(b); });
+    out.names.forEach(function (n) {
+      if (count[n] < 2 || count[n] > 4) out.problems.push(n + " has " + count[n] + " shift" + (count[n] === 1 ? "" : "s") + " (expected 2 to 4).");
+    });
+    out.shifts.forEach(function (s) {
+      var where = s.who + "'s " + DAYS[s.day] + " cover list";
+      if (womenOnly(s.role) && gender[s.who] === "M") out.problems.push(s.who + " is on Buckets & Composting on " + DAYS[s.day] + ", which is for women only.");
+      s.cover.forEach(function (c) {
+        if (!count[c]) out.problems.push("\"" + c + "\" (in " + where + ") isn't a student on the list.");
+        else if (c === s.who) out.problems.push(where + " includes " + c + ".");
+        else if (works[c + "|" + s.day]) out.problems.push(c + " is in " + where + " but also works on " + DAYS[s.day] + ".");
+        else if (womenOnly(s.role) && gender[c] === "M") out.problems.push(c + " is in " + where + ", but Buckets & Composting is for women only.");
+      });
+    });
+    return out;
   }
 
   /* -------------------------------------------------------- My shifts */

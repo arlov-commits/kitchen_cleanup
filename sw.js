@@ -4,20 +4,16 @@
    or an installed copy will not have it offline. The page and
    shift_cover_list.csv are fetched fresh whenever there is a network (racing
    a 2.5-second timer, so a slow connection cannot hang the launch), and so
-   are settings.csv and kitchen.js (the shared data code), so the app and
-   its data can't fall out of step. Editing either CSV needs no change
-   here.
+   is settings.csv. Editing either CSV needs no change here.
 
    Bump CACHE whenever index.html, the data file's name or this file changes.
    The new worker then replaces the old one and reloads any page the old one
    left open, so no phone is stuck on an old page asking for files that are
    gone. */
-var CACHE = "kitchen-v14";
+var CACHE = "kitchen-v15";
 var SHELL = [
   "./",
   "index.html",
-  "kitchen.js",
-  "make-cover-lists.html",
   "shift_cover_list.csv",
   "settings.csv",
   "manifest.webmanifest",
@@ -87,11 +83,9 @@ self.addEventListener("fetch", function (e) {
   var url = new URL(req.url);
   if (url.origin !== location.origin) return;
 
-  /* each page is kept under its own name, so opening the cover-list maker
-     never replaces the app's offline copy */
-  if (req.mode === "navigate") { e.respondWith(fresh(req, url.pathname.split("/").pop() || "index.html")); return; }
-  var fresh1 = url.pathname.match(/\/(shift_cover_list\.csv|settings\.csv|kitchen\.js)$/);
-  if (fresh1) { e.respondWith(fresh(req, fresh1[1])); return; }
+  if (req.mode === "navigate") { e.respondWith(fresh(req, "index.html")); return; }
+  var csv = url.pathname.match(/\/(shift_cover_list|settings)\.csv$/);
+  if (csv) { e.respondWith(fresh(req, csv[1] + ".csv")); return; }
 
   /* Everything else (fonts, icons) never changes at its URL: cache first. */
   e.respondWith(caches.match(req, { ignoreSearch: true }).then(function (hit) {

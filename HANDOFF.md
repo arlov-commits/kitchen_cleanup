@@ -55,9 +55,9 @@ the app.
 3. **Practice run.** They change the Student Kitchen Manager's name in
    `settings.csv` to their own (`HOW-TO-UPDATE.md`, step 3), then check the
    app (step 5).
-4. **New shift list.** If the crew is changing, they make it in the
-   **cover-list maker** (`HOW-TO-UPDATE.md`, step 4) while you watch,
-   upload it, and check the app's footer shows no yellow "Check…" text.
+4. **New shift list.** If the crew is changing, they put in the new list
+   (step 4) while you watch, and check the footer shows no yellow
+   "Check…" text.
 5. **Pass on what isn't written in the files.** Go through the **Handover
    log** below together, especially **Cover-list rules**. Explain anything
    that has changed, and add it to the log.
@@ -86,19 +86,16 @@ Each person handing over adds a line. Newest at the bottom.
 
 ### Cover-list rules
 
-The **cover-list maker** (`make-cover-lists.html`) follows these rules
-for you, so nobody builds the lists by hand:
+Rules for building each shift's cover list that aren't obvious from the
+file. Keep this up to date. The person taking over relies on it.
 
-- Students who don't work that day can cover it. Those with the fewest
-  shifts come first; students with the same number of shifts go in
+- Students who don't work that day can cover it. List those with the
+  fewest shifts first; students with the same number of shifts go in
   alphabetical order.
 - **Buckets & Composting is for women only.** Men are never given that
   role and never listed to cover it. That's what the **Gender** column
-  (F or M) in the shift list is for. The maker and the app both check it.
-
-If a rule ever changes, write it here **and** ask someone comfortable
-with code to change the maker. The rules live in `makeCoverLists()` in
-`kitchen.js`. Until then, the maker keeps using the old rules.
+  (F or M) in the shift list is for. The app checks it and flags any
+  mistake in the footer.
 
 ---
 
