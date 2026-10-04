@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kitchen Cleanup</title>
-<meta name="description" content="Your kitchen cleanup shifts and who can cover them, what to do when you can't make a shift, and the kitchen's cleanup policies.">
+<meta name="description" content="Your kitchen cleanup shifts and who can cover them, what to do when you can't make a shift, and where to submit your timesheet.">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png">
@@ -113,7 +113,7 @@ p{margin:0}
   --nv-shifts:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='5' width='17' height='15.5' rx='2.5'/%3E%3Cpath d='M3.5 10h17M8.5 3v4M15.5 3v4'/%3E%3Cpath d='M9 15l2 2 4-4'/%3E%3C/svg%3E");
   --nv-callout:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3.5h3l1.6 4.4-2.1 1.4a11 11 0 0 0 6.2 6.2l1.4-2.1 4.4 1.6v3a2 2 0 0 1-2.1 2A16.5 16.5 0 0 1 4 5.6a2 2 0 0 1 2-2.1z'/%3E%3C/svg%3E");
   --nv-sick:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 14.2V5a2 2 0 0 1 4 0v9.2a4 4 0 1 1-4 0z'/%3E%3Cpath d='M12 9.5v6.5'/%3E%3C/svg%3E");
-  --nv-policies:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='4.5' width='14' height='16.5' rx='2'/%3E%3Cpath d='M9 4.5V3h6v1.5'/%3E%3Cpath d='M8.5 10.5l1.3 1.3 2.4-2.4M8.5 16l1.3 1.3 2.4-2.4M14 11h2M14 16.5h2'/%3E%3C/svg%3E");
+  --nv-timesheet:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");
 }
 .nav-icon{display:inline-block;width:22px;height:22px;flex-shrink:0;background-color:var(--ink-3);
   -webkit-mask:var(--icon) center/contain no-repeat;mask:var(--icon) center/contain no-repeat}
@@ -133,6 +133,9 @@ p{margin:0}
 .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border-top:2px solid transparent;color:var(--ink-3);
   font-size:12px;font-weight:600;letter-spacing:.02em;padding:8px 4px 7px;text-decoration:none;-webkit-tap-highlight-color:transparent}
 .bn-item.active{color:var(--ink);border-top-color:var(--rust)}
+/* labels stay on one line, so the bar keeps its height on the narrowest phones */
+.bn-item{white-space:nowrap}
+@media (max-width:359px){.bn-item{font-size:11px;letter-spacing:0;padding-left:2px;padding-right:2px}}
 .nav-item:focus-visible,.bn-item:focus-visible{outline:2px solid var(--rust-deep);outline-offset:-3px}
 @media (min-width:820px){
   .topbar{display:flex}
@@ -163,12 +166,22 @@ p{margin:0}
 .role{font-size:15px;font-weight:600;color:var(--ink)}
 .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:30px;
   background:var(--cw);color:var(--ci);vertical-align:4px;margin-left:8px;font-family:var(--body)}
-.time{font-size:14px;color:var(--ink-3);margin-top:-6px}
 .part{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid var(--line-soft)}
 .crew{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .crew li{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:15px}
 .crew .r{color:var(--ink-3);text-align:right}
-.crew .lead-r{color:var(--ci);font-weight:600}
+/* the backups: one closed section per shift, opened by tapping its name */
+.backups{padding-top:4px;border-top:1px solid var(--line-soft)}
+.backups>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:44px;font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.backups>summary::-webkit-details-marker{display:none}
+.backups>summary::after{content:"";flex:0 0 auto;width:9px;height:9px;margin-right:4px;border-right:2px solid var(--ci);border-bottom:2px solid var(--ci);
+  transform:translateY(-2px) rotate(45deg)}
+.backups[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
+.backups .opened,.backups[open] .closed{display:none}
+.backups[open] .opened{display:inline}
+.backups[open]>summary{color:var(--ink-3)}
+.backups .cover{margin-bottom:4px}
 .cover{margin:0;padding:0 0 0 1.6em;columns:2;column-gap:20px;font-size:15px}
 .cover li{padding:2px 0;break-inside:avoid}
 .cover li::marker{color:var(--ci);font-weight:600;font-size:13px}
@@ -212,14 +225,14 @@ p{margin:0}
 .contacts li:last-child{border-bottom:0;padding-bottom:0}
 .contacts .nm{font-family:var(--display);font-size:19px;font-weight:600}
 
-/* ------------------------------------------------------- Policies */
-.sample{background:rgba(224,169,63,.16);border-left:3px solid var(--gold);border-radius:0 6px 6px 0;padding:10px 14px;color:#5c3d10;font-size:14.5px}
-.pol-h{display:flex;align-items:baseline;gap:10px}
-.pol-h .num{font-family:var(--display);font-style:italic;font-size:26px;line-height:1;color:var(--ci)}
-.panel ul,.panel ol.list{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px;color:var(--ink-body)}
-.panel li::marker{color:var(--ci)}
-.panel b{color:var(--ink)}
-.panel .crew,.panel .contacts{padding-left:0;gap:0}
+/* ------------------------------------------------------ Timesheet */
+.due{border-top:4px solid var(--rust)}
+.due .big{font-family:var(--display);font-size:clamp(30px,9vw,40px);font-weight:600;line-height:1.1;color:var(--ink)}
+.due .big em{font-style:italic;color:var(--rust-deep)}
+.portal{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px 20px;border-radius:10px;
+  background:var(--rust-deep);color:#fff;font-size:17px;font-weight:600;text-decoration:none;text-align:center}
+.portal .arr{font-size:20px;line-height:1}
+.portal-url{text-align:center;font-size:14px;color:var(--ink-3);margin-top:-8px}
 
 /* --------------------------------------------------------- footer */
 .foot{background:var(--dark);color:var(--on-dark);font-size:13.5px;flex:0 0 auto}
@@ -265,7 +278,7 @@ p{margin:0}
   <div class="body"><div class="in">
 
     <div class="path k1">
-      <div class="path-h"><span class="nav-icon" style="--icon:var(--nv-shifts)" aria-hidden="true"></span><h2>Planned</h2></div>
+      <div class="path-h"><span class="nav-icon" style="--icon:var(--nv-shifts)" aria-hidden="true"></span><h2>Planned Absence</h2></div>
       <ol class="steps">
         <li class="step"><span class="t">Get Kitchen Manager approval at least 1 week ahead.</span></li>
         <li class="step"><span class="t">Call your backups to arrange a substitute.</span>
@@ -276,7 +289,7 @@ p{margin:0}
     </div>
 
     <div class="path k5">
-      <div class="path-h"><span class="nav-icon" style="--icon:var(--nv-sick)" aria-hidden="true"></span><h2>Sick or unexpected</h2></div>
+      <div class="path-h"><span class="nav-icon" style="--icon:var(--nv-sick)" aria-hidden="true"></span><h2>Sick or Unexpected Absence</h2></div>
       <ol class="steps">
         <li class="step"><span class="t">Act as soon as you feel unwell, even if you're unsure.</span>
           <span class="s">Don't wait for the shift.</span></li>
@@ -308,78 +321,20 @@ p{margin:0}
   </div></div>
 </main>
 
-<!-- ============================================================ POLICIES -->
-<main class="view" id="view-policies" hidden>
+<!-- ============================================================ TIMESHEET -->
+<main class="view" id="view-timesheet" hidden>
   <div class="head"><div class="in">
-    <span class="eyebrow">How we leave the kitchen</span>
-    <h1>Cleanup <em>policies</em></h1>
+    <span class="eyebrow">Work study hours</span>
+    <h1>Submit your <em>timesheet</em></h1>
   </div></div>
   <div class="body"><div class="in">
-    <p class="sample"><b>Sample text.</b> These policies are a placeholder to be replaced with the kitchen's own.</p>
-
-    <section class="panel k0">
-      <div class="pol-h"><span class="num">1</span><h3>Arriving</h3></div>
-      <ul>
-        <li>Be there at the start of the shift, ready to work.</li>
-        <li>Tie long hair back, put on an apron and wash your hands before touching anything.</li>
-        <li>Wear closed-toe, non-slip shoes. Floors get wet.</li>
-        <li>Phones go in your bag or pocket, not on the counters.</li>
-        <li>Check with the Student Leader for anything special on today's shift.</li>
-      </ul>
-    </section>
-    <section class="panel k1">
-      <div class="pol-h"><span class="num">2</span><h3>The cleanup, in order</h3></div>
-      <ol class="list">
-        <li><b>Clear and scrape.</b> Bring in every dish, scrape food into the compost bucket, and stack by type.</li>
-        <li><b>Put food away.</b> See Food safety before anything goes in the fridge.</li>
-        <li><b>Dishes.</b> Wash, rinse, sanitize, then air-dry on the racks. No towel-drying.</li>
-        <li><b>Pots and pans.</b> Soak the hard ones first and come back to them.</li>
-        <li><b>Counters and tables.</b> Wipe down, then sanitize, including the edges.</li>
-        <li><b>Stove and equipment.</b> Let it cool first. Wipe the knobs and the fronts.</li>
-        <li><b>Floors.</b> Sweep first, then mop, working toward the door. Put out the wet-floor sign.</li>
-        <li><b>Buckets and composting.</b> Empty and rinse the compost buckets, take out trash and recycling, and put new liners in.</li>
-      </ol>
-    </section>
-    <section class="panel k2">
-      <div class="pol-h"><span class="num">3</span><h3>Food safety</h3></div>
-      <ul>
-        <li>Leftovers go in a covered container, labelled with what it is and today's date.</li>
-        <li>Refrigerate leftovers within 2 hours of serving. Shallow containers cool fastest.</li>
-        <li>Nothing is stored on the floor, and raw ingredients go below ready-to-eat food.</li>
-        <li>Keep allergen-free dishes and utensils separate. If you're not sure, ask.</li>
-        <li>If something looks or smells off, don't taste it: tell the Kitchen Manager.</li>
-      </ul>
-    </section>
-    <section class="panel k3">
-      <div class="pol-h"><span class="num">4</span><h3>Chemicals and safety</h3></div>
-      <ul>
-        <li>Never mix cleaning products, especially bleach and ammonia.</li>
-        <li>Use only labelled spray bottles. If a bottle has no label, don't use it.</li>
-        <li>Wear gloves for sanitizer and degreaser, and follow the dilution on the label.</li>
-        <li>The safety data sheets are kept by the chemical shelf.</li>
-        <li>Report any cut, burn, spill or breakage to the Kitchen Manager the same day, however small.</li>
-      </ul>
-    </section>
-    <section class="panel k4">
-      <div class="pol-h"><span class="num">5</span><h3>Before you leave</h3></div>
-      <ul>
-        <li>Walk the kitchen once with your crew: sinks empty, counters dry, floors done.</li>
-        <li>Dish towels and aprons go in the laundry bin.</li>
-        <li>Stove, oven and burners off. Fridge and freezer doors shut tight.</li>
-        <li>The Student Leader checks the kitchen and signs the shift sheet.</li>
-        <li>Lights off and the door locked if you're the last ones out.</li>
-      </ul>
-    </section>
-    <section class="panel k5">
-      <div class="pol-h"><span class="num">6</span><h3>Attendance</h3></div>
-      <ul>
-        <li>If you can't make a shift, follow the Call out steps. It isn't covered until someone says yes.</li>
-        <li>Arriving more than 10 minutes late counts as a late arrival.</li>
-        <li>Make up missed hours within two weeks, at a time the Kitchen Manager agrees to.</li>
-        <li>If you swapped, do your substitute's shift as agreed.</li>
-        <li>An uncovered absence is reported to the Work Study Manager.</li>
-      </ul>
-    </section>
+    <div class="panel due">
+      <span class="eyebrow">Due every week</span>
+      <p class="big"><em>Sunday</em>, 5 pm</p>
+      <p>Your timesheet needs to be submitted by Sunday at 5 pm.</p>
+    </div>
+    <a class="portal" href="https://www.drbu.edu/timesheet" target="_blank" rel="noopener">Open the timesheet portal<span class="arr" aria-hidden="true">&#8599;</span></a>
+    <p class="portal-url">drbu.edu/timesheet</p>
   </div></div>
 </main>
 
@@ -402,7 +357,6 @@ p{margin:0}
   /* ---------------------------------------------------------- settings
      Shown as written. A value still in [BRACKETS] is a placeholder. */
   var CONFIG = {
-    shiftTime: "[SHIFT TIME]",
     contacts: [
       { role: "Kitchen Manager", name: "Sheng Xiu", email: "[EMAIL]" },
       { role: "Work Study Manager", name: "Nahelia", email: "[EMAIL]" }
@@ -414,7 +368,7 @@ p{margin:0}
   var TABS = [
     { id: "shifts", label: "My shifts", title: "My shifts" },
     { id: "callout", label: "Call out", title: "Call out" },
-    { id: "policies", label: "Policies", title: "Cleanup policies" }
+    { id: "timesheet", label: "Submit Timesheet", title: "Submit timesheet" }
   ];
   var ME_KEY = "kitchen.me";
 
@@ -497,6 +451,11 @@ p{margin:0}
   }
 
   /* -------------------------------------------------------- My shifts */
+  /* The list calls it Student Leader; the crew calls it Shift Leader. */
+  function roleName(r) { return r.replace(/student leader/i, "Shift Leader"); }
+  /* On with you: the Shift Leader first, Buckets & Composting last. */
+  function roleRank(r) { return /leader/i.test(r) ? 0 : /bucket/i.test(r) ? 2 : 1; }
+
   function renderPicker() {
     var sel = $("me");
     var opts = '<option value="">Choose your name…</option>';
@@ -520,24 +479,20 @@ p{margin:0}
 
     var today = (new Date().getDay() + 6) % 7;
     var mine = data.shifts.filter(function (s) { return s.who === me; }).sort(function (a, b) { return a.day - b.day; });
-    var time = CONFIG.shiftTime;
-    body.innerHTML = '<p class="lead">' + mine.length + " shift" + (mine.length === 1 ? "" : "s") + " a week" +
-      (time ? ", each one " + esc(time) : "") + ".</p>" +
+    body.innerHTML = '<p class="lead">' + mine.length + " shift" + (mine.length === 1 ? "" : "s") + " a week.</p>" +
       mine.map(function (s) {
         var crew = data.shifts.filter(function (x) { return x.day === s.day && x.who !== me; })
-          .sort(function (a, b) { return a.who.localeCompare(b.who); });
+          .sort(function (a, b) { return roleRank(a.role) - roleRank(b.role) || a.who.localeCompare(b.who); });
         return '<section class="panel shift k' + s.day + '">' +
           '<div class="shift-h"><h2>' + DAYS[s.day] + (s.day === today ? '<span class="tag">Today</span>' : "") + "</h2>" +
-          (s.role ? '<span class="role">' + esc(s.role) + "</span>" : "") + "</div>" +
-          (time ? '<p class="time">' + esc(time) + "</p>" : "") +
+          (s.role ? '<span class="role">' + esc(roleName(s.role)) + "</span>" : "") + "</div>" +
           '<div class="part"><h4>On with you</h4><ul class="crew">' +
           (crew.length ? crew.map(function (x) {
-            var lead = /leader/i.test(x.role);
-            return "<li><span>" + esc(x.who) + '</span><span class="r' + (lead ? " lead-r" : "") + '">' + esc(x.role) + "</span></li>";
+            return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(roleName(x.role)) + "</span></li>";
           }).join("") : '<li class="note">Just you.</li>') + "</ul></div>" +
-          '<div class="part"><h4>Can cover for you · ' + s.cover.length + "</h4>" +
-          '<p class="note">Ask in this order: fewest shifts first.</p>' +
-          '<ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol></div>" +
+          '<details class="backups"><summary><span><span class="closed">Shift Backups</span><span class="opened">Can cover for you</span> · ' +
+          s.cover.length + "</span></summary>" +
+          '<ol class="cover">' + s.cover.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + "</ol></details>" +
           "</section>";
       }).join("");
   }

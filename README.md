@@ -2,10 +2,11 @@
 
 A quick reference for work study students on the kitchen cleanup crew: your
 shifts and who can cover them, what to do when you can't make a shift, and
-the kitchen's cleanup policies.
+where to submit your timesheet.
 
-It's information, not a tool. Each tab shows everything at once, with
-nothing to open, expand or tap through. It's written for phones first.
+It's information, not a tool. Each tab shows everything at once. The only
+thing to open is each shift's list of backups. It's written for phones
+first.
 
 It's built like the Food as Medicine and Tea Brew Chart apps: one
 `index.html` with markup, CSS and vanilla ES5, no build step and no
@@ -15,9 +16,9 @@ dependencies. Served over the web, it installs as an app on a phone.
 
 | Tab | What it shows |
 | --- | --- |
-| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day and your role, who else is on that day with their roles (the Student Leader is highlighted), and who can cover for you, numbered in the order to ask. |
-| **Call out** | The substitute-replacement steps from the poster: **Planned**, then **Sick or unexpected**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
-| **Policies** | The cleanup policies. **The current text is a placeholder sample** and should be replaced with the kitchen's own. |
+| **My shifts** | Choose your name from the list. The phone remembers it. Then, for each of your shifts: the day and your role, and who else is on that day with their roles, the Shift Leader first and Buckets & Composting last. Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. |
+| **Call out** | The substitute-replacement steps from the poster: **Planned Absence**, then **Sick or Unexpected Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
+| **Submit Timesheet** | The deadline, Sunday at 5 pm, and a button to the timesheet portal at drbu.edu/timesheet. |
 
 There are no phone numbers and no call buttons in the app.
 
@@ -38,7 +39,8 @@ One row per shift, as exported from the spreadsheet:
 
 The app shows the cover list **exactly as written**, in that order. It
 doesn't work out who is free by itself. "On with you" is everyone else who
-has a row on the same day.
+has a row on the same day. The file says "Student Leader", and the app
+shows it as "Shift Leader".
 
 The footer checks the file and names anything that looks wrong:
 - a count that doesn't match its list;
@@ -48,13 +50,12 @@ The footer checks the file and names anything that looks wrong:
 
 The browser console shows the same warnings.
 
-## The shift time and contacts
+## The contacts
 
 These are in `CONFIG`, near the top of the `<script>` in `index.html`:
 
 ```js
 var CONFIG = {
-  shiftTime: "[SHIFT TIME]",
   contacts: [
     { role: "Kitchen Manager", name: "Sheng Xiu", email: "[EMAIL]" },
     { role: "Work Study Manager", name: "Nahelia", email: "[EMAIL]" }
@@ -62,8 +63,7 @@ var CONFIG = {
 };
 ```
 
-A value in `[BRACKETS]` shows as a grey placeholder. To hide the shift
-time, set `shiftTime` to `""`.
+A value in `[BRACKETS]` shows as a grey placeholder.
 
 ## Files
 
@@ -71,7 +71,7 @@ time, set `shiftTime` to `""`.
 | --- | --- |
 | `index.html` | The whole app. |
 | `shift_cover_list.csv` | The shifts, roles and cover lists. Read when the app opens. |
-| `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. |
+| `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
 | `fonts/` | Inter and Playfair Display, self-hosted, with their SIL Open Font Licenses. |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |
 
@@ -102,5 +102,5 @@ Mon rust, Tue teal, Wed violet, Thu green, Fri pink. The Call out paths
 follow the poster: Planned in teal, Sick in orange, and Covered in green.
 The 30-minute question is a gold diamond.
 
-There are no shadows and no hover effects, and nothing expands or moves.
+There are no shadows, no hover effects and no motion.
 Every text colour meets WCAG AA.

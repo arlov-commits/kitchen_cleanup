@@ -9,7 +9,7 @@
    The new worker then replaces the old one and reloads any page the old one
    left open, so no phone is stuck on an old page asking for files that are
    gone. */
-var CACHE = "kitchen-v3";
+var CACHE = "kitchen-v4";
 var SHELL = [
   "./",
   "index.html",

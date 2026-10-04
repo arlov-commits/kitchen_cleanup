@@ -14,24 +14,30 @@ and the tab shell from the second.
 
 - `index.html` is the whole app: markup, CSS and vanilla **ES5** in one
   file. No build step and no dependencies. There are three tabs, chosen by
-  hash: `#shifts`, `#callout` and `#policies`.
+  hash: `#shifts`, `#callout` and `#timesheet`.
 - `shift_cover_list.csv` is the shift data, exported from the user's
   spreadsheet: `Student`, `Shift day`, `Role`, `# who can cover`, and
   `Can be asked to cover (fewest shifts first)`. It is **fetched**, so
   the app must be served. The cover list is curated: show it exactly as
   written and in that order, and never work out cover from who is free.
-  "On with you" is the other rows on the same day.
+  "On with you" is the other rows on the same day, Shift Leader first and
+  Buckets & Composting last. The list says "Student Leader"; the app shows
+  "Shift Leader" (`roleName()`), never highlighted.
 - **It is information, not a tool.** Each tab shows everything at once,
-  phone first. Don't add collapsing sections, toggles, in-card links or
-  buttons, a whole-team view, phone numbers or call buttons. The user
-  ruled these out.
-- `CONFIG` at the top of the script holds the shift time and the contacts
-  (names and emails only). A `[BRACKETED]` value is a placeholder.
-- The Policies tab is **placeholder sample text** until the user supplies
-  the real policies. Keep the "Sample text" notice until then.
+  phone first. Don't add toggles, in-card links or buttons, a whole-team
+  view, phone numbers or call buttons, or a shift time. The user ruled
+  these out. The one exception the user asked for: each shift's backups
+  are a closed `<details>` titled "Shift Backups" that reads "Can cover
+  for you" when open.
+- `CONFIG` at the top of the script holds the contacts (names and emails
+  only). A `[BRACKETED]` value is a placeholder.
+- The third tab, Submit Timesheet, gives the deadline (Sunday, 5 pm) and
+  a button to https://www.drbu.edu/timesheet.
 - It is an installable PWA. A file added to the app must also go in `SHELL`
-  in `sw.js`. The page and `shift_cover_list.csv` are served network-first, and
-  everything else cache-first.
+  in `sw.js`. The page and `shift_cover_list.csv` are served network-first,
+  and everything else cache-first. Bump `CACHE` in `sw.js` whenever
+  `index.html` or `sw.js` changes: the new worker then reloads any page
+  the old one left open, so no phone sticks on an old version.
 - `icons/icon.svg` is the icon source. Re-render every PNG from it with
   Playwright, and never edit a PNG.
 - The user's name is in `localStorage` under `kitchen.me`. Wrap every
@@ -59,5 +65,6 @@ and the tab shell from the second.
 
 Serve the repo root (`python3 -m http.server`) and check with Playwright
 (Chromium is preinstalled) at 320px, 375px and 1280px wide. Check the empty
-name state, a chosen name, Call out and Policies. Watch for page errors and
+name state, a chosen name with its backups closed and open, Call out and
+Submit Timesheet. Watch for page errors and
 sideways scroll, and confirm the tab bar sits inside the viewport. Measure any new colour pair against WCAG AA.
