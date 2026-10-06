@@ -298,17 +298,17 @@ function serve(dir, port) {
   check("call out: no bare Kitchen Manager", (call.match(/Kitchen Manager/g) || []).length, (call.match(/Student Kitchen Manager/g) || []).length);
   check("call out: sick or unplanned first, then planned", await p.$$eval(".path-h h2", function (h) { return h.map(function (x) { return x.textContent; }); }), ["Sick or Unplanned Absence", "Planned Absence", "Missed Shift"]);
   check("call out: the four situations, in the first person, in order", await p.$$eval(".sit h3", function (h) { return h.map(function (x) { return x.closest(".path").className.slice(5) + " " + x.textContent; }); }),
-    ["k5 Not sure if I can make it", "k5 I forgot my shift, and it has already started", "k5 I'm too sick to get out of bed", "k1 I already know I'll miss a shift", "k0 Oh no! I missed my shift"]);
+    ["k5 Not sure if I can make it today", "k5 I'm too sick to get out of bed", "k5 I forgot my shift, and it has already started", "k1 I will miss a shift in the future", "k0 Oh no! I missed my shift"]);
   check("call out: a jump list at the top, one button for each", await p.$$eval(".jump-b", function (b) { return b.map(function (x) { return x.getAttribute("data-jump") + " " + x.textContent; }); }),
-    ["sit-maybe Not sure if I can make it", "sit-forgot I forgot my shift, and it has already started", "sit-sick I'm too sick to get out of bed", "sit-plan I already know I'll miss a shift",
+    ["sit-maybe Not sure if I can make it today", "sit-sick I'm too sick to get out of bed", "sit-forgot I forgot my shift, and it has already started", "sit-plan I will miss a shift in the future",
      "sit-missed Oh no! I missed my shift"]);
   await p.click(".jump-b[data-jump='sit-plan']");
   check("call out: a jump scrolls its situation to the top, and stays on Call out", [await p.evaluate(function () {
     var d = document.getElementById("sit-plan").getBoundingClientRect().top - document.getElementById("scroll").getBoundingClientRect().top;
     return d >= 0 && d <= 20;
-  }), await p.evaluate(function () { return location.hash; }), await p.evaluate(function () { return document.activeElement.textContent; })], [true, "#callout", "I already know I'll miss a shift"]);
+  }), await p.evaluate(function () { return location.hash; }), await p.evaluate(function () { return document.activeElement.textContent; })], [true, "#callout", "I will miss a shift in the future"]);
   check("call out: the deadlines and the questions", await p.$$eval(".step.ask .t", function (h) { return h.map(function (x) { return x.textContent; }); }),
-    ["It's 10:30 am, no one has said yes, and you still can't come?", "Is it already after 12:40 pm?", "It's 10:00 am and no one has said yes?",
+    ["It's 10:30 am, no one has said yes, and you still can't come?", "It's 10:00 am and no one has said yes?", "Is it already after 12:40 pm?",
      "Your absence is 4 days away, and you still have no backup?", "Your absence is only 1 or 2 days away?"]);
   check("call out: once you arrive, tell the Shift Leader", await text(p, "#sit-forgot .step:nth-child(3) .t"), "Once you arrive, tell the Shift Leader what happened.");
   var msgs = await p.$$eval(".tpl", function (b) { return b.map(function (x) { return [x.querySelector(".tpl-t").getAttribute("lang"), x.querySelector(".copy-btn").getAttribute("data-copy")]; }); });
@@ -319,7 +319,7 @@ function serve(dir, port) {
      "Then wait for instructions. You will be given a make-up shift. Do not come in for another shift on your own, without approval."]);
   check("call out: the first message, with Beth's name, and her role as she only does Pots & Pans", msgs[0][1],
     "Hi friend, I have a Pots & Pans shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nBeth");
-  check("call out: the late message leaves room to explain", msgs[2][1],
+  check("call out: the late message leaves room to explain", msgs[5][1],
     "Hello Art, I forgot my Pots & Pans shift today and only remembered after 12:40 pm. [your explanation] I am sorry. Please advise.\nBeth");
   check("call out: messages to the Student Kitchen Manager use the name from the settings", msgs.filter(function (m) { return /^Hello Art,/.test(m[1]); }).length, 5);
   check("call out: what's left to fill in is marked", await p.$$eval(".tpl:nth-of-type(1) .ph, .ph", function (m) { return m.length > 0 && m.every(function (x) { return /^\[.+\]$/.test(x.textContent); }); }), true);

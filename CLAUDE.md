@@ -76,9 +76,9 @@ and the tab shell from the second.
   - **Jump list:** "What's happening?" has one button per situation
     (`.jump-b`, `data-jump`). It scrolls `#scroll`; it isn't a link, as
     the hash picks the tab. In the PDF the buttons link to their pages.
-  - **Order:** "Not sure if I can make it", "I forgot my shift, and it has
-    already started" and "I'm too sick to get out of bed" (Sick or
-    Unplanned Absence), then "I already know I'll miss a shift" (Planned
+  - **Order:** "Not sure if I can make it today", "I'm too sick to get out
+    of bed" and "I forgot my shift, and it has already started" (Sick or
+    Unplanned Absence), then "I will miss a shift in the future" (Planned
     Absence), then "Oh no! I missed my shift" (Missed Shift, in rust):
     message the Student Kitchen Manager and the Shift Leader, then wait
     for a make-up shift and **never** come in for another shift without
