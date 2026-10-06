@@ -306,13 +306,15 @@ p{margin:0}
 .avt table{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.35}
 .avt th{text-align:left;vertical-align:bottom;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:10px 6px 8px}
 .avt tbody{border-top:2px solid var(--c)}
-.avt td{vertical-align:top;padding:9px 6px;border-top:1px solid var(--line-soft);color:var(--ink)}
+.avt td{vertical-align:middle;padding:10px 6px;border-top:1px solid var(--line-soft);color:var(--ink)}
 .avt tr.avd th{padding:10px 6px 2px;text-align:left;font-weight:400}
 .avt tr.avd .dp{font-size:12.5px;padding:4px 10px}
 .avt tr.avd+tr td{border-top:0}
-.avt .avr{font-weight:600}
+/* merged cells: centred down their rows, set off by a hairline */
+.avt .avr{font-weight:600;padding-left:6px;border-right:1px solid var(--line-soft)}
+.avt .avn[rowspan]{border-left:1px solid var(--line-soft)}
 .avt .avb span{display:block}
-.avt .avb .dp{display:inline-block;margin-bottom:4px}
+.avt .avb .dp{display:inline-block;margin-bottom:3px}
 .avt .avb span+span{font-weight:600}
 .avt .avn{color:var(--ink-2);overflow-wrap:break-word}
 .avt tr.lr .avb span,.avt tr.lr .avn{color:var(--ink-3);font-weight:400}
@@ -1760,10 +1762,16 @@ p{margin:0}
           lines.push({ trade: [DAYS[d], as, DAYS[g.back], g.mine].join("|"), back: '<span class="dp k' + g.back + '">' + dayShort(g.back) + "</span><span>" + esc(g.mine) + "</span>", who: who(g.who) });
         });
         if (job.last.length) lines.push({ trade: [DAYS[d], as, "", ""].join("|"), back: "<span>" + t("av_no_trade") + "</span>", who: who(job.last), lr: true });
+        /* the same names on rows next to each other (within the job, and
+           not across a last resort) share one cell */
+        var same = function (a, b) { return a && b && a.who === b.who && !a.lr === !b.lr; };
         lines.forEach(function (l, i) {
+          var span = 1;
+          while (same(l, lines[i + span])) span++;
           rows.push('<tr data-trade="' + esc(l.trade) + '"' + (l.lr ? ' class="lr"' : "") + ">" +
             (i ? "" : '<td class="avr" rowspan="' + lines.length + '">' + esc(as) + "</td>") +
-            '<td class="avb">' + l.back + '</td><td class="avn">' + l.who + "</td></tr>");
+            '<td class="avb">' + l.back + "</td>" +
+            (same(lines[i - 1], l) ? "" : '<td class="avn"' + (span > 1 ? ' rowspan="' + span + '"' : "") + ">" + l.who + "</td>") + "</tr>");
         });
       });
       /* the day, merged across the top of its rows */

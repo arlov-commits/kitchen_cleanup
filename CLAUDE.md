@@ -47,7 +47,10 @@ and the tab shell from the second.
   is a `tbody` topped by a merged row with its full-name tag (`tr.avd`).
   The job is merged down its rows (`.avr`, rowspan). Each trade is a row:
   their day tag and job, then the names. A job's last resorts close its
-  rows: "Last resort: no trade" (`tr.lr`). Rows carry `data-trade` for the
+  rows: "Last resort: no trade" (`tr.lr`). Matching names on neighbouring
+  rows of the same job (and kind of row) share one cell (`.avn` rowspan).
+  Every cell is centred vertically; merged cells are set off by a hairline.
+  Keep cell padding at 6px across, or Chinese overflows at 320px. Rows carry `data-trade` for the
   tests. A merged day column was tried and left no room for the names at
   phone width.
 - The head of My shifts: the heading with the name beside it as a pill

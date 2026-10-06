@@ -242,9 +242,16 @@ function serve(dir, port) {
     });
     return out;
   }
+  /* reads each row's names, following a merged names cell down its rows */
   function availOnPage() {
     return p.$$eval(".avt tr[data-trade]", function (l) {
-      return l.map(function (x) { return x.getAttribute("data-trade") + " = " + x.querySelector(".avn").textContent; });
+      var held = "", left = 0;
+      return l.map(function (x) {
+        var c = x.querySelector(".avn");
+        if (c) { held = c.textContent; left = +(c.getAttribute("rowspan") || 1); }
+        left--;
+        return x.getAttribute("data-trade") + " = " + held;
+      });
     });
   }
   check("availability: one row per trade, in order", await availOnPage(), availOf("Aryashree"));
@@ -259,6 +266,31 @@ function serve(dir, port) {
     availOf("Aryashree").forEach(function (r) { var d = r.split("|")[0]; if (days.indexOf(d) < 0) days.push(d); });
     return days.map(function (d) { return d + " true true"; });
   })());
+  async function mergedNames(who) {
+    await p.selectOption("#me", who);
+    return p.evaluate(function () {
+      var bad = 0, merged = 0;
+      [].forEach.call(document.querySelectorAll(".avt tbody"), function (g) {
+        var cells = [].slice.call(g.querySelectorAll(".avn"));
+        cells.forEach(function (c, i) {
+          if (+(c.getAttribute("rowspan") || 1) > 1) merged++;
+          var next = cells[i + 1];
+          /* a matching neighbour in the same job and kind of row should have been merged */
+          if (next && next.textContent === c.textContent && next.closest("tr").className === c.closest("tr").className) {
+            var r1 = c.closest("tr"), r2 = next.closest("tr");
+            if (r1.getAttribute("data-trade").split("|")[1] === r2.getAttribute("data-trade").split("|")[1]) bad++;
+          }
+        });
+      });
+      return [merged > 0, bad];
+    });
+  }
+  check("availability: matching names on neighbouring rows share one cell (Nita's three Roxannes)", await mergedNames("Nita"), [true, 0]);
+  check("availability: Nita's rows still read right through the merged cells", await availOnPage(), availOf("Nita"));
+  await p.selectOption("#me", "Aryashree");
+  check("availability: merged cells are centred down their rows", await p.$$eval(".avt td", function (c) {
+    return c.every(function (x) { return getComputedStyle(x).verticalAlign === "middle"; });
+  }), true);
   check("availability: the headings", await p.$$eval(".avt thead th", function (h) { return h.map(function (x) { return x.textContent; }); }),
     ["You may be asked to work", "In exchange, they would work your", "Who may ask"]);
   for (var who of ["Adam", "Ben Kong", "Ivwananji", "Thanh"]) {
