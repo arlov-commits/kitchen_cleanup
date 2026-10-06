@@ -65,9 +65,6 @@ window.kitchenTheme();
   --mark-bg:#14181f; --mark-fg:#ffffff;   /* the Today/Tomorrow marker: neutral, so no day hue swallows it */
   --rust-btn:#8c2f12;     /* rust under white text: the portal button, the badge */
   --yes-ink:#1d4a2a; --no-ink:#5a2a18;
-  --band:#e7efeb;         /* My availability: a soft sage band, edge to edge */
-  --band-line:#c9dbd2;
-  --band-accent:#2f5f50;  /* sage as text on the band */
   /* One hue per weekday (Mon first): a fill, a deeper ink for text, a wash. */
   --k0:#b8431c; --k0-ink:#8c2f12; --k0-w:rgba(184,67,28,.09);   /* rust   */
   --k1:#0c8599; --k1-ink:#0b7285; --k1-w:rgba(12,133,153,.10);  /* teal   */
@@ -103,9 +100,6 @@ window.kitchenTheme();
   --mark-bg:#eceef1; --mark-fg:#14181f;
   --rust-btn:#a33a17;
   --yes-ink:#b2f2bb; --no-ink:#ffc9b5;
-  --band:#18211f;
-  --band-line:#2a3833;
-  --band-accent:#8fd0bd;
   --k0:#d0582c; --k0-ink:#f0906b; --k0-w:rgba(240,144,107,.14);
   --k1:#1098ad; --k1-ink:#4fd1e3; --k1-w:rgba(79,209,227,.13);
   --k2:#845ef7; --k2-ink:#b9a2fd; --k2-w:rgba(185,162,253,.14);
@@ -170,6 +164,7 @@ p{margin:0}
   --ic-light:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6'/%3E%3C/svg%3E");
   --ic-dark:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'%3E%3Cpath d='M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z'/%3E%3C/svg%3E");
   --ic-auto:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.3' fill='none' stroke='black' stroke-width='1.8'/%3E%3Cpath d='M12 3.7a8.3 8.3 0 0 1 0 16.6z' fill='black'/%3E%3C/svg%3E");
+  --nv-availability:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h15M15.5 4.5L19 8l-3.5 3.5M20 16H5M8.5 12.5L5 16l3.5 3.5'/%3E%3C/svg%3E");
   --nv-timesheet:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");
 }
 .nav-icon{display:inline-block;width:22px;height:22px;flex-shrink:0;background-color:var(--ink-3);
@@ -204,9 +199,9 @@ p{margin:0}
 .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border-top:2px solid transparent;color:var(--ink-3);
   font-size:12px;font-weight:600;letter-spacing:.02em;padding:8px 4px 7px;text-decoration:none;-webkit-tap-highlight-color:transparent}
 .bn-item.active{color:var(--ink);border-top-color:var(--rust)}
-/* labels stay on one line, so the bar keeps its height on the narrowest phones */
-.bn-item{white-space:nowrap}
-@media (max-width:359px){.bn-item{font-size:11px;letter-spacing:0;padding-left:2px;padding-right:2px}}
+/* four tabs: a label takes two lines where it must, centred under its icon */
+.bn-item{text-align:center;line-height:1.2;padding-left:2px;padding-right:2px}
+@media (max-width:359px){.bn-item{font-size:11px;letter-spacing:0}}
 /* the Sunday reminder: a "1" bubble on the Submit Timesheet tab's icon */
 .ico{position:relative;display:inline-flex}
 .badge{position:absolute;top:-6px;right:-9px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--rust-btn);color:#fff;
@@ -292,28 +287,17 @@ p{margin:0}
 .backups[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
 .backups .cover-lead{font-size:15px;color:var(--ink-2);margin-bottom:6px}
 .backups .cover{margin-bottom:4px}
-/* My availability: a full-width band between the shift cards and the
-   footer, set apart the way the footer is, in soft sage rather than black */
-#view-shifts{display:flex;flex-direction:column}
-#view-shifts>.body{flex:1 0 auto}
-.band{background:var(--band);border-top:1px solid var(--band-line)}
-.band .in{padding-top:26px;padding-bottom:30px;display:flex;flex-direction:column;gap:12px}
-.band .eyebrow{color:var(--band-accent)}
-.band h2{font-size:22px}
-.band h2 em{color:var(--band-accent)}
-.band .note{color:var(--ink-2)}
-.avail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.avail-list li{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-top:1px solid var(--band-line)}
-.avail-list li:last-child{border-bottom:1px solid var(--band-line)}
-/* the day in ink with a small dot in its hue: calm on the sage */
-.avail-list .d{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:18px;font-weight:600;color:var(--ink)}
-.avail-list .d::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
-/* under each day: the shifts of yours they'd take in exchange, then the
-   role you'd cover as (a small label), then the names */
-.avail-list .ax{display:flex;flex-direction:column;gap:3px;padding-left:17px;margin-top:8px}
-.avail-list .xh{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:13.5px;color:var(--ink-2)}
-.avail-list .ag{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;padding-left:12px;border-left:2px solid var(--band-line)}
-.avail-list .ar{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--band-accent)}
+/* ------------------------------------------------- My availability */
+/* one card per day you may be asked to cover, topped in the day's hue like
+   the shift cards; under it, each shift of yours they'd take in exchange,
+   then the role you'd cover as (a small label), then the names */
+.avail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:20px}
+.avail-list li{border-top:4px solid var(--c);gap:10px}
+.avail-list .d{color:var(--ci)}
+.avail-list .ax{display:flex;flex-direction:column;gap:4px;padding-top:10px;border-top:1px solid var(--line-soft)}
+.avail-list .xh{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:14px;color:var(--ink-2)}
+.avail-list .ag{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;padding-left:12px;border-left:2px solid var(--line)}
+.avail-list .ar{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
 .avail-list .an{font-size:15px;font-weight:600;color:var(--ink)}
 .avail-list .ax.lr .xh,.avail-list .ax.lr .an{color:var(--ink-3)}
 .avail-list .ax.lr .an{font-weight:400}
@@ -432,7 +416,6 @@ p{margin:0}
   <div class="body"><div class="in" id="shifts-body">
     <p class="note">Loading the shift list…</p>
   </div></div>
-  <section class="band" id="avail" hidden><div class="in" id="avail-in"></div></section>
 </main>
 
 <!-- ============================================================ CALL OUT -->
@@ -488,6 +471,18 @@ p{margin:0}
   </div></div>
 </main>
 
+<!-- ====================================================== MY AVAILABILITY -->
+<main class="view" id="view-availability" hidden>
+  <div class="head"><div class="in">
+    <div class="head-top"><span class="eyebrow">My availability</span><button type="button" class="theme-btn" data-theme-btn></button></div>
+    <h1>Days you may be <em>asked to cover</em></h1>
+    <p class="lead" id="avail-lead" hidden></p>
+  </div></div>
+  <div class="body"><div class="in" id="avail-body">
+    <p class="note">Loading the shift list…</p>
+  </div></div>
+</main>
+
 <!-- ============================================================ TIMESHEET -->
 <main class="view" id="view-timesheet" hidden>
   <div class="head"><div class="in">
@@ -502,6 +497,7 @@ p{margin:0}
     </div>
     <a class="portal" href="https://www.drbu.edu/timesheet" target="_blank" rel="noopener">Open the timesheet portal<span class="arr" aria-hidden="true">&#8599;</span></a>
     <p class="portal-url">drbu.edu/timesheet</p>
+    <p class="motto">It's not done until your hours are <em>submitted.</em></p>
   </div></div>
 </main>
 
@@ -545,6 +541,7 @@ p{margin:0}
   var TABS = [
     { id: "shifts", label: "My shifts", title: "My shifts" },
     { id: "callout", label: "Call out", title: "Call out" },
+    { id: "availability", label: "My availability", title: "My availability" },
     { id: "timesheet", label: "Submit Timesheet", title: "Submit timesheet" }
   ];
   var ME_KEY = "kitchen.me", TS_KEY = "kitchen.timesheet";
@@ -831,7 +828,6 @@ p{margin:0}
 
   function renderShifts() {
     var body = $("shifts-body");
-    $("avail").hidden = true;
     $("glance").hidden = true;
     shownDay = dateKey(new Date());
     if (loadError) {
@@ -866,8 +862,6 @@ p{margin:0}
             '<p class="cover-lead">No one is listed to cover this shift yet.</p>') + "</details>" +
           "</section>";
       }).join("");
-    $("avail-in").innerHTML = availability();
-    $("avail").hidden = false;
   }
 
   /* a numbered list of backups, starting at a given number. Each shows
@@ -921,7 +915,7 @@ p{margin:0}
     days.forEach(function (day, d) {
       if (!day) return;
       /* by your day in exchange, Monday first; 7 is the last resort */
-      rows.push('<li class="k' + d + '"><span class="d">' + DAYS[d] + "</span>" + day.map(function (roles, back) {
+      rows.push('<li class="panel k' + d + '"><h2 class="d">' + DAYS[d] + "</h2>" + day.map(function (roles, back) {
         return '<div class="ax' + (back < 7 ? "" : " lr") + '"><p class="xh">' +
           (back < 7 ? "In exchange for your " + dayTag(back) : "Last resort") + "</p>" +
           Object.keys(roles).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
@@ -930,11 +924,20 @@ p{margin:0}
           }).join("") + "</div>";
       }).filter(Boolean).join("") + "</li>");
     });
+    return rows.length ? '<ul class="avail-list">' + rows.join("") + "</ul>" : '<p class="note">You\'re not listed as a backup on any day.</p>';
+  }
+
+  /* the My availability tab: the head's lead names who it's for */
+  function renderAvailability() {
+    var body = $("avail-body"), lead = $("avail-lead");
+    lead.hidden = true;
+    if (loadError) { body.innerHTML = '<p class="note">The shift list didn\'t load. See My shifts.</p>'; return; }
+    if (!data) { body.innerHTML = '<p class="note">Loading the shift list…</p>'; return; }
+    if (!me) { body.innerHTML = '<p class="note">Choose your name on My shifts to see the days you may be asked to cover.</p>'; return; }
+    lead.innerHTML = "<b>" + esc(me) + "</b>, you\'re a backup on these days. Someone on that shift may ask you to cover, in exchange for a shift of yours.";
+    lead.hidden = false;
     var km = CONFIG.contacts.filter(function (c) { return /kitchen manager/i.test(c.role); })[0];
-    return '<span class="eyebrow">My availability</span><h2>Days you may be <em>asked to cover</em></h2>' +
-      (rows.length ? '<p class="note">You\'re a backup on these days, so someone on that shift may ask you to cover, in exchange for a shift of yours.</p>' +
-        '<ul class="avail-list">' + rows.join("") + "</ul>" :
-        '<p class="note">You\'re not listed as a backup on any day.</p>') +
+    body.innerHTML = availability() +
       (km ? '<p class="note">Something here wrong or out of date? Send an email to the ' + esc(km.role) + " (" + esc(km.name) + ").</p>" : "");
   }
 
@@ -981,13 +984,14 @@ p{margin:0}
       (settingsProblems.length ? ' <span class="warn">Check ' + SETTINGS_FILE + ": " + esc(settingsProblems.join(" ")) + "</span>" : "");
   }
 
-  function renderAll() { renderPicker(); renderShifts(); renderContacts(); renderPortal(); renderStatus(); }
+  function renderAll() { renderPicker(); renderShifts(); renderAvailability(); renderContacts(); renderPortal(); renderStatus(); }
 
   $("me").addEventListener("change", function () {
     me = this.value;
     if (me) store.set(ME_KEY, me); else store.del(ME_KEY);
     drawWho();
     renderShifts();
+    renderAvailability();
   });
 
   /* ------------------------------------------------------------- tabs */

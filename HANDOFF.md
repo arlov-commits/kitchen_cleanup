@@ -170,7 +170,7 @@ take one of their shifts in return: on another day, and allowed by Rules
   shows it only when two or more do Recycling that day.
 - **Shift Backups:** each backup's name, then their shifts you could take
   in return, same job first (all their shifts, in the last resort).
-- **My availability:** the days you're on someone's list, grouped by the
+- **My availability** (its own tab): the days you're on someone's list, grouped by the
   day you'd cover, then each shift of yours they could take in exchange,
   then the job you'd cover as, then who. Anyone whose last resort you
   are is in a quiet "Last resort" group at the end of that day.

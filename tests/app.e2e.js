@@ -1,7 +1,7 @@
 /* End-to-end checks in Chromium: NODE_PATH=$(npm root -g) node tests/app.e2e.js
    Needs Playwright (preinstalled in Claude Code cloud sessions) and python3.
    Serves the repo, then drives every screen: picking a name, the shift
-   cards, backups, My availability, the tabs, the Sunday badge, settings,
+   cards, backups, the My availability tab, the tabs, the Sunday badge, settings,
    load errors, the theme button, Install as app, layout at three widths in
    both modes, offline use and the service worker's self-update. */
 "use strict";
@@ -103,7 +103,9 @@ function serve(dir, port) {
   var names = await p.$$eval("#me option", function (o) { return o.map(function (x) { return x.value; }); });
   check("picker: placeholder then every student", names, [""].concat(Array.from(new Set(ROWS.map(function (r) { return r.who; }))).sort()));
   check("empty state", await text(p, "#shifts-body"), "Choose your name above to see your shifts and who can cover them.");
-  check("band hidden with no name", await p.$eval("#avail", function (e) { return e.hidden; }), true);
+  check("My availability with no name", [await text(p, "#avail-body"), await p.$eval("#avail-lead", function (e) { return e.hidden; })],
+    ["Choose your name on My shifts to see the days you may be asked to cover.", true]);
+  check("My availability is no longer under the shift cards", await p.$$eval("#view-shifts .avail-list, #view-shifts .band", function (e) { return e.length; }), 0);
   check("no name: a labelled list under the heading, no week at a glance", await p.evaluate(function () {
     return [document.getElementById("who").className, getComputedStyle(document.querySelector("#who label")).width !== "1px", document.getElementById("glance").hidden];
   }), ["who", true, true]);
@@ -196,7 +198,7 @@ function serve(dir, port) {
   check("Recycling with two on: shows the other", (await crews("Adrian"))[0], "Monday: Vayu");
   await p.click(".shift:nth-of-type(2) summary");
   check("no Shift Leader in any substitute list or in My availability", await p.evaluate(function () {
-    return [].some.call(document.querySelectorAll(".cover, #avail"), function (e) { return /shift leader/i.test(e.textContent); });
+    return [].some.call(document.querySelectorAll(".cover, #view-availability"), function (e) { return /shift leader/i.test(e.textContent); });
   }), false);
   check("Shift Leader's own card: Pots & Pans, nothing about leading", [await text(p, ".shift:nth-of-type(2) .role"), await text(p, ".shift:nth-of-type(2) .cover-lead")],
     ["Pots & Pans", "Can cover for you"]);
@@ -258,8 +260,19 @@ function serve(dir, port) {
     check("availability: " + who, await availOnPage(), availOf(who));
   }
   await p.selectOption("#me", "Aryashree");
-  check("availability: wrong-info line", await text(p, "#avail .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Art).");
-  check("band shown", await p.$eval("#avail", function (e) { return e.hidden; }), false);
+  check("availability: wrong-info line", await text(p, "#avail-body .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Art).");
+  check("availability: the lead names who it's for", await text(p, "#avail-lead"),
+    "Aryashree, you're a backup on these days. Someone on that shift may ask you to cover, in exchange for a shift of yours.");
+  await p.click("#bottom-nav a[href='#availability']");
+  await p.waitForFunction(function () { return !document.getElementById("view-availability").hidden; });
+  check("availability tab: its own view, between Call out and Submit Timesheet",
+    [await p.$$eval("#bottom-nav a", function (a) { return a.map(function (x) { return x.textContent; }); }), await p.title(),
+     await p.$$eval("main.view", function (v) { return v.filter(function (x) { return !x.hidden; }).map(function (x) { return x.id; }); })],
+    [["My shifts", "Call out", "My availability", "Submit Timesheet"], "My availability · Kitchen Cleanup", ["view-availability"]]);
+  check("availability tab: each day a card in its hue", await p.$$eval(".avail-list li", function (l) {
+    return l.every(function (x) { return x.classList.contains("panel") && /\bk[0-6]\b/.test(x.className) && x.querySelector("h2.d"); });
+  }), true);
+  await p.goto(BASE); await ready(p);
 
   /* persistence */
   await p.reload(); await ready(p);
@@ -276,7 +289,7 @@ function serve(dir, port) {
   await p.click("#bottom-nav a[href='#callout']");
   await p.waitForFunction(function () { return !document.getElementById("view-callout").hidden; });
   check("tab: hash", await p.evaluate(function () { return location.hash; }), "#callout");
-  check("tab: views", await p.$$eval("main.view", function (v) { return v.map(function (x) { return x.id + ":" + !x.hidden; }); }), ["view-shifts:false", "view-callout:true", "view-timesheet:false"]);
+  check("tab: views", await p.$$eval("main.view", function (v) { return v.map(function (x) { return x.id + ":" + !x.hidden; }); }), ["view-shifts:false", "view-callout:true", "view-availability:false", "view-timesheet:false"]);
   check("tab: title", await p.title(), "Call out · Kitchen Cleanup");
   check("tab: active", await p.$$eval("#bottom-nav a.active", function (a) { return a.map(function (x) { return x.textContent; }); }), ["Call out"]);
   check("tab: scrolled to top", await p.$eval("#scroll", function (e) { return e.scrollTop; }), 0);
@@ -288,6 +301,7 @@ function serve(dir, port) {
   check("unknown hash shows My shifts", await p.$eval("#view-shifts", function (e) { return e.hidden; }), false);
   await p.goto(BASE + "#timesheet"); await ready(p);
   check("portal link", [await p.getAttribute(".portal", "href"), await text(p, ".portal-url")], ["https://www.drbu.edu/timesheet", "drbu.edu/timesheet"]);
+  check("timesheet motto", await text(p, "#view-timesheet .motto"), "It's not done until your hours are submitted.");
   check("no badge on a Monday", await p.$$eval(".badge", function (b) { return b.length; }), 0);
   await p.context().close();
 
@@ -326,8 +340,8 @@ function serve(dir, port) {
   check("settings: contacts", await text(p, "#contacts"), "STUDENT KITCHEN MANAGER Mei WORK STUDY MANAGER Jordan Lee");
   await p.goto(BASE + "#timesheet"); await ready(p); await p.waitForTimeout(150);
   check("settings: portal", [await p.getAttribute(".portal", "href"), await text(p, ".portal-url")], ["https://example.edu/hours/", "example.edu/hours"]);
-  await p.goto(BASE); await ready(p); await p.selectOption("#me", "Beth");
-  check("settings: band line", await text(p, "#avail .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Mei).");
+  await p.goto(BASE + "#availability"); await ready(p); await p.evaluate(function () { localStorage.setItem("kitchen.me", "Beth"); }); await p.reload(); await ready(p); await p.waitForTimeout(150);
+  check("settings: My availability line", await text(p, "#avail-body .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Mei).");
   await p.context().close();
   p = await page({ settings: "Setting,Value\nStudent Kitchen Manager,\nTimesheet portal link,drbu.edu\n" });
   await p.goto(BASE); await ready(p); await p.waitForTimeout(150);
@@ -407,7 +421,7 @@ function serve(dir, port) {
   for (var v of [[320, 640], [375, 780], [1280, 900]]) {
     for (var mode of ["light", "dark"]) {
       p = await page({ ctx: { viewport: { width: v[0], height: v[1] } }, init: new Function("try{localStorage.setItem('kitchen.theme','" + mode + "');localStorage.setItem('kitchen.me','Aryashree')}catch(e){}"), time: "2026-10-04T10:00:00" });
-      for (var tab of ["", "#callout", "#timesheet"]) {
+      for (var tab of ["", "#callout", "#availability", "#timesheet"]) {
         await p.goto(BASE + tab); await ready(p); await p.waitForTimeout(100);
         var m = await p.evaluate(function () {
           var s = document.getElementById("scroll"), nav = document.querySelector(innerWidth >= 820 ? ".topbar" : ".bottomnav").getBoundingClientRect();

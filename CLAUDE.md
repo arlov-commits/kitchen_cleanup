@@ -13,8 +13,9 @@ It is a sibling of the Food as Medicine (`meal_program`) and Tea Brew Chart
 and the tab shell from the second.
 
 - `index.html` is the whole app: markup, CSS and vanilla **ES5** in one
-  file. No build step and no dependencies. There are three tabs, chosen by
-  hash: `#shifts`, `#callout` and `#timesheet`.
+  file. No build step and no dependencies. There are four tabs, chosen by
+  hash: `#shifts`, `#callout`, `#availability` and `#timesheet`. With
+  four, the bottom bar's labels may take two lines.
 - **The shift files** are `shifts.csv` (Student, Shift day, Role),
   `students.csv` (Student, Gender F/M, Trained for, and the optional
   Only does, Only covers, Covered only by same job) and `roles.csv`
@@ -67,13 +68,12 @@ and the tab shell from the second.
   these out. The one exception the user asked for: each shift's backups
   are a closed `<details>` always titled "Shift Backups · N", with "Can
   cover for you" as body text above the list.
-- Under the shift cards, "My availability" lists the days the student
-  appears in someone's cover list, and for whom, then a line to tell the
-  Student Kitchen Manager (from the settings) if anything is wrong.
-  It is a full-width band (`.band`, `--band`) between the cards and the
-  footer: soft sage in light mode and deep sage in dark mode, distinct from
-  the page and the footer. Days are in ink with a dot in their hue. Sand
-  and brown were tried and rejected. Keep it short.
+- "My availability" is its own tab, between Call out and Submit
+  Timesheet (the user moved it there from a sage band under the shift
+  cards). Its head lead names the chosen student. The body has one card
+  per day (`.avail-list li.panel`, topped in the day's hue like the shift
+  cards), then a line to tell the Student Kitchen Manager (from the
+  settings) if anything is wrong. Keep it short.
 - Today/Tomorrow is a neutral pill beside the day name (`.when`, solid for
   today, outlined for tomorrow, `--mark-bg`/`--mark-fg`). Oxblood text
   above the day was tried and blended in.
@@ -94,8 +94,9 @@ and the tab shell from the second.
   both in step with any change to the CSV formats, the settings, or what
   the footer checks. Anything that would need a successor to edit
   `index.html` belongs in `settings.csv` instead.
-- The third tab, Submit Timesheet, gives the deadline (Sunday, 5 pm) and
-  a button to https://www.drbu.edu/timesheet. On a Sunday its tab carries a "1"
+- The last tab, Submit Timesheet, gives the deadline (Sunday, 5 pm), a
+  button to https://www.drbu.edu/timesheet, and a motto echoing Call
+  out's: "It's not done until your hours are *submitted.*" On a Sunday its tab carries a "1"
   bubble until that button is pressed that day (`kitchen.timesheet` holds
   the date it was pressed).
 - The service worker's self-update reloads open pages from **outside**
