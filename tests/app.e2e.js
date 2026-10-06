@@ -379,6 +379,43 @@ function serve(dir, port) {
   check("language: any other phone starts in English", (await langState()).slice(0, 2), ["en", "EN"]);
   await p.context().close();
 
+  /* ---------------------------------------------------- Save as PDF */
+  p = await page({ time: "2026-10-05T21:30:00", init: function () { localStorage.setItem("kitchen.me", "Adam"); } });   // Monday night: dark, Adam works today
+  await p.goto(BASE); await ready(p);
+  check("footer: every hour counts", await text(p, ".foot .hours"), "Every hour counts. Each shift must be done in full: an hour you miss is an hour a teammate works for you.");
+  await p.click("#pdf-btn");
+  check("Save as PDF: says what to choose", await text(p, "#pdf-help"), "In the window that opens, choose Save as PDF as the printer.");
+  check("before: Today and Tomorrow on the glance and cards, and the date", [await p.$$eval(".when", function (w) { return w.length; }), await p.$$eval(".today", function (w) { return w.length; })], [4, 1]);
+  await p.evaluate(function () { window.dispatchEvent(new Event("beforeprint")); });
+  await p.emulateMedia({ media: "print" });
+  var pr = await p.evaluate(function () {
+    var vis = function (sel) { return [].filter.call(document.querySelectorAll(sel), function (e) { return e.offsetParent || getComputedStyle(e).display !== "none" && e.getClientRects().length; }).length; };
+    return {
+      theme: document.documentElement.dataset.theme,
+      views: [].filter.call(document.querySelectorAll("main.view"), function (v) { return getComputedStyle(v).display !== "none"; }).length,
+      today: document.querySelectorAll(".when, .today").length,
+      dates: [].map.call(document.querySelectorAll(".gl li"), function (l) { return l.textContent; }),
+      open: document.querySelectorAll("details.backups:not([open])").length,
+      hidden: vis(".bottomnav, .topbar, .copy-btn, #pdf-btn, #install-btn, [data-theme-btn], [data-lang-btn]"),
+      stamp: document.getElementById("stamp").innerText.replace(/\s+/g, " ").trim(),
+      link: document.querySelector("#stamp a").getAttribute("href"),
+      role: document.querySelector(".copy-btn").getAttribute("data-copy").indexOf("my [your role] shift today") >= 0
+    };
+  });
+  check("PDF: light, all four tabs, no Today or Tomorrow, no dates, backups open, no buttons", [pr.theme, pr.views, pr.today, pr.dates, pr.open, pr.hidden],
+    ["light", 4, 0, ["MonPots & Pans", "TuePots & Pans", "ThuRecycling"], 0, 0]);
+  check("PDF: stamped with when it was saved and for whom, linking to the app", [pr.stamp, pr.link],
+    ["Kitchen Cleanup · Saved Monday, October 5, 2026 at 9:30 PM · For Adam This copy doesn't change. For the latest shifts and backups, open the app: " + BASE, BASE]);
+  check("PDF: messages don't name today's role", pr.role, true);
+  var pdf = (await p.pdf({ format: "Letter", printBackground: true })).toString("latin1");
+  check("PDF: several pages, with live links to the portal and the app",
+    [(pdf.match(/\/Type\s*\/Page[^s]/g) || []).length > 6, pdf.indexOf("(https://www.drbu.edu/timesheet)") >= 0, pdf.indexOf("(" + BASE + ")") >= 0], [true, true, true]);
+  await p.emulateMedia({ media: "screen" });
+  await p.evaluate(function () { window.dispatchEvent(new Event("afterprint")); });
+  check("after: back as it was", [await p.evaluate(function () { return document.documentElement.dataset.theme; }), await p.$$eval(".when", function (w) { return w.length; }),
+    await p.$$eval("details.backups[open]", function (d) { return d.length; })], ["dark", 4, 0]);
+  await p.context().close();
+
   /* -------------------------------------------------- Sunday badge */
   p = await page({ time: "2026-10-04T10:00:00" });                  // a Sunday
   await p.goto(BASE + "#timesheet"); await ready(p);

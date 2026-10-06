@@ -107,6 +107,16 @@ phone numbers.
 | `fonts/` | Inter and Playfair Display (Latin and Vietnamese), self-hosted, with their SIL Open Font Licenses. Chinese and Thai use the phone's own fonts. |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |
 
+## Saving it as a PDF
+
+The footer's **Save as PDF** button is a last-resort offline copy for
+students. It opens the phone's print window, where they choose **Save as
+PDF** (on iPhone: Share, then Save to Files). The PDF has all four tabs,
+each from a new page, in colour. Every shift's backups are open, and the
+links still work. It has no Today or Tomorrow and no upcoming dates, so it
+stays true. A line at the top says when it was saved, for whom, and links
+back to the app. Printing from the browser's menu gives the same result.
+
 ## Installing it
 
 The footer has an **Install as app** button. In Chrome and Edge it opens

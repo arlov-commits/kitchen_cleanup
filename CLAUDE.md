@@ -131,6 +131,18 @@ and the tab shell from the second.
   the old one left open, so no phone sticks on an old version.
 - `icons/icon.svg` is the icon source. Re-render every PNG from it with
   Playwright, and never edit a PNG.
+- The footer opens with "Every hour counts" (`.hours`), the line the
+  user asked for: each shift must be done in full.
+- The footer's **Save as PDF** button is the students' last-resort offline
+  copy. It opens the phone's print window (`window.print()`; no PDF
+  library, no dependencies). `beforeprint`/`afterprint` (`forPrint()`) lay
+  out all four tabs, each from a new page, in colour and light mode, with
+  the backups open. They leave out Today/Tomorrow, the glance's dates and
+  the "Today is" line, and name no role "today" in the messages, so the
+  copy stays true. A stamp on top gives when it was saved, for whom, and a
+  live link to the app. Links stay links. Buttons and the tab bars aren't
+  printed. Print-only and screen-only bits use `.print-only` and
+  `.screen-only`.
 - The footer's Install as app button uses `beforeinstallprompt` where the
   browser offers it, and otherwise shows short instructions (iPhone:
   Share, then Add to Home Screen). It is hidden when running installed.

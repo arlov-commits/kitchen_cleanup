@@ -409,6 +409,37 @@ p{margin:0}
   mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14'/%3E%3C/svg%3E") center/contain no-repeat}
 .install-btn:focus-visible{outline:2px solid var(--rust-on-dark);outline-offset:2px}
 .install-help{font-size:13.5px;color:var(--on-dark);max-width:46ch}
+.foot-btns{display:flex;flex-direction:column;gap:2px}
+.pdf-btn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z'/%3E%3Cpath d='M14 3.5v5h5M12 11.5v6M9.5 15l2.5 2.5 2.5-2.5'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z'/%3E%3Cpath d='M14 3.5v5h5M12 11.5v6M9.5 15l2.5 2.5 2.5-2.5'/%3E%3C/svg%3E")}
+/* every hour counts: the one line in the footer set a little apart */
+.foot .hours{color:var(--on-dark);font-size:14.5px;max-width:52ch;margin:2px 0 6px;padding-left:12px;border-left:3px solid var(--rust)}
+.foot .hours b{color:#fff}
+
+/* --------------------------------------------- Save as PDF (print) */
+/* The whole app, tab after tab, each from a new page: in colour, in light
+   mode, with every link live. No Today or Tomorrow and no dates to go
+   stale, just the stamp of when it was saved. */
+.print-only{display:none}
+@media print{
+  @page{margin:12mm 10mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{background:var(--white)}
+  .shell{height:auto;overflow:visible;display:block}
+  .frame,.pane{display:block;overflow:visible;min-height:0}
+  .topbar,.bottomnav,.head-btns,.copy-btn,.foot-btns,.screen-only{display:none !important}
+  .print-only{display:block}
+  main.view[hidden]{display:block !important}
+  main.view+main.view{break-before:page}
+  .cover li,.crew li,.step,.tpl,.ax,.shift-h,.path-h,.panel.due,.contacts li{break-inside:avoid}
+  .path-h,.shift-h,.sit h3,.avail-list .d{break-after:avoid}
+  .me-pill::after,.backups>summary::after{display:none}
+  .head .in{padding-top:18px;padding-bottom:16px}
+  .stamp{max-width:var(--max);margin:0 auto;padding:12px var(--gutter);font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--line)}
+  .stamp b{color:var(--ink)}
+  .stamp a{color:var(--rust-deep);word-break:break-all}
+  .portal{text-decoration:none}
+}
 
 .msg{border-left:4px solid var(--gold);border-radius:4px 10px 10px 4px}
 </style>
@@ -425,6 +456,9 @@ p{margin:0}
   </header>
   <div class="frame">
     <div class="pane" id="scroll">
+
+<!-- the stamp at the top of a saved PDF (print only) -->
+<div class="print-only stamp" id="stamp"></div>
 
 <!-- ============================================================ MY SHIFTS -->
 <main class="view" id="view-shifts">
@@ -499,11 +533,18 @@ p{margin:0}
       <footer class="foot">
         <div class="in">
           <span class="brand"><span class="cjk" lang="zh" aria-hidden="true">淨</span>Kitchen Cleanup</span>
+          <p class="hours" data-t="every_hour"></p>
           <p id="data-status"></p>
-          <p data-t="saved_here"></p>
-          <div class="install" id="install">
-            <button type="button" class="install-btn" id="install-btn" data-t="install"></button>
-            <p class="install-help" id="install-help" hidden></p>
+          <p class="screen-only" data-t="saved_here"></p>
+          <div class="foot-btns">
+            <div class="install" id="install">
+              <button type="button" class="install-btn" id="install-btn" data-t="install"></button>
+              <p class="install-help" id="install-help" hidden></p>
+            </div>
+            <div class="install pdf" id="pdf">
+              <button type="button" class="install-btn pdf-btn" id="pdf-btn" data-t="save_pdf"></button>
+              <p class="install-help" id="pdf-help" hidden></p>
+            </div>
           </div>
         </div>
       </footer>
@@ -648,7 +689,15 @@ p{margin:0}
       saved_here: "Your name is saved on this phone only.",
       install: "Install as app",
       install_ios: "In Safari, tap the Share button, then Add to Home Screen.",
-      install_other: "Open your browser's menu and choose Install app or Add to Home screen."
+      install_other: "Open your browser's menu and choose Install app or Add to Home screen.",
+      every_hour: "<b>Every hour counts.</b> Each shift must be done in full: an hour you miss is an hour a teammate works for you.",
+      save_pdf: "Save as PDF",
+      pdf_ios: "In the window that opens, tap the Share button, then Save to Files.",
+      pdf_other: "In the window that opens, choose Save as PDF as the printer.",
+      pdf_stamp: "Saved {when}",
+      pdf_for: "For {name}",
+      pdf_note: "This copy doesn't change. For the latest shifts and backups, open the app: {link}",
+      co_how_print: "The messages below are in English, ready to send. Change any words in [brackets] first."
     },
 
     "zh-Hans": {
@@ -756,7 +805,15 @@ p{margin:0}
       saved_here: "你的名字只保存在这部手机上。",
       install: "安装为应用",
       install_ios: "在 Safari 中点按“分享”按钮，然后选择“添加到主屏幕”。",
-      install_other: "打开浏览器的菜单，选择“安装应用”或“添加到主屏幕”。"
+      install_other: "打开浏览器的菜单，选择“安装应用”或“添加到主屏幕”。",
+      every_hour: "<b>每一小时都很重要。</b>每个班次都必须完整完成：你缺的每一小时，都要由同事替你做。",
+      save_pdf: "保存为 PDF",
+      pdf_ios: "在打开的窗口中，点按“分享”按钮，然后选择“存储到文件”。",
+      pdf_other: "在打开的窗口中，把打印机选为“另存为 PDF”。",
+      pdf_stamp: "保存于{when}",
+      pdf_for: "姓名：{name}",
+      pdf_note: "这份文件不会更新。要看最新的班次和替班人选，请打开本应用：{link}",
+      co_how_print: "下面的消息是英文的，可以直接发送。发送前，先修改 [方括号] 里的字。"
     },
 
     "zh-Hant": {
@@ -864,7 +921,15 @@ p{margin:0}
       saved_here: "你的名字只儲存在這支手機上。",
       install: "安裝為應用程式",
       install_ios: "在 Safari 中點按「分享」按鈕，然後選擇「加入主畫面」。",
-      install_other: "開啟瀏覽器的選單，選擇「安裝應用程式」或「加到主畫面」。"
+      install_other: "開啟瀏覽器的選單，選擇「安裝應用程式」或「加到主畫面」。",
+      every_hour: "<b>每一小時都很重要。</b>每個班次都必須完整完成：你缺的每一小時，都要由同事幫你做。",
+      save_pdf: "儲存為 PDF",
+      pdf_ios: "在開啟的視窗中，點按「分享」按鈕，然後選擇「儲存到檔案」。",
+      pdf_other: "在開啟的視窗中，將印表機選為「另存為 PDF」。",
+      pdf_stamp: "儲存於{when}",
+      pdf_for: "姓名：{name}",
+      pdf_note: "這份文件不會更新。要看最新的班次和代班人選，請開啟本應用程式：{link}",
+      co_how_print: "下面的訊息是英文的，可以直接傳送。傳送前，先修改 [方括號] 裡的字。"
     },
 
     th: {
@@ -972,7 +1037,15 @@ p{margin:0}
       saved_here: "ชื่อของคุณบันทึกไว้ในโทรศัพท์เครื่องนี้เท่านั้น",
       install: "ติดตั้งเป็นแอป",
       install_ios: "ใน Safari แตะปุ่มแชร์ แล้วเลือก “เพิ่มไปยังหน้าจอโฮม”",
-      install_other: "เปิดเมนูของเบราว์เซอร์ แล้วเลือก “ติดตั้งแอป” หรือ “เพิ่มไปยังหน้าจอหลัก”"
+      install_other: "เปิดเมนูของเบราว์เซอร์ แล้วเลือก “ติดตั้งแอป” หรือ “เพิ่มไปยังหน้าจอหลัก”",
+      every_hour: "<b>ทุกชั่วโมงสำคัญ</b> ทุกกะต้องทำให้ครบ ชั่วโมงที่คุณขาด คือชั่วโมงที่เพื่อนร่วมทีมต้องทำแทนคุณ",
+      save_pdf: "บันทึกเป็น PDF",
+      pdf_ios: "ในหน้าต่างที่เปิดขึ้น แตะปุ่มแชร์ แล้วเลือก “บันทึกไปยังไฟล์”",
+      pdf_other: "ในหน้าต่างที่เปิดขึ้น เลือกเครื่องพิมพ์เป็น “บันทึกเป็น PDF”",
+      pdf_stamp: "บันทึกเมื่อ {when}",
+      pdf_for: "สำหรับ {name}",
+      pdf_note: "สำเนานี้จะไม่อัปเดต ดูกะและตัวสำรองล่าสุดได้ในแอป: {link}",
+      co_how_print: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง"
     },
 
     vi: {
@@ -1080,7 +1153,15 @@ p{margin:0}
       saved_here: "Tên của bạn chỉ được lưu trên điện thoại này.",
       install: "Cài làm ứng dụng",
       install_ios: "Trong Safari, chạm nút Chia sẻ, rồi chọn “Thêm vào MH chính”.",
-      install_other: "Mở menu của trình duyệt và chọn “Cài đặt ứng dụng” hoặc “Thêm vào màn hình chính”."
+      install_other: "Mở menu của trình duyệt và chọn “Cài đặt ứng dụng” hoặc “Thêm vào màn hình chính”.",
+      every_hour: "<b>Mỗi giờ đều quan trọng.</b> Mỗi ca phải được làm trọn vẹn: mỗi giờ bạn vắng là một giờ đồng đội phải làm thay bạn.",
+      save_pdf: "Lưu thành PDF",
+      pdf_ios: "Trong cửa sổ mở ra, chạm nút Chia sẻ, rồi chọn “Lưu vào Tệp”.",
+      pdf_other: "Trong cửa sổ mở ra, chọn máy in là “Lưu dưới dạng PDF”.",
+      pdf_stamp: "Lưu lúc {when}",
+      pdf_for: "Dành cho {name}",
+      pdf_note: "Bản này không tự cập nhật. Để xem ca và người dự phòng mới nhất, hãy mở ứng dụng: {link}",
+      co_how_print: "Các tin nhắn bên dưới bằng tiếng Anh, sẵn sàng để gửi. Hãy sửa chữ trong [ngoặc vuông] trước khi gửi."
     }
   };
   /* END STRINGS */
@@ -1106,7 +1187,7 @@ p{margin:0}
     del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
 
-  var data = null, loadError = null, me = store.get(ME_KEY) || "", shownDay = "";
+  var data = null, loadError = null, me = store.get(ME_KEY) || "", shownDay = "", printing = false;
   /* the language: as chosen on this phone, or else the phone's own if the
      app has it, or else English */
   function pickLang() {
@@ -1390,6 +1471,10 @@ p{margin:0}
      shift shows as Pots & Pans) */
   function glance(mine, now) {
     var today = (now.getDay() + 6) % 7;
+    /* a saved PDF keeps nothing that goes stale: week order, no dates */
+    if (printing) return '<ul class="gl" aria-label="' + t("glance_label") + '">' + mine.map(function (s) {
+      return '<li class="k' + s.day + '"><span class="gd">' + dayShort(s.day) + '</span><span></span><span class="gr">' + esc(s.as) + "</span><span></span></li>";
+    }).join("") + "</ul>";
     var next = mine.map(function (s) { return { s: s, t: nextDate(s.day, now) }; }).sort(function (a, b) { return a.t - b.t; });
     return '<p class="today">' + t("today_is", { date: longDate(now) }) + "</p>" +
       '<ul class="gl" aria-label="' + t("glance_label") + '">' + next.map(function (x) {
@@ -1410,7 +1495,7 @@ p{margin:0}
     if (!data) { body.innerHTML = '<p class="note">' + t("loading") + "</p>"; return; }
     if (!me) { body.innerHTML = '<p class="note">' + t("choose_prompt") + "</p>"; return; }
 
-    var now = new Date(), today = (now.getDay() + 6) % 7;
+    var now = new Date(), today = printing ? -9 : (now.getDay() + 6) % 7;
     var mine = data.shifts.filter(function (s) { return s.who === me; }).sort(function (a, b) { return a.day - b.day; });
     $("glance").innerHTML = glance(mine, now);
     $("glance").hidden = false;
@@ -1424,7 +1509,7 @@ p{margin:0}
           (crew.length ? '<div class="part"><h4>' + t("on_with_you") + '</h4><ul class="crew">' + crew.map(function (x) {
             return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(x.role) + "</span></li>";
           }).join("") + "</ul></div>" : "") +
-          '<details class="backups"><summary><span>' + t("shift_backups", { n: s.cover.length }) + "</span></summary>" +
+          '<details class="backups"' + (printing ? " open" : "") + "><summary><span>" + t("shift_backups", { n: s.cover.length }) + "</span></summary>" +
           (s.cover.length ? '<p class="cover-lead">' + t("can_cover") + "</p>" +
             backupList(s.cover.slice(0, s.lastFrom), 1, s.swap, s.as) +
             (s.lastFrom < s.cover.length ? '<div class="last"><p class="last-h">' + t("last_resort") + "</p>" +
@@ -1563,9 +1648,10 @@ p{margin:0}
   /* sick or unplanned first, then planned; each step in plain words, with
      the message to send under it */
   function renderCallout() {
-    var today = (new Date().getDay() + 6) % 7, km = { km: esc(kmName()) }, done = step(t("covered"), "", "", "done");
+    var today = printing ? -1 : (new Date().getDay() + 6) % 7, km = { km: esc(kmName()) }, done = step(t("covered"), "", "", "done");
     $("callout-paths").innerHTML =
-      '<p class="co-how">' + t("co_how") + (me ? "" : " " + t("msg_noname")) + "</p>" +
+      '<p class="co-how"><span class="screen-only">' + t("co_how") + "</span>" + '<span class="print-only">' + t("co_how_print") + "</span>" +
+        (me ? "" : " " + t("msg_noname")) + "</p>" +
       path("k5", "sick", t("sick_h"),
         sit(t("sick_a"), [
           step(t("a1"), sub(t("a1s")), tpl("sick", today)),
@@ -1662,8 +1748,10 @@ p{margin:0}
     for (var i = 0; i < els.length; i++) els[i].innerHTML = t(els[i].getAttribute("data-t"));
     $("top-nav").setAttribute("aria-label", t("views"));
     $("bottom-nav").setAttribute("aria-label", t("views"));
-    var help = $("install-help");
-    if (!help.hidden) help.textContent = t(help.getAttribute("data-which"));
+    ["install-help", "pdf-help"].forEach(function (id) {
+      var help = $(id);
+      if (!help.hidden) help.textContent = t(help.getAttribute("data-which"));
+    });
   }
   function renderAll() { renderPicker(); renderShifts(); renderAvailability(); renderCallout(); renderContacts(); renderPortal(); renderStatus(); }
 
@@ -1783,6 +1871,39 @@ p{margin:0}
     help.textContent = t(help.getAttribute("data-which"));
     help.hidden = false;
   });
+
+  /* ---------------------------------------------------- Save as PDF */
+  /* The phone's own print window saves the PDF. Before it's drawn, every
+     tab is laid out for paper (see the print styles), the backups are
+     opened, Today and Tomorrow and the dates are left out, and the stamp
+     says when it was saved; afterwards the app goes back as it was. This
+     also runs when someone prints from the browser's menu. */
+  function savedWhen(d) {
+    var tag = { en: "en-US", "zh-Hans": "zh-CN", "zh-Hant": "zh-TW", th: "th-TH", vi: "vi-VN" }[lang];
+    try { return d.toLocaleString(tag, { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+    catch (e) { return longDate(d) + " " + d.getFullYear(); }
+  }
+  function forPrint(on) {
+    printing = on;
+    if (on) {
+      document.documentElement.setAttribute("data-theme", "light");
+      var link = location.href.split("#")[0];
+      $("stamp").innerHTML = "<p><b>Kitchen Cleanup</b> · " + t("pdf_stamp", { when: esc(savedWhen(new Date())) }) +
+        (me ? " · " + t("pdf_for", { name: esc(me) }) : "") + "</p><p>" +
+        t("pdf_note", { link: '<a href="' + esc(link) + '">' + esc(link) + "</a>" }) + "</p>";
+    } else drawTheme();
+    renderShifts(); renderCallout();
+  }
+  window.addEventListener("beforeprint", function () { forPrint(true); });
+  window.addEventListener("afterprint", function () { forPrint(false); });
+  $("pdf-btn").addEventListener("click", function () {
+    var help = $("pdf-help"), ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    help.setAttribute("data-which", ios ? "pdf_ios" : "pdf_other");
+    help.textContent = t(help.getAttribute("data-which"));
+    help.hidden = false;
+    window.print();
+  });
+  if (location.protocol === "file:" || typeof window.print !== "function") $("pdf").hidden = true;
 
   /* ------------------------------------------------------------ start */
   route(); renderAll();
