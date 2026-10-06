@@ -323,7 +323,7 @@ langs.slice(1).forEach(function (l) {
   }), []);
   check(l + ": nothing left empty or in English by mistake", Object.keys(b.STR.en).filter(function (k) {
     var v = b.STR[l][k];
-    return !v || (typeof v === "string" && v === b.STR.en[k]);
+    return !v || (typeof v === "string" && v === b.STR.en[k] && /[a-z]/i.test(v));   /* punctuation (", ") may match */
   }), []);
 });
 check("roles and the managers' titles stay in English", langs.every(function (l) {

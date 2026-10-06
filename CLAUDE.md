@@ -41,12 +41,14 @@ and the tab shell from the second.
 - "Can cover for you" shows each backup as a bold name, then their swap
   options (`shiftsHTML()`, the shift's own job first), or all their
   shifts in the last resort: each role as a quiet label followed by day
-  tags (`.dp`) in that day's hue. My availability groups as far as it
-  goes: day covered (`li`), then "In exchange for your" one day of yours
-  (`.ax`, from `s.swap[me]`), then the role you'd cover as (`.ar`), then
-  the names (`.an`). A person who could take several of your shifts is
-  under each. Anyone whose last resort you are is in a quiet "Last
-  resort" group (`.ax.lr`) at the end of that day.
+  tags (`.dp`) in that day's hue. My availability spells everything out
+  in sentences, never a grid of labels to decode. One card per day
+  covered (`li`), then one sentence per day of yours in exchange and job
+  (`.ax`, from `s.swap[me]`): "**Beth**, **Priya** or **Roxanne** may ask
+  you to work their **Pots & Pans** shift on WEDNESDAY. In exchange, they
+  would work your **Buckets & Composting** shift on TUESDAY." Names and
+  jobs are bold ink, days are full-name tags in their hue. Anyone whose
+  last resort you are gets a quieter sentence (`.ax.lr`) at the end.
 - The head of My shifts: the heading with the name beside it as a pill
   (`.who.set`: the select sits unseen over `#me-pill`; before a name is
   chosen it is a full-width labelled select). Under it, the week at a
@@ -86,7 +88,7 @@ and the tab shell from the second.
     for a make-up shift and **never** come in for another shift without
     approval. Situation titles are first person.
   - **Standalone:** each situation is written to be read alone (`sit()`).
-  - **Times:** 10:30 am (not sure), 10:00 am (can't make it, too sick), 12:15 pm and
+  - **Times:** 10:00 am (can't make it, not sure, too sick), 12:15 pm and
     12:40 pm (forgot), and 4 days ahead (planned). They are the user's
     and belong here; still never show shift hours elsewhere.
   - **Messages** (`MSG`) are always English. They fill in the student's
@@ -94,9 +96,10 @@ and the tab shell from the second.
     for a student who only ever does one job (`myRole()`); otherwise it
     stays `[my role]`, as the message may be for another day. Anything
     else stays in `[brackets]`, marked, always first person (`[my name]`,
-    `[my explanation]`). Messages to the Student Kitchen Manager say who
-    cannot cover and who has not replied, separately, so they know who
-    might still be found. No note sits above the messages, except "choose
+    `[my explanation]`). Messages to the Student Kitchen Manager say "I
+    messaged my backups. [names] said they cannot cover, and [names] did
+    not reply.", so they know who is ruled out and who might still be
+    found. No note sits above the messages, except "choose
     your name" when none is chosen.
   - Questions are gold diamonds (`.step.ask`).
 - **Languages.** English, 简体中文, 繁體中文, ไทย and Tiếng Việt, all in

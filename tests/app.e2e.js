@@ -219,42 +219,48 @@ function serve(dir, port) {
 
   /* My availability: day covered, then your day in exchange, then the
      role you'd cover as, then who; the last resort at the end of the day */
+  /* My availability, as sentences: who may ask you to work their shift
+     that day, and which of your shifts they'd work in exchange; last
+     resorts at the end of the day */
+  function nameList(list) {
+    list = list.slice().sort();
+    return list.length < 2 ? list[0] : list.slice(0, -1).join(", ") + " or " + list[list.length - 1];
+  }
   function availOf(me) {
     var avail = {};
     ROWS.forEach(function (r) {
       var at = r.cover.indexOf(me);
       if (at < 0) return;
-      var day = avail[r.day] = avail[r.day] || {}, as = ROLE[r.role].as;
-      (at < r.before ? r.swaps[me].map(function (x) { return x.day; }) : ["Last resort"]).forEach(function (back) {
-        var g = day[back] = day[back] || {};
-        (g[as] = g[as] || []).push(r.who);
+      var day = avail[r.day] = avail[r.day] || { swaps: {}, last: {} }, as = ROLE[r.role].as;
+      if (at >= r.before) { (day.last[as] = day.last[as] || []).push(r.who); return; }
+      r.swaps[me].forEach(function (x) {
+        var key = DAYS.indexOf(x.day) + "|" + ROLE[as].rank;
+        (day.swaps[key] = day.swaps[key] || { back: x.day, mine: x.as, theirs: as, who: [] }).who.push(r.who);
       });
     });
     return DAYS.filter(function (d) { return avail[d]; }).map(function (d) {
-      return d + " | " + DAYS.concat("Last resort").filter(function (b) { return avail[d][b]; }).map(function (b) {
-        var g = avail[d][b];
-        return (b === "Last resort" ? b : "In exchange for your " + b.slice(0, 3)) + " > " + Object.keys(g).sort(function (x, y) { return ROLE[x].rank - ROLE[y].rank; }).map(function (as) {
-          return "As " + as + ": " + g[as].sort().join(", ");
-        }).join(" / ");
-      }).join(" | ");
+      var day = avail[d];
+      return [d].concat(Object.keys(day.swaps).sort().map(function (k) {
+        var g = day.swaps[k];
+        return nameList(g.who) + " may ask you to work their " + g.theirs + " shift on " + d + ". In exchange, they would work your " + g.mine + " shift on " + g.back + ".";
+      }), Object.keys(day.last).sort(function (x, y) { return ROLE[x].rank - ROLE[y].rank; }).map(function (as) {
+        return "As a last resort, " + nameList(day.last[as]) + " may also ask you to work their " + as + " shift on " + d + ".";
+      })).join(" | ");
     });
   }
   function availOnPage() {
     return p.$$eval(".avail-list li", function (l) {
       return l.map(function (x) {
-        return x.querySelector(".d").textContent + " | " + [].map.call(x.querySelectorAll(".ax"), function (g) {
-          return g.querySelector(".xh").textContent + " > " + [].map.call(g.querySelectorAll(".ag"), function (a) {
-            return a.querySelector(".ar").textContent + ": " + a.querySelector(".an").textContent;
-          }).join(" / ");
-        }).join(" | ");
+        return [x.querySelector(".d").textContent].concat([].map.call(x.querySelectorAll(".ax"), function (g) { return g.textContent; })).join(" | ");
       });
     });
   }
-  check("availability: by day, day in exchange, role, then who", await availOnPage(), availOf("Aryashree"));
-  check("availability: exchange days carry their day's colour", await p.$$eval(".avail-list .xh .dp", function (t) {
-    var k = { Mon: "k0", Tue: "k1", Wed: "k2", Thu: "k3", Fri: "k4", Sat: "k5", Sun: "k6" };
+  check("availability: spelled out in sentences, by day", await availOnPage(), availOf("Aryashree"));
+  check("availability: the days in a sentence carry their colour", await p.$$eval(".avail-list .ax .dp", function (t) {
+    var k = { Monday: "k0", Tuesday: "k1", Wednesday: "k2", Thursday: "k3", Friday: "k4", Saturday: "k5", Sunday: "k6" };
     return t.length > 0 && t.every(function (x) { return x.classList.contains(k[x.textContent]); });
   }), true);
+  check("availability: no all-caps labels to decode", await p.$$eval(".avail-list .ar, .avail-list .xh", function (n) { return n.length; }), 0);
   for (var who of ["Adam", "Ben Kong", "Ivwananji", "Thanh"]) {
     await p.selectOption("#me", who);
     check("availability: " + who, await availOnPage(), availOf(who));
@@ -308,7 +314,7 @@ function serve(dir, port) {
     return d >= 0 && d <= 20;
   }), await p.evaluate(function () { return location.hash; }), await p.evaluate(function () { return document.activeElement.textContent; })], [true, "#callout", "I will miss a shift in the future"]);
   check("call out: the deadlines and the questions", await p.$$eval(".step.ask .t", function (h) { return h.map(function (x) { return x.textContent; }); }),
-    ["It's 10:00 am and no one has said yes?", "It's 10:30 am, no one has said yes, and you still can't come?", "It's 10:00 am and no one has said yes?", "Is it already after 12:40 pm?",
+    ["It's 10:00 am and no one has said yes?", "It's 10:00 am, no one has said yes, and you still can't come?", "It's 10:00 am and no one has said yes?", "Is it already after 12:40 pm?",
      "Your absence is 4 days away, and you still have no backup?", "Your absence is only 1 or 2 days away?"]);
   check("call out: no Covered step", await p.$$eval(".step.done", function (n) { return n.length; }), 0);
   check("call out: a future absence 1 or 2 days away follows I can't make it today", await text(p, "#sit-plan .step:nth-child(3) .act"), "Then follow the steps in “I can't make it today”, above.");
@@ -317,17 +323,17 @@ function serve(dir, port) {
   check("call out: thirteen messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [13, true]);
   check("call out: I can't make it today, first: ask the backups, then the Student Kitchen Manager", [msgs[0][1], msgs[2][1]],
     ["Hello friend, I cannot come to my Pots & Pans shift today. [my reason] Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\nBeth",
-     "Hello Art, I cannot come to my Pots & Pans shift today. [my reason] I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\nBeth"]);
+     "Hello Art, I cannot come to my Pots & Pans shift today. [my reason] I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\nBeth"]);
   check("call out: a missed shift: message the Student Kitchen Manager and the Shift Leader, then wait", [msgs[11][1], msgs[12][1], await text(p, "#sit-missed .step:nth-child(3)")],
     ["Hello Art, I missed my Pots & Pans shift on [day]. [my explanation] I am sorry. Please advise.\nBeth",
      "Hello [Shift Leader's name], I missed my Pots & Pans shift on [day]. [my explanation] I am sorry.\nBeth",
      "Then wait for instructions. You will be given a make-up shift. Do not come in for another shift on your own, without approval."]);
   check("call out: the not-sure message, with Beth's name, and her role as she only does Pots & Pans", msgs[3][1],
-    "Hi friend, I have a Pots & Pans shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nBeth");
+    "Hi friend, I have a Pots & Pans shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:00 am? I will let you know by 10:00 am.\nThank you,\nBeth");
   check("call out: the late message leaves room to explain", msgs[8][1],
     "Hello Art, I forgot my Pots & Pans shift today and only remembered after 12:40 pm. [my explanation] I am sorry. Please advise.\nBeth");
-  check("call out: messages to the Student Kitchen Manager say who can't cover and who hasn't replied", msgs.filter(function (m) {
-    return m[1].indexOf("I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.") >= 0;
+  check("call out: messages to the Student Kitchen Manager say which backups can't cover and which haven't replied", msgs.filter(function (m) {
+    return m[1].indexOf("I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.") >= 0;
   }).length, 4);
   check("call out: no note above the messages once a name is chosen", await p.$$eval(".co-how", function (n) { return n.length; }), 0);
   check("call out: every placeholder in the first person", msgs.every(function (m) { return !/\[your /.test(m[1]); }), true);

@@ -306,13 +306,13 @@ p{margin:0}
 .avail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:20px}
 .avail-list li{border-top:4px solid var(--c);gap:10px}
 .avail-list .d{color:var(--ci)}
-.avail-list .ax{display:flex;flex-direction:column;gap:4px;padding-top:10px;border-top:1px solid var(--line-soft)}
-.avail-list .xh{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:14px;color:var(--ink-2)}
-.avail-list .ag{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;padding-left:12px;border-left:2px solid var(--line)}
-.avail-list .ar{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
-.avail-list .an{font-size:15px;font-weight:600;color:var(--ink)}
-.avail-list .ax.lr .xh,.avail-list .ax.lr .an{color:var(--ink-3)}
-.avail-list .ax.lr .an{font-weight:400}
+/* each line a plain sentence; the names, jobs and days in it stand out:
+   names and jobs in bold ink, days as tags in their hue */
+.avail-list .ax{padding-top:10px;border-top:1px solid var(--line-soft);font-size:15.5px;line-height:1.7;color:var(--ink-2)}
+.avail-list .nm,.avail-list .rl{font-weight:600;color:var(--ink)}
+.avail-list .dp{font-size:11.5px;padding:3px 8px;vertical-align:1px}
+.avail-list .ax.lr{font-size:14.5px;color:var(--ink-3)}
+.avail-list .ax.lr .nm,.avail-list .ax.lr .rl{font-weight:500;color:var(--ink-2)}
 .cover{margin:0;padding:0 0 0 1.6em;font-size:15px}
 /* each backup: the name on its own line, then what they work, as role
    labels each followed by day tags in that day's colour */
@@ -694,9 +694,9 @@ p{margin:0}
       sit_maybe_s: "I feel unwell, and I don't know yet if I can work today.",
       m1: "Find a backup now, even if you might feel better later.",
       m1s: "Message each of your backups on WhatsApp or by text. Send it to one person at a time, not in a group. Your backups are on the My shifts page.",
-      m2: "By 10:30 am, make your choice.",
+      m2: "By 10:00 am, make your choice.",
       m2s: "Either a backup works your shift, or you come in yourself. Tell your backup which one.",
-      m3: "It's 10:30 am, no one has said yes, and you still can't come?",
+      m3: "It's 10:00 am, no one has said yes, and you still can't come?",
       m3t: "Message the Student Kitchen Manager ({km}) right away.",
       sit_forgot: "I forgot my shift, and it has already started",
       f1: "Go to work right now, even if it is already 12:15 pm.",
@@ -738,8 +738,11 @@ p{margin:0}
       avail_no_name: "Choose your name on My shifts to see the days you may be asked to cover.",
       avail_failed: "The shift list didn't load. See My shifts.",
       avail_none: "You're not listed as a backup on any day.",
-      exchange_for: "In exchange for your {day}",
-      cover_as: "As {role}",
+      av_ask: "{names} may ask you to work their {role} shift on {day}.",
+      av_back: "In exchange, they would work your {role} shift on {day}.",
+      av_last: "As a last resort, {names} may also ask you to work their {role} shift on {day}.",
+      list_sep: ", ",
+      list_or: " or ",
       wrong_info: "Something here wrong or out of date? Send an email to the Student Kitchen Manager ({name}).",
 
       ts_eyebrow: "Work study hours",
@@ -829,9 +832,9 @@ p{margin:0}
       sit_maybe_s: "我身体不舒服，还不知道今天能不能上班。",
       m1: "现在就找替班，即使你之后可能会好起来。",
       m1s: "用 WhatsApp 或短信给你的每一位替班人选发消息。一次发给一个人，不要发在群组里。你的替班人选在「我的班次」页面。",
-      m2: "上午10:30之前，做好决定。",
+      m2: "上午10:00之前，做好决定。",
       m2s: "要么请替班人帮你上这个班，要么你自己来。告诉你的替班人你选了哪一个。",
-      m3: "已经上午10:30了，没有人答应，你还是来不了？",
+      m3: "已经上午10:00了，没有人答应，你还是来不了？",
       m3t: "马上给 Student Kitchen Manager（{km}）发消息。",
       sit_forgot: "我忘了上班，班次已经开始了",
       f1: "现在马上去上班，即使已经中午12:15了。",
@@ -873,8 +876,11 @@ p{margin:0}
       avail_no_name: "在「我的班次」选择你的名字，就能看到你可能被请求替班的日子。",
       avail_failed: "班表没有载入，请看「我的班次」。",
       avail_none: "你目前不是任何一天的替班人选。",
-      exchange_for: "对方替你上{day}的班",
-      cover_as: "岗位：{role}",
+      av_ask: "{names}可能会请你替他们上{day}的{role}班。",
+      av_back: "作为交换，对方会替你上{day}的{role}班。",
+      av_last: "最后选择：{names}也可能会请你替他们上{day}的{role}班。",
+      list_sep: "、",
+      list_or: "或",
       wrong_info: "这里的信息有误或已过时？请发电子邮件给 Student Kitchen Manager（{name}）。",
 
       ts_eyebrow: "勤工助学工时",
@@ -964,9 +970,9 @@ p{margin:0}
       sit_maybe_s: "我身體不舒服，還不知道今天能不能上班。",
       m1: "現在就找代班，即使你之後可能會好起來。",
       m1s: "用 WhatsApp 或簡訊傳訊息給你的每一位代班人選。一次傳給一個人，不要傳在群組裡。你的代班人選在「我的班次」頁面。",
-      m2: "上午10:30之前，做好決定。",
+      m2: "上午10:00之前，做好決定。",
       m2s: "要麼請代班人幫你上這個班，要麼你自己來。告訴你的代班人你選了哪一個。",
-      m3: "已經上午10:30了，沒有人答應，你還是來不了？",
+      m3: "已經上午10:00了，沒有人答應，你還是來不了？",
       m3t: "馬上傳訊息給 Student Kitchen Manager（{km}）。",
       sit_forgot: "我忘了上班，班次已經開始了",
       f1: "現在馬上去上班，即使已經中午12:15了。",
@@ -1008,8 +1014,11 @@ p{margin:0}
       avail_no_name: "在「我的班次」選擇你的名字，就能看到你可能被請求代班的日子。",
       avail_failed: "班表沒有載入，請看「我的班次」。",
       avail_none: "你目前不是任何一天的代班人選。",
-      exchange_for: "對方幫你上{day}的班",
-      cover_as: "職務：{role}",
+      av_ask: "{names}可能會請你幫他們上{day}的{role}班。",
+      av_back: "作為交換，對方會幫你上{day}的{role}班。",
+      av_last: "最後選擇：{names}也可能會請你幫他們上{day}的{role}班。",
+      list_sep: "、",
+      list_or: "或",
       wrong_info: "這裡的資訊有誤或已過時？請寄電子郵件給 Student Kitchen Manager（{name}）。",
 
       ts_eyebrow: "工讀時數",
@@ -1099,9 +1108,9 @@ p{margin:0}
       sit_maybe_s: "ฉันรู้สึกไม่สบาย และยังไม่รู้ว่าวันนี้จะทำงานไหวไหม",
       m1: "หาตัวสำรองตอนนี้เลย แม้คุณอาจจะดีขึ้นทีหลัง",
       m1s: "ส่งข้อความหาตัวสำรองแต่ละคนทาง WhatsApp หรือ SMS ส่งทีละคน ไม่ส่งในกลุ่ม ดูตัวสำรองของคุณได้ที่หน้า “กะของฉัน”",
-      m2: "ก่อน 10:30 น. ให้ตัดสินใจ",
+      m2: "ก่อน 10:00 น. ให้ตัดสินใจ",
       m2s: "ให้ตัวสำรองทำกะแทน หรือคุณมาทำเอง แล้วบอกตัวสำรองว่าเลือกแบบไหน",
-      m3: "10:30 น. แล้ว ยังไม่มีใครตอบตกลง และคุณยังมาไม่ได้?",
+      m3: "10:00 น. แล้ว ยังไม่มีใครตอบตกลง และคุณยังมาไม่ได้?",
       m3t: "ส่งข้อความถึง Student Kitchen Manager ({km}) ทันที",
       sit_forgot: "ฉันลืมกะ และกะเริ่มไปแล้ว",
       f1: "ไปทำงานเดี๋ยวนี้ แม้จะ 12:15 น. แล้วก็ตาม",
@@ -1143,8 +1152,11 @@ p{margin:0}
       avail_no_name: "เลือกชื่อของคุณที่หน้า “กะของฉัน” เพื่อดูวันที่คุณอาจถูกขอให้แทน",
       avail_failed: "โหลดตารางกะไม่สำเร็จ ดูที่หน้า “กะของฉัน”",
       avail_none: "คุณยังไม่ได้เป็นตัวสำรองในวันใดเลย",
-      exchange_for: "แลกกับกะ{day}ของคุณ",
-      cover_as: "ตำแหน่ง: {role}",
+      av_ask: "{names} อาจขอให้คุณทำกะ {role} ของเขาใน{day}",
+      av_back: "เป็นการแลกเปลี่ยน เขาจะทำกะ {role} ของคุณใน{day}",
+      av_last: "ทางเลือกสุดท้าย: {names} อาจขอให้คุณทำกะ {role} ของเขาใน{day}ด้วย",
+      list_sep: ", ",
+      list_or: " หรือ ",
       wrong_info: "ข้อมูลตรงนี้ผิดหรือไม่เป็นปัจจุบัน? ส่งอีเมลถึง Student Kitchen Manager ({name})",
 
       ts_eyebrow: "ชั่วโมงงาน Work Study",
@@ -1234,9 +1246,9 @@ p{margin:0}
       sit_maybe_s: "Tôi thấy không khỏe, và chưa biết hôm nay có làm được không.",
       m1: "Tìm người dự phòng ngay bây giờ, kể cả khi lát nữa bạn có thể khỏe hơn.",
       m1s: "Nhắn tin cho từng người dự phòng qua WhatsApp hoặc tin nhắn điện thoại. Gửi cho từng người một, không gửi trong nhóm. Người dự phòng của bạn có ở trang “Ca của tôi”.",
-      m2: "Trước 10:30 sáng, hãy quyết định.",
+      m2: "Trước 10:00 sáng, hãy quyết định.",
       m2s: "Hoặc người dự phòng làm ca của bạn, hoặc bạn tự đến làm. Báo cho người dự phòng biết bạn chọn cách nào.",
-      m3: "Đã 10:30 sáng, chưa ai đồng ý, và bạn vẫn không đến được?",
+      m3: "Đã 10:00 sáng, chưa ai đồng ý, và bạn vẫn không đến được?",
       m3t: "Nhắn tin ngay cho Student Kitchen Manager ({km}).",
       sit_forgot: "Tôi quên ca, và ca đã bắt đầu",
       f1: "Đi làm ngay bây giờ, kể cả khi đã 12:15 trưa.",
@@ -1278,8 +1290,11 @@ p{margin:0}
       avail_no_name: "Chọn tên của bạn ở trang “Ca của tôi” để xem những ngày bạn có thể được nhờ làm thay.",
       avail_failed: "Không tải được lịch ca. Xem trang “Ca của tôi”.",
       avail_none: "Bạn chưa là người dự phòng vào ngày nào.",
-      exchange_for: "Đổi lấy ca {day} của bạn",
-      cover_as: "Vị trí: {role}",
+      av_ask: "{names} có thể nhờ bạn làm ca {role} của họ vào {day}.",
+      av_back: "Đổi lại, họ sẽ làm ca {role} của bạn vào {day}.",
+      av_last: "Phương án cuối cùng: {names} cũng có thể nhờ bạn làm ca {role} của họ vào {day}.",
+      list_sep: ", ",
+      list_or: " hoặc ",
       wrong_info: "Thông tin ở đây sai hoặc đã cũ? Hãy gửi email cho Student Kitchen Manager ({name}).",
 
       ts_eyebrow: "Giờ làm Work Study",
@@ -1700,35 +1715,43 @@ p{margin:0}
     }).join("");
   }
 
-  /* The days this student appears in someone's backup list, grouped as
-     far as they go: the day you'd cover, then each shift of yours they
-     could take in exchange, then the role you'd cover as (a Shift Leader's
-     shift counts as Pots & Pans), then who. Someone who could take more
-     than one of your shifts is under each. Where you're only their last
-     resort, that's its own quiet group at the end of the day. */
+  /* The days this student appears in someone's backup list, one card per
+     day, each spelled out in sentences: who may ask you to work their
+     shift that day (as the job it is: a Shift Leader's shift counts as Pots
+     & Pans), and which shift of yours they would work in exchange. One
+     sentence for each day of yours and job. Where you're only their last
+     resort, a quieter sentence at the end. */
+  function names(list) {
+    list = list.slice().sort(function (a, b) { return a.localeCompare(b); }).map(function (n) { return '<b class="nm">' + esc(n) + "</b>"; });
+    return list.length < 2 ? list.join("") : list.slice(0, -1).join(t("list_sep")) + t("list_or") + list[list.length - 1];
+  }
+  function dayPill(d) { return '<span class="dp k' + d + '">' + dayName(d) + "</span>"; }
+  function rolePill(r) { return '<b class="rl">' + esc(r) + "</b>"; }
   function availability() {
     var days = [];
     data.shifts.forEach(function (s) {
       var i = s.cover.indexOf(me);
       if (i < 0) return;
-      var day = days[s.day] = days[s.day] || [];
-      (i < s.lastFrom ? s.swap[me].map(function (x) { return x.day; }) : [7]).forEach(function (back) {
-        var roles = day[back] = day[back] || {};
-        (roles[s.as] = roles[s.as] || []).push(s.who);
+      var day = days[s.day] = days[s.day] || { swaps: {}, keys: [], last: {} };
+      if (i >= s.lastFrom) { (day.last[s.as] = day.last[s.as] || []).push(s.who); return; }
+      s.swap[me].forEach(function (x) {
+        var key = x.day + "|" + roleRank(s.as) + "|" + s.as;
+        if (!day.swaps[key]) { day.swaps[key] = { back: x.day, mine: x.as, theirs: s.as, who: [] }; day.keys.push(key); }
+        day.swaps[key].who.push(s.who);
       });
     });
     var rows = [];
     days.forEach(function (day, d) {
       if (!day) return;
-      /* by your day in exchange, Monday first; 7 is the last resort */
-      rows.push('<li class="panel k' + d + '"><h2 class="d">' + dayName(d) + "</h2>" + day.map(function (roles, back) {
-        return '<div class="ax' + (back < 7 ? "" : " lr") + '"><p class="xh">' +
-          (back < 7 ? t("exchange_for", { day: dayTag(back) }) : t("last_resort")) + "</p>" +
-          Object.keys(roles).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
-            return '<p class="ag"><span class="ar">' + t("cover_as", { role: esc(as) }) + '</span><span class="an">' +
-              roles[as].sort(function (a, b) { return a.localeCompare(b); }).map(esc).join(", ") + "</span></p>";
-          }).join("") + "</div>";
-      }).filter(Boolean).join("") + "</li>");
+      /* by your day in exchange, Monday first, then the job */
+      var lines = day.keys.sort().map(function (k) {
+        var g = day.swaps[k];
+        return '<div class="ax"><p>' + t("av_ask", { names: names(g.who), role: rolePill(g.theirs), day: dayPill(d) }) + (/^zh/.test(lang) ? "" : " ") +
+          t("av_back", { role: rolePill(g.mine), day: dayPill(g.back) }) + "</p></div>";
+      }).concat(Object.keys(day.last).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
+        return '<div class="ax lr"><p>' + t("av_last", { names: names(day.last[as]), role: rolePill(as), day: dayPill(d) }) + "</p></div>";
+      }));
+      rows.push('<li class="panel k' + d + '"><h2 class="d">' + dayName(d) + "</h2>" + lines.join("") + "</li>");
     });
     return rows.length ? '<ul class="avail-list">' + rows.join("") + "</ul>" : '<p class="note">' + t("avail_none") + "</p>";
   }
@@ -1754,15 +1777,15 @@ p{margin:0}
      another day.) */
   var MSG = {
     today: "Hello friend, I cannot come to my {role} shift today. [my reason] Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\n{me}",
-    km_today: "Hello {km}, I cannot come to my {role} shift today. [my reason] I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\n{me}",
+    km_today: "Hello {km}, I cannot come to my {role} shift today. [my reason] I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\n{me}",
     sick: "Hello friend, I woke up sick and I am not sure I can come to my {role} shift today. Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\n{me}",
     thanks: "Thank you, but [name] has already agreed to cover my shift today. Have a good day!",
-    km_sick: "Hello {km}, I woke up sick and cannot come to my {role} shift today. I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\n{me}",
-    maybe: "Hi friend, I have a {role} shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\n{me}",
-    km_maybe: "Hello {km}, I am not feeling well and may not be able to come to my {role} shift today. I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\n{me}",
+    km_sick: "Hello {km}, I woke up sick and cannot come to my {role} shift today. I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\n{me}",
+    maybe: "Hi friend, I have a {role} shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:00 am? I will let you know by 10:00 am.\nThank you,\n{me}",
+    km_maybe: "Hello {km}, I am not feeling well and may not be able to come to my {role} shift today. I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\n{me}",
     km_late: "Hello {km}, I forgot my {role} shift today and only remembered after 12:40 pm. [my explanation] I am sorry. Please advise.\n{me}",
     planned: "Hello friend, I cannot come to my {role} shift on [day and date]. Could you cover it for me? In return, I will work one of your shifts.\nThank you,\n{me}",
-    km_planned: "Hello {km}, I cannot come to my {role} shift on [day and date]. I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\n{me}",
+    km_planned: "Hello {km}, I cannot come to my {role} shift on [day and date]. I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\n{me}",
     km_missed: "Hello {km}, I missed my {role} shift on [day]. [my explanation] I am sorry. Please advise.\n{me}",
     sl_missed: "Hello [Shift Leader's name], I missed my {role} shift on [day]. [my explanation] I am sorry.\n{me}"
   };
