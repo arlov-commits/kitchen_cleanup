@@ -692,8 +692,6 @@ p{margin:0}
       sick_h: "Sick or Unplanned Absence",
       planned_h: "Planned Absence",
       co_lead: "Every shift must be done in full. If no one covers for you, your teammates have to work extra.",
-      co_how: "Each message below is in English and ready to send. Tap “Copy message”, paste it into WhatsApp or a text message, and change the words in [brackets] before you send it.",
-      co_how_print: "Each message below is in English and ready to send. Change the words in [brackets] before you send it.",
       msg_noname: "Choose your name on the My shifts page, and your messages will have your name in them.",
       jump_h: "What's happening?",
       sit_maybe: "Not sure if I can make it today",
@@ -828,8 +826,6 @@ p{margin:0}
       sick_h: "生病或临时请假",
       planned_h: "预先请假",
       co_lead: "每个班次都必须完整完成。如果没有人替你，同事就得多做。",
-      co_how: "下面每条消息都是英文的，可以直接发送。点按「复制消息」，粘贴到 WhatsApp 或短信里，发送前先改好 [方括号] 里的字。",
-      co_how_print: "下面每条消息都是英文的，可以直接发送。发送前先改好 [方括号] 里的字。",
       msg_noname: "在「我的班次」页面选择你的名字，消息里就会有你的名字。",
       jump_h: "发生了什么？",
       sit_maybe: "我不确定今天能不能来",
@@ -964,8 +960,6 @@ p{margin:0}
       sick_h: "生病或臨時請假",
       planned_h: "預先請假",
       co_lead: "每個班次都必須完整完成。如果沒有人幫你代班，同事就得多做。",
-      co_how: "下面每則訊息都是英文的，可以直接傳送。點按「複製訊息」，貼到 WhatsApp 或簡訊裡，傳送前先改好 [方括號] 裡的字。",
-      co_how_print: "下面每則訊息都是英文的，可以直接傳送。傳送前先改好 [方括號] 裡的字。",
       msg_noname: "在「我的班次」頁面選擇你的名字，訊息裡就會有你的名字。",
       jump_h: "發生了什麼事？",
       sit_maybe: "我不確定今天能不能來",
@@ -1100,8 +1094,6 @@ p{margin:0}
       sick_h: "ป่วยหรือลากะทันหัน",
       planned_h: "ลาล่วงหน้า",
       co_lead: "ทุกกะต้องทำให้ครบ ถ้าไม่มีใครแทนคุณ เพื่อนร่วมทีมต้องทำงานเพิ่ม",
-      co_how: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แตะ “คัดลอกข้อความ” วางใน WhatsApp หรือ SMS แล้วแก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
-      co_how_print: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
       msg_noname: "เลือกชื่อของคุณที่หน้า “กะของฉัน” แล้วข้อความจะมีชื่อของคุณ",
       jump_h: "เกิดอะไรขึ้น?",
       sit_maybe: "ไม่แน่ใจว่าวันนี้จะมาได้ไหม",
@@ -1236,8 +1228,6 @@ p{margin:0}
       sick_h: "Ốm hoặc nghỉ đột xuất",
       planned_h: "Nghỉ có kế hoạch",
       co_lead: "Mỗi ca đều phải được làm trọn vẹn. Nếu không ai làm thay bạn, đồng đội sẽ phải làm thêm.",
-      co_how: "Mỗi tin nhắn bên dưới đều bằng tiếng Anh và sẵn sàng để gửi. Chạm “Sao chép tin nhắn”, dán vào WhatsApp hoặc tin nhắn điện thoại, rồi sửa chữ trong [ngoặc vuông] trước khi gửi.",
-      co_how_print: "Mỗi tin nhắn bên dưới đều bằng tiếng Anh và sẵn sàng để gửi. Hãy sửa chữ trong [ngoặc vuông] trước khi gửi.",
       msg_noname: "Chọn tên của bạn ở trang “Ca của tôi”, tin nhắn sẽ có sẵn tên bạn.",
       jump_h: "Chuyện gì đang xảy ra?",
       sit_maybe: "Tôi không chắc hôm nay có đi làm được không",
@@ -1755,7 +1745,8 @@ p{margin:0}
   }
 
   /* -------------------------------------------------------- Call out */
-  /* The messages students send, always in English, with their name, their
+  /* The messages students send, always in English and in the first person
+     ([my role]), with their name, their
      role if they only ever do one, and the Student Kitchen Manager's name
      filled in. Anything still in [brackets] is theirs to change before
      sending. (Today's role isn't filled in: the message may be for
@@ -1763,14 +1754,14 @@ p{margin:0}
   var MSG = {
     sick: "Hello friend, I woke up sick and I am not sure I can come to my {role} shift today. Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\n{me}",
     thanks: "Thank you, but [name] has already agreed to cover my shift today. Have a good day!",
-    km_sick: "Hello {km}, I woke up sick and cannot come to my {role} shift today. I messaged [names], but [nobody replied / nobody can cover]. Please advise.\n{me}",
+    km_sick: "Hello {km}, I woke up sick and cannot come to my {role} shift today. I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\n{me}",
     maybe: "Hi friend, I have a {role} shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\n{me}",
-    km_maybe: "Hello {km}, I am not feeling well and may not be able to come to my {role} shift today. I messaged [names], but [nobody replied / nobody can cover]. Please advise.\n{me}",
-    km_late: "Hello {km}, I forgot my {role} shift today and only remembered after 12:40 pm. [your explanation] I am sorry. Please advise.\n{me}",
+    km_maybe: "Hello {km}, I am not feeling well and may not be able to come to my {role} shift today. I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\n{me}",
+    km_late: "Hello {km}, I forgot my {role} shift today and only remembered after 12:40 pm. [my explanation] I am sorry. Please advise.\n{me}",
     planned: "Hello friend, I cannot come to my {role} shift on [day and date]. Could you cover it for me? In return, I will work one of your shifts.\nThank you,\n{me}",
-    km_planned: "Hello {km}, I cannot come to my {role} shift on [day and date]. I messaged [names]. [names] did not reply, and [names] cannot cover. Please advise.\n{me}",
-    km_missed: "Hello {km}, I missed my {role} shift on [day]. [your explanation] I am sorry. Please advise.\n{me}",
-    sl_missed: "Hello [Shift Leader's name], I missed my {role} shift on [day]. [your explanation] I am sorry.\n{me}"
+    km_planned: "Hello {km}, I cannot come to my {role} shift on [day and date]. I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.\n{me}",
+    km_missed: "Hello {km}, I missed my {role} shift on [day]. [my explanation] I am sorry. Please advise.\n{me}",
+    sl_missed: "Hello [Shift Leader's name], I missed my {role} shift on [day]. [my explanation] I am sorry.\n{me}"
   };
   function kmName() {
     var km = CONFIG.contacts.filter(function (c) { return /kitchen manager/i.test(c.role); })[0];
@@ -1785,7 +1776,7 @@ p{margin:0}
     return roles.length === 1 ? roles[0] : "";
   }
   function message(key) {
-    var v = { me: me || "[your name]", role: myRole() || "[your role]", km: kmName() || "Student Kitchen Manager" };
+    var v = { me: me || "[my name]", role: myRole() || "[my role]", km: kmName() || "Student Kitchen Manager" };
     return MSG[key].replace(/\{(\w+)\}/g, function (m, k) { return v[k]; });
   }
   /* a message in its box, with what's left to fill in marked, and a copy button */
@@ -1821,8 +1812,7 @@ p{margin:0}
       '<nav class="jump" aria-label="' + t("jump_h") + '"><h4>' + t("jump_h") + "</h4>" + SITS.map(function (x) {
         return '<button type="button" class="jump-b ' + x[1] + '" data-jump="' + x[0] + '">' + t(x[0].replace("-", "_")) + "</button>";
       }).join("") + "</nav>" +
-      '<p class="co-how"><span class="screen-only">' + t("co_how") + "</span>" + '<span class="print-only">' + t("co_how_print") + "</span>" +
-        (me ? "" : " " + t("msg_noname")) + "</p>" +
+      (me ? "" : '<p class="co-how">' + t("msg_noname") + "</p>") +
       path("k5", "sick", t("sick_h"),
         sit("sit-maybe", t("sit_maybe"), t("sit_maybe_s"), [
           step(t("m1"), sub(t("m1s")), tpl("maybe")),

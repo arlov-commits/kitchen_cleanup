@@ -314,13 +314,18 @@ function serve(dir, port) {
   var msgs = await p.$$eval(".tpl", function (b) { return b.map(function (x) { return [x.querySelector(".tpl-t").getAttribute("lang"), x.querySelector(".copy-btn").getAttribute("data-copy")]; }); });
   check("call out: ten messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [10, true]);
   check("call out: a missed shift: message the Student Kitchen Manager and the Shift Leader, then wait", [msgs[8][1], msgs[9][1], await text(p, "#sit-missed .step:nth-child(3)")],
-    ["Hello Art, I missed my Pots & Pans shift on [day]. [your explanation] I am sorry. Please advise.\nBeth",
-     "Hello [Shift Leader's name], I missed my Pots & Pans shift on [day]. [your explanation] I am sorry.\nBeth",
+    ["Hello Art, I missed my Pots & Pans shift on [day]. [my explanation] I am sorry. Please advise.\nBeth",
+     "Hello [Shift Leader's name], I missed my Pots & Pans shift on [day]. [my explanation] I am sorry.\nBeth",
      "Then wait for instructions. You will be given a make-up shift. Do not come in for another shift on your own, without approval."]);
   check("call out: the first message, with Beth's name, and her role as she only does Pots & Pans", msgs[0][1],
     "Hi friend, I have a Pots & Pans shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nBeth");
   check("call out: the late message leaves room to explain", msgs[5][1],
-    "Hello Art, I forgot my Pots & Pans shift today and only remembered after 12:40 pm. [your explanation] I am sorry. Please advise.\nBeth");
+    "Hello Art, I forgot my Pots & Pans shift today and only remembered after 12:40 pm. [my explanation] I am sorry. Please advise.\nBeth");
+  check("call out: messages to the Student Kitchen Manager say who can't cover and who hasn't replied", msgs.filter(function (m) {
+    return m[1].indexOf("I messaged [names]. [names] cannot cover, and [names] have not replied. Please advise.") >= 0;
+  }).length, 3);
+  check("call out: no note above the messages once a name is chosen", await p.$$eval(".co-how", function (n) { return n.length; }), 0);
+  check("call out: every placeholder in the first person", msgs.every(function (m) { return !/\[your /.test(m[1]); }), true);
   check("call out: messages to the Student Kitchen Manager use the name from the settings", msgs.filter(function (m) { return /^Hello Art,/.test(m[1]); }).length, 5);
   check("call out: what's left to fill in is marked", await p.$$eval(".tpl:nth-of-type(1) .ph, .ph", function (m) { return m.length > 0 && m.every(function (x) { return /^\[.+\]$/.test(x.textContent); }); }), true);
   check("call out: contacts", await text(p, "#contacts"), "STUDENT KITCHEN MANAGER Art WORK STUDY MANAGER Nahelia");
@@ -341,14 +346,14 @@ function serve(dir, port) {
   check("copy: the button says so", await text(p, ".tpl >> nth=0 >> .copy-btn"), "Copied");
   var copied = await p.evaluate(function () { return navigator.clipboard.readText(); });
   check("copy: the message is on the clipboard; Adam does two jobs, so his role is left to fill in", copied,
-    "Hi friend, I have a [your role] shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nAdam");
+    "Hi friend, I have a [my role] shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nAdam");
   await p.waitForTimeout(2700);
   check("copy: the button goes back", await text(p, ".tpl >> nth=0 >> .copy-btn"), "Copy message");
   check("copy: even on a day he works one job, as the message may be for another day", (await p.$$eval(".copy-btn", function (b) { return b.map(function (x) { return x.getAttribute("data-copy"); }); })).every(function (m) { return m.indexOf("Pots & Pans") < 0; }), true);
   await p.evaluate(function () { var m = document.getElementById("me"); m.value = ""; m.dispatchEvent(new Event("change")); });
   check("copy: no name chosen: the name is left to fill in, and the page says so",
-    [(await p.$$eval(".copy-btn", function (b) { return b[0].getAttribute("data-copy"); })).slice(-12), /Choose your name on the My shifts page/.test(await text(p, ".co-how"))],
-    ["\n[your name]", true]);
+    [(await p.$$eval(".copy-btn", function (b) { return b[0].getAttribute("data-copy"); })).slice(-10), /Choose your name on the My shifts page/.test(await text(p, ".co-how"))],
+    ["\n[my name]", true]);
   await p.context().close();
 
   /* ------------------------------------------------------ languages */
@@ -413,7 +418,7 @@ function serve(dir, port) {
       hidden: vis(".bottomnav, .topbar, .copy-btn, #pdf-btn, #install-btn, [data-theme-btn], [data-lang-btn]"),
       stamp: document.getElementById("stamp").innerText.replace(/\s+/g, " ").trim(),
       link: document.querySelector("#stamp a").getAttribute("href"),
-      role: document.querySelector(".copy-btn").getAttribute("data-copy").indexOf("a [your role] shift today") >= 0
+      role: document.querySelector(".copy-btn").getAttribute("data-copy").indexOf("a [my role] shift today") >= 0
     };
   });
   check("PDF: light, all four tabs, no Today or Tomorrow, no dates, backups open, no buttons", [pr.theme, pr.views, pr.today, pr.dates, pr.open, pr.hidden],

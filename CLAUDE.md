@@ -90,9 +90,12 @@ and the tab shell from the second.
   - **Messages** (`MSG`) are always English. They fill in the student's
     name and the Student Kitchen Manager's name. The role is filled only
     for a student who only ever does one job (`myRole()`); otherwise it
-    stays `[your role]`, as the message may be for another day. Anything
-    else stays in `[brackets]`, marked, such as `[your explanation]` in
-    the forgot message.
+    stays `[my role]`, as the message may be for another day. Anything
+    else stays in `[brackets]`, marked, always first person (`[my name]`,
+    `[my explanation]`). Messages to the Student Kitchen Manager say who
+    cannot cover and who has not replied, separately, so they know who
+    might still be found. No note sits above the messages, except "choose
+    your name" when none is chosen.
   - Questions are gold diamonds (`.step.ask`).
 - **Languages.** English, 简体中文, 繁體中文, ไทย and Tiếng Việt, all in
   `STR` in `index.html` and shown through `t()`; fixed page text carries
