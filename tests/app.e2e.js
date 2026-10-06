@@ -268,7 +268,7 @@ function serve(dir, port) {
   await p.selectOption("#me", "Aryashree");
   check("availability: wrong-info line", await text(p, "#avail-body .note:last-child"), "Something here wrong or out of date? Send an email to the Student Kitchen Manager (Art).");
   check("availability: the lead names who it's for", await text(p, "#avail-lead"),
-    "Aryashree, you're a backup on these days. Someone on that shift may ask you to cover, in exchange for a shift of yours.");
+    "Aryashree, you're a backup on these days. Someone on that shift may ask you to cover, in exchange for a shift of yours. You don't have to say yes, but if someone asks, please reply with a yes or a no.");
   await p.click("#bottom-nav a[href='#availability']");
   await p.waitForFunction(function () { return !document.getElementById("view-availability").hidden; });
   check("availability tab: its own view, between Call out and Submit Timesheet",

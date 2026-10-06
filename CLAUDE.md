@@ -119,7 +119,8 @@ and the tab shell from the second.
   letter-spacing in Thai. Vietnamese has its own font subsets.
 - "My availability" is its own tab, between Call out and Submit
   Timesheet (the user moved it there from a sage band under the shift
-  cards). Its head lead names the chosen student. The body has one card
+  cards). Its head lead names the chosen student, and says they don't have
+  to say yes but should **reply with a yes or a no** if asked. The body has one card
   per day (`.avail-list li.panel`, topped in the day's hue like the shift
   cards), then a line to tell the Student Kitchen Manager (from the
   settings) if anything is wrong. Keep it short.
