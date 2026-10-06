@@ -76,7 +76,9 @@ and the tab shell from the second.
   - **Jump list:** "What's happening?" has one button per situation
     (`.jump-b`, `data-jump`). It scrolls `#scroll`; it isn't a link, as
     the hash picks the tab. In the PDF the buttons link to their pages.
-  - **Order:** "Not sure if I can make it today", "I'm too sick to get out
+  - **Order:** "I can't make it today" (the most common: like too sick,
+    with a `[my reason]` gap and a 10:00 am deadline), "Not sure if I can
+    make it today", "I'm too sick to get out
     of bed" and "I forgot my shift, and it has already started" (Sick or
     Unplanned Absence), then "I will miss a shift in the future" (Planned
     Absence), then "Oh no! I missed my shift" (Missed Shift, in rust):
@@ -84,7 +86,7 @@ and the tab shell from the second.
     for a make-up shift and **never** come in for another shift without
     approval. Situation titles are first person.
   - **Standalone:** each situation is written to be read alone (`sit()`).
-  - **Times:** 10:30 am (not sure), 10:00 am (too sick), 12:15 pm and
+  - **Times:** 10:30 am (not sure), 10:00 am (can't make it, too sick), 12:15 pm and
     12:40 pm (forgot), and 4 days ahead (planned). They are the user's
     and belong here; still never show shift hours elsewhere.
   - **Messages** (`MSG`) are always English. They fill in the student's
