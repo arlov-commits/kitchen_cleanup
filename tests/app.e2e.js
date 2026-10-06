@@ -317,12 +317,14 @@ function serve(dir, port) {
   check("call out: the deadlines and the questions, with a late yes wherever the Student Kitchen Manager was told", await p.$$eval(".step.ask .t", function (h) { return h.map(function (x) { return x.closest(".sit").id + " " + x.textContent; }); }),
     ["sit-today It's 10:00 am and no one has said yes?", "sit-today " + LATE, "sit-maybe It's 10:00 am, no one has said yes, and you still can't come?", "sit-maybe " + LATE,
      "sit-sick It's 10:00 am and no one has said yes?", "sit-sick " + LATE, "sit-forgot Is it already after 12:40 pm?",
-     "sit-plan Your absence is 4 days away, and you still have no backup?", "sit-plan " + LATE, "sit-plan Your absence is only 1 or 2 days away?"]);
+     "sit-plan Your absence is 4 days away, and you still have no backup?", "sit-plan " + LATE, "sit-plan Your absence is only 1 or 2 days away, and you haven't messaged anyone yet?"]);
   check("call out: no Covered step", await p.$$eval(".step.done", function (n) { return n.length; }), 0);
   check("call out: a future absence 1 or 2 days away follows I can't make it today", await text(p, "#sit-plan .step:nth-child(4) .act"), "Then follow the steps in “I can't make it today”, above.");
   check("call out: once you arrive, tell the Shift Leader", await text(p, "#sit-forgot .step:nth-child(3) .t"), "Once you arrive, tell the Shift Leader what happened.");
   var msgs = await p.$$eval(".tpl", function (b) { return b.map(function (x) { return [x.querySelector(".tpl-t").getAttribute("lang"), x.querySelector(".copy-btn").getAttribute("data-copy")]; }); });
   check("call out: seventeen messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [17, true]);
+  check("call out: a future absence: the message to the Student Kitchen Manager gives a reason", msgs[13][1],
+    "Hello Art, I cannot come to my Pots & Pans shift on [day and date]. [my reason] I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\nBeth");
   check("call out: a late yes: tell the Student Kitchen Manager who has agreed", [msgs[3][1], msgs[14][1]],
     ["Hello Art, an update: [name] has just agreed to cover my Pots & Pans shift today. Thank you.\nBeth",
      "Hello Art, an update: [name] has agreed to cover my Pots & Pans shift on [day and date]. Thank you.\nBeth"]);
