@@ -101,6 +101,10 @@ and the tab shell from the second.
     not reply.", so they know who is ruled out and who might still be
     found. No note sits above the messages, except "choose
     your name" when none is chosen.
+  - Wherever the Student Kitchen Manager is told no backup was found (can't
+    make it, not sure, too sick, a future absence), a last question covers
+    a late yes: message them again at once with who agreed (`km_yes`,
+    `km_yes_plan`), so they stop looking, and tell the other backups.
   - Questions are gold diamonds (`.step.ask`).
 - **Languages.** English, 简体中文, 繁體中文, ไทย and Tiếng Việt, all in
   `STR` in `index.html` and shown through `t()`; fixed page text carries

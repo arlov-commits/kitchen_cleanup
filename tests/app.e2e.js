@@ -313,31 +313,36 @@ function serve(dir, port) {
     var d = document.getElementById("sit-plan").getBoundingClientRect().top - document.getElementById("scroll").getBoundingClientRect().top;
     return d >= 0 && d <= 20;
   }), await p.evaluate(function () { return location.hash; }), await p.evaluate(function () { return document.activeElement.textContent; })], [true, "#callout", "I will miss a shift in the future"]);
-  check("call out: the deadlines and the questions", await p.$$eval(".step.ask .t", function (h) { return h.map(function (x) { return x.textContent; }); }),
-    ["It's 10:00 am and no one has said yes?", "It's 10:00 am, no one has said yes, and you still can't come?", "It's 10:00 am and no one has said yes?", "Is it already after 12:40 pm?",
-     "Your absence is 4 days away, and you still have no backup?", "Your absence is only 1 or 2 days away?"]);
+  var LATE = "Someone says yes after you messaged the Student Kitchen Manager?";
+  check("call out: the deadlines and the questions, with a late yes wherever the Student Kitchen Manager was told", await p.$$eval(".step.ask .t", function (h) { return h.map(function (x) { return x.closest(".sit").id + " " + x.textContent; }); }),
+    ["sit-today It's 10:00 am and no one has said yes?", "sit-today " + LATE, "sit-maybe It's 10:00 am, no one has said yes, and you still can't come?", "sit-maybe " + LATE,
+     "sit-sick It's 10:00 am and no one has said yes?", "sit-sick " + LATE, "sit-forgot Is it already after 12:40 pm?",
+     "sit-plan Your absence is 4 days away, and you still have no backup?", "sit-plan " + LATE, "sit-plan Your absence is only 1 or 2 days away?"]);
   check("call out: no Covered step", await p.$$eval(".step.done", function (n) { return n.length; }), 0);
-  check("call out: a future absence 1 or 2 days away follows I can't make it today", await text(p, "#sit-plan .step:nth-child(3) .act"), "Then follow the steps in “I can't make it today”, above.");
+  check("call out: a future absence 1 or 2 days away follows I can't make it today", await text(p, "#sit-plan .step:nth-child(4) .act"), "Then follow the steps in “I can't make it today”, above.");
   check("call out: once you arrive, tell the Shift Leader", await text(p, "#sit-forgot .step:nth-child(3) .t"), "Once you arrive, tell the Shift Leader what happened.");
   var msgs = await p.$$eval(".tpl", function (b) { return b.map(function (x) { return [x.querySelector(".tpl-t").getAttribute("lang"), x.querySelector(".copy-btn").getAttribute("data-copy")]; }); });
-  check("call out: thirteen messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [13, true]);
+  check("call out: seventeen messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [17, true]);
+  check("call out: a late yes: tell the Student Kitchen Manager who has agreed", [msgs[3][1], msgs[14][1]],
+    ["Hello Art, an update: [name] has just agreed to cover my Pots & Pans shift today. Thank you.\nBeth",
+     "Hello Art, an update: [name] has agreed to cover my Pots & Pans shift on [day and date]. Thank you.\nBeth"]);
   check("call out: I can't make it today, first: ask the backups, then the Student Kitchen Manager", [msgs[0][1], msgs[2][1]],
     ["Hello friend, I cannot come to my Pots & Pans shift today. [my reason] Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\nBeth",
      "Hello Art, I cannot come to my Pots & Pans shift today. [my reason] I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\nBeth"]);
-  check("call out: a missed shift: message the Student Kitchen Manager and the Shift Leader, then wait", [msgs[11][1], msgs[12][1], await text(p, "#sit-missed .step:nth-child(3)")],
+  check("call out: a missed shift: message the Student Kitchen Manager and the Shift Leader, then wait", [msgs[15][1], msgs[16][1], await text(p, "#sit-missed .step:nth-child(3)")],
     ["Hello Art, I missed my Pots & Pans shift on [day]. [my explanation] I am sorry. Please advise.\nBeth",
      "Hello [Shift Leader's name], I missed my Pots & Pans shift on [day]. [my explanation] I am sorry.\nBeth",
      "Then wait for instructions. You will be given a make-up shift. Do not come in for another shift on your own, without approval."]);
-  check("call out: the not-sure message, with Beth's name, and her role as she only does Pots & Pans", msgs[3][1],
+  check("call out: the not-sure message, with Beth's name, and her role as she only does Pots & Pans", msgs[4][1],
     "Hi friend, I have a Pots & Pans shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:00 am? I will let you know by 10:00 am.\nThank you,\nBeth");
-  check("call out: the late message leaves room to explain", msgs[8][1],
+  check("call out: the late message leaves room to explain", msgs[11][1],
     "Hello Art, I forgot my Pots & Pans shift today and only remembered after 12:40 pm. [my explanation] I am sorry. Please advise.\nBeth");
   check("call out: messages to the Student Kitchen Manager say which backups can't cover and which haven't replied", msgs.filter(function (m) {
     return m[1].indexOf("I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.") >= 0;
   }).length, 4);
   check("call out: no note above the messages once a name is chosen", await p.$$eval(".co-how", function (n) { return n.length; }), 0);
   check("call out: every placeholder in the first person", msgs.every(function (m) { return !/\[your /.test(m[1]); }), true);
-  check("call out: messages to the Student Kitchen Manager use the name from the settings", msgs.filter(function (m) { return /^Hello Art,/.test(m[1]); }).length, 6);
+  check("call out: messages to the Student Kitchen Manager use the name from the settings", msgs.filter(function (m) { return /^Hello Art,/.test(m[1]); }).length, 10);
   check("call out: what's left to fill in is marked", await p.$$eval(".tpl:nth-of-type(1) .ph, .ph", function (m) { return m.length > 0 && m.every(function (x) { return /^\[.+\]$/.test(x.textContent); }); }), true);
   check("call out: contacts", await text(p, "#contacts"), "STUDENT KITCHEN MANAGER Art WORK STUDY MANAGER Nahelia");
   await p.goto(BASE + "#nope"); await ready(p);

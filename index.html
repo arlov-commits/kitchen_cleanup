@@ -698,6 +698,8 @@ p{margin:0}
       m2s: "Either a backup works your shift, or you come in yourself. Tell your backup which one.",
       m3: "It's 10:00 am, no one has said yes, and you still can't come?",
       m3t: "Message the Student Kitchen Manager ({km}) right away.",
+      late_yes: "Someone says yes after you messaged the Student Kitchen Manager?",
+      late_yes_t: "Message the Student Kitchen Manager ({km}) again right away, so they can stop looking. Tell your other backups too.",
       sit_forgot: "I forgot my shift, and it has already started",
       f1: "Go to work right now, even if it is already 12:15 pm.",
       f2: "Go straight there. Don't stop at the DRBU building for gloves or an apron.",
@@ -836,6 +838,8 @@ p{margin:0}
       m2s: "要么请替班人帮你上这个班，要么你自己来。告诉你的替班人你选了哪一个。",
       m3: "已经上午10:00了，没有人答应，你还是来不了？",
       m3t: "马上给 Student Kitchen Manager（{km}）发消息。",
+      late_yes: "你已经给 Student Kitchen Manager 发了消息，之后才有人答应？",
+      late_yes_t: "马上再给 Student Kitchen Manager（{km}）发消息，让他们不用再找人。也告诉你的其他替班人选。",
       sit_forgot: "我忘了上班，班次已经开始了",
       f1: "现在马上去上班，即使已经中午12:15了。",
       f2: "直接过去。不要先去 DRBU 大楼拿手套或围裙。",
@@ -974,6 +978,8 @@ p{margin:0}
       m2s: "要麼請代班人幫你上這個班，要麼你自己來。告訴你的代班人你選了哪一個。",
       m3: "已經上午10:00了，沒有人答應，你還是來不了？",
       m3t: "馬上傳訊息給 Student Kitchen Manager（{km}）。",
+      late_yes: "你已經傳訊息給 Student Kitchen Manager，之後才有人答應？",
+      late_yes_t: "馬上再傳訊息給 Student Kitchen Manager（{km}），讓他們不用再找人。也告訴你的其他代班人選。",
       sit_forgot: "我忘了上班，班次已經開始了",
       f1: "現在馬上去上班，即使已經中午12:15了。",
       f2: "直接過去。不要先去 DRBU 大樓拿手套或圍裙。",
@@ -1112,6 +1118,8 @@ p{margin:0}
       m2s: "ให้ตัวสำรองทำกะแทน หรือคุณมาทำเอง แล้วบอกตัวสำรองว่าเลือกแบบไหน",
       m3: "10:00 น. แล้ว ยังไม่มีใครตอบตกลง และคุณยังมาไม่ได้?",
       m3t: "ส่งข้อความถึง Student Kitchen Manager ({km}) ทันที",
+      late_yes: "มีคนตอบตกลง หลังจากที่คุณส่งข้อความถึง Student Kitchen Manager แล้ว?",
+      late_yes_t: "ส่งข้อความถึง Student Kitchen Manager ({km}) อีกครั้งทันที เพื่อจะได้ไม่ต้องหาคนต่อ และบอกตัวสำรองคนอื่นด้วย",
       sit_forgot: "ฉันลืมกะ และกะเริ่มไปแล้ว",
       f1: "ไปทำงานเดี๋ยวนี้ แม้จะ 12:15 น. แล้วก็ตาม",
       f2: "ไปที่ทำงานโดยตรง ไม่ต้องแวะเอาถุงมือหรือผ้ากันเปื้อนที่อาคาร DRBU",
@@ -1250,6 +1258,8 @@ p{margin:0}
       m2s: "Hoặc người dự phòng làm ca của bạn, hoặc bạn tự đến làm. Báo cho người dự phòng biết bạn chọn cách nào.",
       m3: "Đã 10:00 sáng, chưa ai đồng ý, và bạn vẫn không đến được?",
       m3t: "Nhắn tin ngay cho Student Kitchen Manager ({km}).",
+      late_yes: "Có người đồng ý sau khi bạn đã nhắn cho Student Kitchen Manager?",
+      late_yes_t: "Nhắn lại ngay cho Student Kitchen Manager ({km}) để họ không phải tìm người nữa. Báo cho những người dự phòng khác nữa.",
       sit_forgot: "Tôi quên ca, và ca đã bắt đầu",
       f1: "Đi làm ngay bây giờ, kể cả khi đã 12:15 trưa.",
       f2: "Đi thẳng đến chỗ làm. Đừng ghé tòa nhà DRBU để lấy găng tay hay tạp dề.",
@@ -1786,6 +1796,8 @@ p{margin:0}
     km_late: "Hello {km}, I forgot my {role} shift today and only remembered after 12:40 pm. [my explanation] I am sorry. Please advise.\n{me}",
     planned: "Hello friend, I cannot come to my {role} shift on [day and date]. Could you cover it for me? In return, I will work one of your shifts.\nThank you,\n{me}",
     km_planned: "Hello {km}, I cannot come to my {role} shift on [day and date]. I messaged my backups. [names] said they cannot cover, and [names] did not reply. Please advise.\n{me}",
+    km_yes: "Hello {km}, an update: [name] has just agreed to cover my {role} shift today. Thank you.\n{me}",
+    km_yes_plan: "Hello {km}, an update: [name] has agreed to cover my {role} shift on [day and date]. Thank you.\n{me}",
     km_missed: "Hello {km}, I missed my {role} shift on [day]. [my explanation] I am sorry. Please advise.\n{me}",
     sl_missed: "Hello [Shift Leader's name], I missed my {role} shift on [day]. [my explanation] I am sorry.\n{me}"
   };
@@ -1844,16 +1856,19 @@ p{margin:0}
           step(t("s1"), sub(t("s1s")), tpl("today")),
           step(t("s2"), "", tpl("thanks")),
           step(t("s3"), act(t("s3t", km)), tpl("km_today"), "ask"),
-          step(t("s4"))]) +
+          step(t("s4")),
+          step(t("late_yes"), act(t("late_yes_t", km)), tpl("km_yes"), "ask")]) +
         sit("sit-maybe", t("sit_maybe"), t("sit_maybe_s"), [
           step(t("m1"), sub(t("m1s")), tpl("maybe")),
           step(t("m2"), sub(t("m2s"))),
-          step(t("m3"), act(t("m3t", km)), tpl("km_maybe"), "ask")]) +
+          step(t("m3"), act(t("m3t", km)), tpl("km_maybe"), "ask"),
+          step(t("late_yes"), act(t("late_yes_t", km)), tpl("km_yes"), "ask")]) +
         sit("sit-sick", t("sit_sick"), t("sit_sick_s"), [
           step(t("s1"), sub(t("s1s")), tpl("sick")),
           step(t("s2"), "", tpl("thanks")),
           step(t("s3"), act(t("s3t", km)), tpl("km_sick"), "ask"),
-          step(t("s4"))]) +
+          step(t("s4")),
+          step(t("late_yes"), act(t("late_yes_t", km)), tpl("km_yes"), "ask")]) +
         sit("sit-forgot", t("sit_forgot"), "", [
           step(t("f1")),
           step(t("f2")),
@@ -1863,6 +1878,7 @@ p{margin:0}
         sit("sit-plan", t("sit_plan"), "", [
           step(t("p1"), sub(t("p1s")), tpl("planned")),
           step(t("p2"), act(t("p2t", km)), tpl("km_planned"), "ask"),
+          step(t("late_yes"), act(t("late_yes_t", km)), tpl("km_yes_plan"), "ask"),
           step(t("p3"), act(t("p3t")), "", "ask")])) +
       path("k0", "missed", t("missed_h"),
         sit("sit-missed", t("sit_missed"), "", [
