@@ -110,12 +110,19 @@ phone numbers.
 ## Saving it as a PDF
 
 The footer's **Save as PDF** button is a last-resort offline copy for
-students. It opens the phone's print window, where they choose **Save as
-PDF** (on iPhone: Share, then Save to Files). The PDF has all four tabs,
-each from a new page, in colour. Every shift's backups are open, and the
-links still work. It has no Today or Tomorrow and no upcoming dates, so it
-stays true. A line at the top says when it was saved, for whom, and links
-back to the app. Printing from the browser's menu gives the same result.
+students. It asks first, then the phone makes the PDF and downloads it at
+once. Each page is a phone-sized picture of the app, in colour.
+- A cover gives the student's name, when it was saved, a link back to the
+  app, and the contents. Tapping a tab there jumps to it, and the same
+  tabs are bookmarks.
+- Each tab starts on a new page, and every shift's backups are open.
+- It has no Today or Tomorrow and no upcoming dates, so it stays true.
+- The links (the timesheet portal, the app) still work.
+- It's made in the app itself, with no outside service, so it also works
+  offline.
+
+If a phone can't make it, the dialog says so and offers the print window
+instead, where they choose Save as PDF.
 
 ## Installing it
 

@@ -379,12 +379,10 @@ function serve(dir, port) {
   check("language: any other phone starts in English", (await langState()).slice(0, 2), ["en", "EN"]);
   await p.context().close();
 
-  /* ---------------------------------------------------- Save as PDF */
+  /* ------------------------------- printing from the browser's menu */
   p = await page({ time: "2026-10-05T21:30:00", init: function () { localStorage.setItem("kitchen.me", "Adam"); } });   // Monday night: dark, Adam works today
   await p.goto(BASE); await ready(p);
   check("footer: every hour counts", await text(p, ".foot .hours"), "Every hour counts. Each shift must be done in full: an hour you miss is an hour a teammate works for you.");
-  await p.click("#pdf-btn");
-  check("Save as PDF: says what to choose", await text(p, "#pdf-help"), "In the window that opens, choose Save as PDF as the printer.");
   check("before: Today and Tomorrow on the glance and cards, and the date", [await p.$$eval(".when", function (w) { return w.length; }), await p.$$eval(".today", function (w) { return w.length; })], [4, 1]);
   await p.evaluate(function () { window.dispatchEvent(new Event("beforeprint")); });
   await p.emulateMedia({ media: "print" });
@@ -414,6 +412,42 @@ function serve(dir, port) {
   await p.evaluate(function () { window.dispatchEvent(new Event("afterprint")); });
   check("after: back as it was", [await p.evaluate(function () { return document.documentElement.dataset.theme; }), await p.$$eval(".when", function (w) { return w.length; }),
     await p.$$eval("details.backups[open]", function (d) { return d.length; })], ["dark", 4, 0]);
+  await p.context().close();
+
+  /* ---------------------------------------------------- Save as PDF */
+  p = await page({ time: "2026-10-05T21:30:00", init: function () { localStorage.setItem("kitchen.me", "Adam"); }, ctx: { acceptDownloads: true } });
+  await p.goto(BASE + "#timesheet"); await ready(p);
+  var printed = 0;
+  await p.exposeFunction("__printed", function () { printed++; });
+  await p.evaluate(function () { window.print = function () { window.__printed(); }; });
+  await p.click("#pdf-btn");
+  check("Save as PDF: asks first", [await p.evaluate(function () { return document.getElementById("pdf-dlg").open; }), await text(p, "#pdf-dlg h2"), await text(p, "#pdf-go"), await text(p, ".dlg-no")],
+    [true, "Save the app as a PDF?", "Download PDF", "Cancel"]);
+  await p.click(".dlg-no");
+  check("Save as PDF: Cancel closes it, and nothing is made", [await p.evaluate(function () { return document.getElementById("pdf-dlg").open; }), printed], [false, 0]);
+  await p.click("#pdf-btn");
+  var got = await Promise.all([p.waitForEvent("download", { timeout: 60000 }), p.click("#pdf-go")]);
+  var file = path.join(os.tmpdir(), "kitchen-" + PORT + ".pdf");
+  await got[0].saveAs(file);
+  var bin = fs.readFileSync(file).toString("latin1");
+  fs.unlinkSync(file);
+  var pageCount = (bin.match(/\/Type \/Page /g) || []).length;
+  check("Save as PDF: downloads straight away, named for the student and the day, and closes", [got[0].suggestedFilename(), bin.slice(0, 8), await p.evaluate(function () { return document.getElementById("pdf-dlg").open; }), printed],
+    ["Kitchen Cleanup - Adam - 2026-10-05.pdf", "%PDF-1.4", false, 0]);
+  check("Save as PDF: phone-sized pages, each a picture", [pageCount > 8, (bin.match(/\/MediaBox \[0 0 390 844\]/g) || []).length === pageCount,
+    (bin.match(/\/Width 780 \/Height 1688/g) || []).length === pageCount], [true, true, true]);
+  var dests = (bin.match(/\/Subtype \/Link [^\n]*\/Dest \[(\d+) 0 R/g) || []).length;
+  check("Save as PDF: the cover's contents go to the four tabs; bookmarks too", [dests, (bin.match(/\/Parent \d+ 0 R \/Prev|\/Parent \d+ 0 R \/Next|\/Parent \d+ 0 R \/Dest/g) || []).length, bin.indexOf("/Title (Call out)") > 0], [4, 4, true]);
+  check("Save as PDF: live links to the timesheet portal and the app", [bin.indexOf("/URI (https://www.drbu.edu/timesheet)") > 0, bin.indexOf("/URI (" + BASE + ")") > 0], [true, true]);
+  check("Save as PDF: the app is left as it was", [await p.$$eval(".when", function (w) { return w.length; }), await p.$$eval("iframe", function (f) { return f.length; }), await p.evaluate(function () { return document.documentElement.dataset.theme; })], [4, 0, "dark"]);
+  /* if the phone can't draw the pages, the dialog offers the print window */
+  await p.evaluate(function () { HTMLCanvasElement.prototype.toDataURL = function () { throw new Error("tainted"); }; });
+  await p.click("#pdf-btn"); await p.click("#pdf-go");
+  await p.waitForFunction(function () { return !document.getElementById("pdf-msg").hidden; }, null, { timeout: 30000 });
+  check("Save as PDF: if it fails, says so and offers the print window", [await text(p, "#pdf-msg"), await text(p, "#pdf-go")],
+    ["This phone couldn't make the PDF. You can still save one from the print window: choose Save as PDF there.", "Open the print window"]);
+  await p.click("#pdf-go");
+  check("Save as PDF: which then opens", [printed, await p.evaluate(function () { return document.getElementById("pdf-dlg").open; })], [1, false]);
   await p.context().close();
 
   /* -------------------------------------------------- Sunday badge */

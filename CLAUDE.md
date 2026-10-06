@@ -134,15 +134,24 @@ and the tab shell from the second.
 - The footer opens with "Every hour counts" (`.hours`), the line the
   user asked for: each shift must be done in full.
 - The footer's **Save as PDF** button is the students' last-resort offline
-  copy. It opens the phone's print window (`window.print()`; no PDF
-  library, no dependencies). `beforeprint`/`afterprint` (`forPrint()`) lay
-  out all four tabs, each from a new page, in colour and light mode, with
-  the backups open. They leave out Today/Tomorrow, the glance's dates and
-  the "Today is" line, and name no role "today" in the messages, so the
-  copy stays true. A stamp on top gives when it was saved, for whom, and a
-  live link to the app. Links stay links. Buttons and the tab bars aren't
-  printed. Print-only and screen-only bits use `.print-only` and
-  `.screen-only`.
+  copy. It asks first in a `<dialog>` (`#pdf-dlg`; `confirm()` where there
+  is none), then makes the PDF on the phone and downloads it, with no
+  print window and no library (`buildPDF()`):
+  - `pdfTabs()` copies the four tabs as they print (backups open, no
+    Today/Tomorrow or dates, no role named "today"), plus the footer.
+  - Each is laid out at 390px in a hidden iframe (`.snap`, the app's CSS
+    without its `@media` blocks, fonts inlined).
+  - Each page is drawn from an SVG `foreignObject` onto a canvas as a JPEG
+    (390×844 pt, 2×). Each tab starts a page, and pages are cut at gaps
+    between blocks (`PDF_BREAKS`, `pdfCuts()`).
+  - A cover lists the tabs with page numbers; tapping a row jumps there.
+  - `makePDF()` writes the file: link annotations (web addresses and
+    pages) and bookmarks.
+  - If drawing fails (a canvas the phone won't read back), the dialog says
+    so and offers the print window, which uses the print styles
+    (`forPrint()`). The print styles also serve the browser's own Print.
+  - Never give the PDF cover a class an app element already uses (it once
+    took `.cover`, the backup lists').
 - The footer's Install as app button uses `beforeinstallprompt` where the
   browser offers it, and otherwise shows short instructions (iPhone:
   Share, then Add to Home Screen). It is hidden when running installed.

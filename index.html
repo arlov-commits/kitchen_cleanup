@@ -115,7 +115,7 @@ window.kitchenTheme();
 :root[lang="zh-Hant"]{--display:'Playfair Display',Georgia,"Songti TC","Noto Serif CJK TC",serif;
   --body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif}
 :root[lang^="zh"] em,:root[lang="th"] em{font-style:normal}
-:root[lang="th"] body *{letter-spacing:0}   /* spaced-out Thai falls apart */
+:root[lang="th"] body *,:root[lang="th"] .snap *{letter-spacing:0}   /* spaced-out Thai falls apart */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--white)}
 body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
@@ -416,6 +416,42 @@ p{margin:0}
 .foot .hours{color:var(--on-dark);font-size:14.5px;max-width:52ch;margin:2px 0 6px;padding-left:12px;border-left:3px solid var(--rust)}
 .foot .hours b{color:#fff}
 
+/* the Save as PDF dialog: a plain card over a dimmed page */
+.dlg{width:min(420px,calc(100vw - 32px));max-width:none;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--white);color:var(--ink)}
+.dlg::backdrop{background:rgba(20,24,31,.55)}
+.dlg form{margin:0;padding:20px 20px 18px;display:flex;flex-direction:column;gap:10px}
+.dlg h2{font-size:22px}
+.dlg p{font-size:15px;color:var(--ink-2)}
+.dlg .dlg-msg{color:var(--rust-deep)}
+.dlg-btns{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:6px}
+.dlg-btns button{min-height:44px;padding:10px 16px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.dlg-no{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.dlg-yes{background:var(--rust-btn);border:1.5px solid var(--rust-btn);color:#fff}
+.dlg-yes:disabled{cursor:progress}
+
+/* The PDF's pages are drawn from a copy of each tab laid out at phone
+   width inside .snap (never seen on screen): as printed, with the
+   backups open, no buttons, and in light mode. Its cover lists the tabs. */
+.snap{width:390px;margin:0;background:var(--cream);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.snap .print-only{display:block}
+.snap .head-btns,.snap .copy-btn,.snap .foot-btns,.snap .screen-only,.snap .me-pill::after,.snap .backups>summary::after{display:none !important}
+.pdf-cover{min-height:844px;padding:64px 26px 34px;background:var(--white);display:flex;flex-direction:column}
+.cv-mark{font-family:var(--cjk);font-size:60px;line-height:1;color:var(--rust-deep)}
+.cv-title{font-size:40px;margin-top:14px}
+.cv-for{font-size:19px;font-weight:600;margin-top:20px}
+.cv-when{font-size:15px;color:var(--ink-2)}
+.cv-note{font-size:14px;color:var(--ink-3);margin-top:14px}
+.cv-note a{word-break:break-all}
+.cv-h{margin:34px 0 8px}
+.toc{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.toc li{display:flex;align-items:center;gap:12px;padding:15px 4px;border-bottom:1px solid var(--line);font-size:18px;font-weight:600;color:var(--ink)}
+.toc .nav-icon{background-color:var(--rust)}
+.toc .tp{margin-left:auto;font-size:14px;font-weight:500;color:var(--ink-3)}
+.cv-tap{font-size:13.5px;color:var(--ink-3);margin-top:10px}
+.cv-hours{margin-top:auto;padding-left:12px;border-left:3px solid var(--rust);font-size:14.5px;color:var(--ink-2)}
+.cv-hours b{color:var(--ink)}
+
 /* --------------------------------------------- Save as PDF (print) */
 /* The whole app, tab after tab, each from a new page: in colour, in light
    mode, with every link live. No Today or Tomorrow and no dates to go
@@ -543,7 +579,6 @@ p{margin:0}
             </div>
             <div class="install pdf" id="pdf">
               <button type="button" class="install-btn pdf-btn" id="pdf-btn" data-t="save_pdf"></button>
-              <p class="install-help" id="pdf-help" hidden></p>
             </div>
           </div>
         </div>
@@ -552,6 +587,19 @@ p{margin:0}
   </div>
   <nav class="bottomnav" id="bottom-nav" aria-label="Views"></nav>
 </div>
+
+<!-- Save as PDF: asks first, then makes and downloads the PDF -->
+<dialog class="dlg" id="pdf-dlg">
+  <form method="dialog">
+    <h2 data-t="pdf_q"></h2>
+    <p data-t="pdf_what"></p>
+    <p class="dlg-msg" id="pdf-msg" hidden></p>
+    <div class="dlg-btns">
+      <button value="cancel" class="dlg-no" data-t="cancel"></button>
+      <button type="button" class="dlg-yes" id="pdf-go"></button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 (function () {
@@ -692,12 +740,20 @@ p{margin:0}
       install_other: "Open your browser's menu and choose Install app or Add to Home screen.",
       every_hour: "<b>Every hour counts.</b> Each shift must be done in full: an hour you miss is an hour a teammate works for you.",
       save_pdf: "Save as PDF",
-      pdf_ios: "In the window that opens, tap the Share button, then Save to Files.",
-      pdf_other: "In the window that opens, choose Save as PDF as the printer.",
       pdf_stamp: "Saved {when}",
       pdf_for: "For {name}",
       pdf_note: "This copy doesn't change. For the latest shifts and backups, open the app: {link}",
-      co_how_print: "The messages below are in English, ready to send. Change any words in [brackets] first."
+      co_how_print: "The messages below are in English, ready to send. Change any words in [brackets] first.",
+      pdf_q: "Save the app as a PDF?",
+      pdf_what: "This downloads the whole app to your phone as one PDF: your shifts, Call out, My availability and the timesheet, as they are now. Keep it for when you're offline. It won't update itself.",
+      cancel: "Cancel",
+      pdf_go: "Download PDF",
+      pdf_making: "Making the PDF…",
+      pdf_failed: "This phone couldn't make the PDF. You can still save one from the print window: choose Save as PDF there.",
+      pdf_print: "Open the print window",
+      pdf_contents: "Contents",
+      pdf_page: "page {n}",
+      pdf_tap: "Tap a section to go to it."
     },
 
     "zh-Hans": {
@@ -808,12 +864,20 @@ p{margin:0}
       install_other: "打开浏览器的菜单，选择“安装应用”或“添加到主屏幕”。",
       every_hour: "<b>每一小时都很重要。</b>每个班次都必须完整完成：你缺的每一小时，都要由同事替你做。",
       save_pdf: "保存为 PDF",
-      pdf_ios: "在打开的窗口中，点按“分享”按钮，然后选择“存储到文件”。",
-      pdf_other: "在打开的窗口中，把打印机选为“另存为 PDF”。",
       pdf_stamp: "保存于{when}",
       pdf_for: "姓名：{name}",
       pdf_note: "这份文件不会更新。要看最新的班次和替班人选，请打开本应用：{link}",
-      co_how_print: "下面的消息是英文的，可以直接发送。发送前，先修改 [方括号] 里的字。"
+      co_how_print: "下面的消息是英文的，可以直接发送。发送前，先修改 [方括号] 里的字。",
+      pdf_q: "把本应用保存为 PDF？",
+      pdf_what: "这会把整个应用下载到你的手机，保存成一个 PDF：你的班次、请假、我的替班和工时表，都是现在的内容。没有网络时可以用它。它不会自动更新。",
+      cancel: "取消",
+      pdf_go: "下载 PDF",
+      pdf_making: "正在生成 PDF…",
+      pdf_failed: "这部手机无法生成 PDF。你仍可以在打印窗口中保存：在那里选择“另存为 PDF”。",
+      pdf_print: "打开打印窗口",
+      pdf_contents: "目录",
+      pdf_page: "第{n}页",
+      pdf_tap: "点按章节即可跳转。"
     },
 
     "zh-Hant": {
@@ -924,12 +988,20 @@ p{margin:0}
       install_other: "開啟瀏覽器的選單，選擇「安裝應用程式」或「加到主畫面」。",
       every_hour: "<b>每一小時都很重要。</b>每個班次都必須完整完成：你缺的每一小時，都要由同事幫你做。",
       save_pdf: "儲存為 PDF",
-      pdf_ios: "在開啟的視窗中，點按「分享」按鈕，然後選擇「儲存到檔案」。",
-      pdf_other: "在開啟的視窗中，將印表機選為「另存為 PDF」。",
       pdf_stamp: "儲存於{when}",
       pdf_for: "姓名：{name}",
       pdf_note: "這份文件不會更新。要看最新的班次和代班人選，請開啟本應用程式：{link}",
-      co_how_print: "下面的訊息是英文的，可以直接傳送。傳送前，先修改 [方括號] 裡的字。"
+      co_how_print: "下面的訊息是英文的，可以直接傳送。傳送前，先修改 [方括號] 裡的字。",
+      pdf_q: "把本應用程式儲存為 PDF？",
+      pdf_what: "這會把整個應用程式下載到你的手機，儲存成一個 PDF：你的班次、請假、我的代班和工時表，都是現在的內容。沒有網路時可以用它。它不會自動更新。",
+      cancel: "取消",
+      pdf_go: "下載 PDF",
+      pdf_making: "正在產生 PDF…",
+      pdf_failed: "這支手機無法產生 PDF。你仍可以在列印視窗中儲存：在那裡選擇「另存為 PDF」。",
+      pdf_print: "開啟列印視窗",
+      pdf_contents: "目錄",
+      pdf_page: "第{n}頁",
+      pdf_tap: "點按章節即可跳轉。"
     },
 
     th: {
@@ -1040,12 +1112,20 @@ p{margin:0}
       install_other: "เปิดเมนูของเบราว์เซอร์ แล้วเลือก “ติดตั้งแอป” หรือ “เพิ่มไปยังหน้าจอหลัก”",
       every_hour: "<b>ทุกชั่วโมงสำคัญ</b> ทุกกะต้องทำให้ครบ ชั่วโมงที่คุณขาด คือชั่วโมงที่เพื่อนร่วมทีมต้องทำแทนคุณ",
       save_pdf: "บันทึกเป็น PDF",
-      pdf_ios: "ในหน้าต่างที่เปิดขึ้น แตะปุ่มแชร์ แล้วเลือก “บันทึกไปยังไฟล์”",
-      pdf_other: "ในหน้าต่างที่เปิดขึ้น เลือกเครื่องพิมพ์เป็น “บันทึกเป็น PDF”",
       pdf_stamp: "บันทึกเมื่อ {when}",
       pdf_for: "สำหรับ {name}",
       pdf_note: "สำเนานี้จะไม่อัปเดต ดูกะและตัวสำรองล่าสุดได้ในแอป: {link}",
-      co_how_print: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง"
+      co_how_print: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
+      pdf_q: "บันทึกแอปเป็น PDF?",
+      pdf_what: "จะดาวน์โหลดแอปทั้งหมดลงโทรศัพท์ของคุณเป็น PDF ไฟล์เดียว: กะของคุณ การแจ้งลา การรับแทนกะ และใบลงเวลา ตามข้อมูลตอนนี้ เก็บไว้ใช้ตอนไม่มีอินเทอร์เน็ต ไฟล์นี้จะไม่อัปเดตเอง",
+      cancel: "ยกเลิก",
+      pdf_go: "ดาวน์โหลด PDF",
+      pdf_making: "กำลังสร้าง PDF…",
+      pdf_failed: "โทรศัพท์เครื่องนี้สร้าง PDF ไม่ได้ แต่ยังบันทึกจากหน้าต่างพิมพ์ได้: เลือก “บันทึกเป็น PDF” ที่นั่น",
+      pdf_print: "เปิดหน้าต่างพิมพ์",
+      pdf_contents: "สารบัญ",
+      pdf_page: "หน้า {n}",
+      pdf_tap: "แตะหัวข้อเพื่อไปยังหน้านั้น"
     },
 
     vi: {
@@ -1156,12 +1236,20 @@ p{margin:0}
       install_other: "Mở menu của trình duyệt và chọn “Cài đặt ứng dụng” hoặc “Thêm vào màn hình chính”.",
       every_hour: "<b>Mỗi giờ đều quan trọng.</b> Mỗi ca phải được làm trọn vẹn: mỗi giờ bạn vắng là một giờ đồng đội phải làm thay bạn.",
       save_pdf: "Lưu thành PDF",
-      pdf_ios: "Trong cửa sổ mở ra, chạm nút Chia sẻ, rồi chọn “Lưu vào Tệp”.",
-      pdf_other: "Trong cửa sổ mở ra, chọn máy in là “Lưu dưới dạng PDF”.",
       pdf_stamp: "Lưu lúc {when}",
       pdf_for: "Dành cho {name}",
       pdf_note: "Bản này không tự cập nhật. Để xem ca và người dự phòng mới nhất, hãy mở ứng dụng: {link}",
-      co_how_print: "Các tin nhắn bên dưới bằng tiếng Anh, sẵn sàng để gửi. Hãy sửa chữ trong [ngoặc vuông] trước khi gửi."
+      co_how_print: "Các tin nhắn bên dưới bằng tiếng Anh, sẵn sàng để gửi. Hãy sửa chữ trong [ngoặc vuông] trước khi gửi.",
+      pdf_q: "Lưu ứng dụng thành PDF?",
+      pdf_what: "Thao tác này tải toàn bộ ứng dụng về điện thoại của bạn thành một tệp PDF: các ca của bạn, Báo nghỉ, Thay ca và bảng giờ, theo nội dung hiện tại. Hãy giữ để dùng khi không có mạng. Tệp này không tự cập nhật.",
+      cancel: "Hủy",
+      pdf_go: "Tải PDF",
+      pdf_making: "Đang tạo PDF…",
+      pdf_failed: "Điện thoại này không tạo được PDF. Bạn vẫn có thể lưu từ cửa sổ in: hãy chọn “Lưu dưới dạng PDF” ở đó.",
+      pdf_print: "Mở cửa sổ in",
+      pdf_contents: "Mục lục",
+      pdf_page: "trang {n}",
+      pdf_tap: "Chạm vào một mục để chuyển đến đó."
     }
   };
   /* END STRINGS */
@@ -1748,10 +1836,8 @@ p{margin:0}
     for (var i = 0; i < els.length; i++) els[i].innerHTML = t(els[i].getAttribute("data-t"));
     $("top-nav").setAttribute("aria-label", t("views"));
     $("bottom-nav").setAttribute("aria-label", t("views"));
-    ["install-help", "pdf-help"].forEach(function (id) {
-      var help = $(id);
-      if (!help.hidden) help.textContent = t(help.getAttribute("data-which"));
-    });
+    var help = $("install-help");
+    if (!help.hidden) help.textContent = t(help.getAttribute("data-which"));
   }
   function renderAll() { renderPicker(); renderShifts(); renderAvailability(); renderCallout(); renderContacts(); renderPortal(); renderStatus(); }
 
@@ -1872,12 +1958,11 @@ p{margin:0}
     help.hidden = false;
   });
 
-  /* ---------------------------------------------------- Save as PDF */
-  /* The phone's own print window saves the PDF. Before it's drawn, every
-     tab is laid out for paper (see the print styles), the backups are
-     opened, Today and Tomorrow and the dates are left out, and the stamp
-     says when it was saved; afterwards the app goes back as it was. This
-     also runs when someone prints from the browser's menu. */
+  /* ---------------------------------------------------- printing */
+  /* Printing from the browser's menu (and Save as PDF's fallback) lays
+     every tab out for paper (see the print styles): the backups opened,
+     Today and Tomorrow and the dates left out, and a stamp saying when it
+     was saved. Afterwards the app goes back as it was. */
   function savedWhen(d) {
     var tag = { en: "en-US", "zh-Hans": "zh-CN", "zh-Hant": "zh-TW", th: "th-TH", vi: "vi-VN" }[lang];
     try { return d.toLocaleString(tag, { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }); }
@@ -1896,14 +1981,312 @@ p{margin:0}
   }
   window.addEventListener("beforeprint", function () { forPrint(true); });
   window.addEventListener("afterprint", function () { forPrint(false); });
+
+  /* ---------------------------------------------------- Save as PDF */
+  /* The footer's Save as PDF asks first, then makes the PDF on the phone
+     and downloads it, with no library: each tab is laid out at phone
+     width in a hidden frame, drawn as pictures (an SVG of the page, onto
+     a canvas) and cut into phone-sized pages, each tab from a new page,
+     at gaps between blocks. A cover lists the tabs; tapping one goes to
+     it. Links stay links. If the phone can't draw the pictures, the
+     dialog offers the print window instead. */
+  var PDF_W = 390, PDF_H = 844, PDF_S = 2, PDF_TOP = 18;
+  var PDF_BREAKS = ".head, .body .in > *, .shift-h, .part, .crew li, .backups summary, .cover-lead, .cover li, .last-h, .last-n, .path-h, .sit, .sit h3, " +
+    ".step, .tpl, .avail-list > li, .ax, .ag, .panel, .motto, .contacts li, .foot, .gl li, .co-how, .portal, .portal-url";
+
+  /* CSS without its @media blocks: the copy is always phone-sized and on
+     screen, whatever the phone it's made on */
+  function stripMedia(css) {
+    var out = "", i = 0, at, j, depth;
+    while ((at = css.indexOf("@media", i)) >= 0) {
+      out += css.slice(i, at);
+      /* 123 and 125 are the braces (written so, as the tests count braces) */
+      for (j = at, depth = 0; j < css.length; j++) {
+        if (css.charCodeAt(j) === 123) depth++;
+        else if (css.charCodeAt(j) === 125 && --depth === 0) break;
+      }
+      i = j + 1;
+    }
+    return out + css.slice(i);
+  }
+  function base64(bytes) {
+    var s = "", i;
+    for (i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  function unbase64(b64) {
+    var s = atob(b64), out = new Uint8Array(s.length), i;
+    for (i = 0; i < s.length; i++) out[i] = s.charCodeAt(i);
+    return out;
+  }
+  /* the app's CSS with its fonts inside, as a picture can't fetch them */
+  var snapCSS = null;
+  function pdfCSS() {
+    if (snapCSS) return snapCSS;
+    var css = stripMedia(document.querySelector("style").textContent), files = [];
+    css.replace(/url\((fonts\/[^)]+\.woff2)\)/g, function (m, f) { if (files.indexOf(f) < 0) files.push(f); return m; });
+    snapCSS = Promise.all(files.map(function (f) {
+      return fetch(f).then(function (r) { if (!r.ok) throw new Error(f); return r.arrayBuffer(); })
+        .then(function (b) { return [f, base64(new Uint8Array(b))]; });
+    })).then(function (list) {
+      list.forEach(function (x) { css = css.split("url(" + x[0] + ")").join("url(data:font/woff2;base64," + x[1] + ")"); });
+      return css;
+    });
+    snapCSS.catch(function () { snapCSS = null; });
+    return snapCSS;
+  }
+
+  /* the four tabs as they print, plus the footer after the last */
+  function pdfTabs() {
+    printing = true; renderShifts(); renderCallout();
+    var out = TABS.map(function (id) {
+      var v = $("view-" + id).cloneNode(true);
+      v.removeAttribute("hidden");
+      return v.outerHTML;
+    });
+    out[out.length - 1] += document.querySelector(".foot").outerHTML;
+    printing = false; renderShifts(); renderCallout();
+    return out;
+  }
+  function coverHTML(starts, when) {
+    var link = location.href.split("#")[0];
+    return '<section class="pdf-cover"><span class="cv-mark" lang="zh">淨</span><h1 class="cv-title">Kitchen <em>Cleanup</em></h1>' +
+      (me ? '<p class="cv-for">' + t("pdf_for", { name: esc(me) }) + "</p>" : "") +
+      '<p class="cv-when">' + t("pdf_stamp", { when: esc(savedWhen(when)) }) + "</p>" +
+      '<p class="cv-note">' + t("pdf_note", { link: '<a href="' + esc(link) + '">' + esc(link) + "</a>" }) + "</p>" +
+      '<h4 class="cv-h">' + t("pdf_contents") + '</h4><ol class="toc">' + TABS.map(function (id, i) {
+        return '<li data-goto="' + i + '"><span class="nav-icon" aria-hidden="true" style="--icon:var(--nv-' + id + ')"></span><span>' + t("tab_" + id) +
+          '</span><span class="tp">' + t("pdf_page", { n: starts[i] + 1 }) + "</span></li>";
+      }).join("") + '</ol><p class="cv-tap">' + t("pdf_tap") + '</p><p class="cv-hours">' + t("every_hour") + "</p></section>";
+  }
+
+  /* a hidden frame, phone-wide, to lay the copies out in */
+  function pdfFrame(css) {
+    var f = document.createElement("iframe");
+    f.setAttribute("aria-hidden", "true");
+    f.tabIndex = -1;
+    f.style.cssText = "position:absolute;left:-10000px;top:0;width:" + PDF_W + "px;height:" + PDF_H + "px;border:0;visibility:hidden";
+    document.body.appendChild(f);
+    var d = f.contentDocument;
+    d.open();
+    d.write('<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8"><style>' + css + '</style></head><body style="margin:0"><div class="snap"></div></body></html>');
+    d.close();
+    return f;
+  }
+  /* lay out one part; note its height, where it may be cut, and its links */
+  function pdfLayout(f, html) {
+    var d = f.contentDocument, root = d.querySelector(".snap");
+    root.innerHTML = html;
+    void root.offsetHeight;
+    return (d.fonts && d.fonts.ready ? d.fonts.ready : Promise.resolve()).then(function () {
+      return new Promise(function (r) { setTimeout(r, 40); });
+    }).then(function () {
+      var top = root.getBoundingClientRect().top;
+      function box(e) { var b = e.getBoundingClientRect(); return { x: b.left, y: b.top - top, w: b.width, h: b.height }; }
+      return {
+        h: Math.ceil(root.getBoundingClientRect().height),
+        breaks: [].map.call(root.querySelectorAll(PDF_BREAKS), function (e) { return Math.floor(box(e).y); }),
+        links: [].map.call(root.querySelectorAll("a[href^='http'], [data-goto]"), function (e) {
+          var b = box(e);
+          b.uri = e.getAttribute("href");
+          b.go = e.getAttribute("data-goto");
+          return b;
+        }),
+        bg: d.defaultView.getComputedStyle(root).backgroundColor,
+        xhtml: new XMLSerializer().serializeToString(root)
+      };
+    });
+  }
+  /* cut a part of height h into pages: [from, to, top margin], each cut
+     at the last gap between blocks that fits */
+  function pdfCuts(h, breaks) {
+    var out = [], from = 0, top, room, to;
+    while (h - from > 1) {
+      top = out.length ? PDF_TOP : 0;
+      room = PDF_H - top;
+      if (h - from <= room) { out.push([from, h, top]); break; }
+      to = 0;
+      breaks.forEach(function (b) { if (b > from + room * 0.35 && b <= from + room) to = Math.max(to, b); });
+      if (!to) to = from + room;
+      out.push([from, to, top]);
+      from = to;
+    }
+    return out;
+  }
+  function xmlEsc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  /* draw one page of a part: the SVG of the whole part, framed on the
+     page's slice, onto a canvas, as a JPEG */
+  function pdfDraw(part, cut, css) {
+    var len = cut[1] - cut[0];
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" lang="' + lang + '" width="' + PDF_W * PDF_S + '" height="' + len * PDF_S +
+      '" viewBox="0 ' + cut[0] + " " + PDF_W + " " + len + '"><foreignObject x="0" y="0" width="' + PDF_W + '" height="' + part.h + '">' +
+      '<div xmlns="http://www.w3.org/1999/xhtml"><style>' + xmlEsc(css) + "</style>" + part.xhtml + "</div></foreignObject></svg>";
+    return new Promise(function (done, fail) {
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement("canvas"), x = c.getContext("2d");
+        c.width = PDF_W * PDF_S; c.height = PDF_H * PDF_S;
+        x.fillStyle = part.bg; x.fillRect(0, 0, c.width, c.height);
+        setTimeout(function () {
+          try {
+            x.drawImage(img, 0, cut[2] * PDF_S, PDF_W * PDF_S, len * PDF_S);
+            done(unbase64(c.toDataURL("image/jpeg", 0.88).split(",")[1]));
+          } catch (e) { fail(e); }
+        }, 30);
+      };
+      img.onerror = function () { fail(new Error("draw")); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    });
+  }
+
+  /* a PDF, written byte by byte: each page one JPEG, with its links
+     (to a web address, or to another page) and the bookmarks */
+  function pdfText(s) {
+    if (/^[\x20-\x7e]*$/.test(s)) return "(" + s.replace(/[\\()]/g, "\\$&") + ")";
+    var hex = "FEFF";
+    for (var i = 0; i < s.length; i++) hex += ("000" + s.charCodeAt(i).toString(16).toUpperCase()).slice(-4);
+    return "<" + hex + ">";
+  }
+  function makePDF(pages, outline, info) {
+    var parts = [], size = 0, offsets = [], n = 0, ids = {}, i;
+    function add(x) {
+      if (typeof x === "string") { var b = new Uint8Array(x.length); for (var k = 0; k < x.length; k++) b[k] = x.charCodeAt(k) & 255; x = b; }
+      parts.push(x); size += x.length;
+    }
+    function id(name) { return ids[name] || (ids[name] = ++n); }
+    function obj(name, body, stream) {
+      offsets[id(name)] = size;
+      add(id(name) + " 0 obj\n" + body + (stream ? "\nstream\n" : "\nendobj\n"));
+      if (stream) { add(stream); add("\nendstream\nendobj\n"); }
+    }
+    id("catalog"); id("pages"); id("info");
+    if (outline.length) id("outlines");
+    pages.forEach(function (p, k) { id("page" + k); });
+    add("%PDF-1.4\n%\xe2\xe3\xcf\xd3\n");
+    obj("catalog", "<< /Type /Catalog /Pages " + id("pages") + " 0 R" + (outline.length ? " /Outlines " + id("outlines") + " 0 R" : "") + " >>");
+    obj("pages", "<< /Type /Pages /Count " + pages.length + " /Kids [" + pages.map(function (p, k) { return id("page" + k) + " 0 R"; }).join(" ") + "] >>");
+    obj("info", "<< /Title " + pdfText(info.title) + " /Producer (Kitchen Cleanup) /CreationDate (D:" + info.date + ") >>");
+    function dest(k) { return "[" + id("page" + k) + " 0 R /XYZ 0 " + pages[k].h + " 0]"; }
+    pages.forEach(function (p, k) {
+      var annots = p.links.map(function (l, j) {
+        var name = "link" + k + "-" + j;
+        obj(name, "<< /Type /Annot /Subtype /Link /Border [0 0 0] /Rect [" + [l.x, p.h - l.y - l.h, l.x + l.w, p.h - l.y].map(function (v) { return v.toFixed(2); }).join(" ") + "] " +
+          (l.uri ? "/A << /S /URI /URI " + pdfText(l.uri) + " >>" : "/Dest " + dest(l.page)) + " >>");
+        return id(name) + " 0 R";
+      });
+      obj("page" + k, "<< /Type /Page /Parent " + id("pages") + " 0 R /MediaBox [0 0 " + p.w + " " + p.h + "] /Resources << /XObject << /Im0 " + id("img" + k) +
+        " 0 R >> >> /Contents " + id("draw" + k) + " 0 R" + (annots.length ? " /Annots [" + annots.join(" ") + "]" : "") + " >>");
+      var draw = "q " + p.w + " 0 0 " + p.h + " 0 0 cm /Im0 Do Q";
+      obj("draw" + k, "<< /Length " + draw.length + " >>", draw);
+      obj("img" + k, "<< /Type /XObject /Subtype /Image /Width " + p.iw + " /Height " + p.ih + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + p.jpg.length + " >>", p.jpg);
+    });
+    if (outline.length) {
+      obj("outlines", "<< /Type /Outlines /First " + id("ol0") + " 0 R /Last " + id("ol" + (outline.length - 1)) + " 0 R /Count " + outline.length + " >>");
+      outline.forEach(function (o, k) {
+        obj("ol" + k, "<< /Title " + pdfText(o.title) + " /Parent " + id("outlines") + " 0 R" + (k ? " /Prev " + id("ol" + (k - 1)) + " 0 R" : "") +
+          (k < outline.length - 1 ? " /Next " + id("ol" + (k + 1)) + " 0 R" : "") + " /Dest " + dest(o.page) + " >>");
+      });
+    }
+    var xref = size, table = "xref\n0 " + (n + 1) + "\n0000000000 65535 f \n";
+    for (i = 1; i <= n; i++) table += ("000000000" + offsets[i]).slice(-10) + " 00000 n \n";
+    add(table + "trailer\n<< /Size " + (n + 1) + " /Root " + id("catalog") + " 0 R /Info " + id("info") + " 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
+    var out = new Uint8Array(size), at = 0;
+    parts.forEach(function (b) { out.set(b, at); at += b.length; });
+    return out;
+  }
+
+  /* the whole PDF: lay out the tabs, then the cover (now their pages are
+     known), draw every page, and write the file */
+  function buildPDF(progress) {
+    var tabs = pdfTabs(), when = new Date(), frame;
+    return pdfCSS().then(function (css) {
+      frame = pdfFrame(css);
+      var parts = [], chain = Promise.resolve();
+      tabs.forEach(function (html, i) { chain = chain.then(function () { return pdfLayout(frame, html).then(function (p) { parts[i] = p; }); }); });
+      return chain.then(function () {
+        var starts = [], n = 1;
+        parts.forEach(function (p) { p.cuts = pdfCuts(p.h, p.breaks); starts.push(n); n += p.cuts.length; });
+        return pdfLayout(frame, coverHTML(starts, when)).then(function (cover) {
+          cover.cuts = [[0, Math.min(cover.h, PDF_H), 0]];
+          parts.unshift(cover);
+          var pages = [], total = n, chain2 = Promise.resolve();
+          parts.forEach(function (p) {
+            p.cuts.forEach(function (cut) {
+              chain2 = chain2.then(function () {
+                progress(pages.length + 1, total);
+                return pdfDraw(p, cut, css).then(function (jpg) {
+                  pages.push({
+                    w: PDF_W, h: PDF_H, iw: PDF_W * PDF_S, ih: PDF_H * PDF_S, jpg: jpg,
+                    links: p.links.filter(function (l) { return l.y >= cut[0] - 1 && l.y + l.h <= cut[1] + 1; }).map(function (l) {
+                      return { x: l.x, y: l.y - cut[0] + cut[2], w: l.w, h: l.h, uri: l.uri, page: l.go == null ? null : starts[+l.go] };
+                    })
+                  });
+                });
+              });
+            });
+          });
+          return chain2.then(function () {
+            var d = when, two = function (v) { return ("0" + v).slice(-2); };
+            return makePDF(pages, TABS.map(function (id, i) { return { title: t("tab_" + id), page: starts[i] }; }), {
+              title: "Kitchen Cleanup" + (me ? " · " + me : ""),
+              date: d.getFullYear() + two(d.getMonth() + 1) + two(d.getDate()) + two(d.getHours()) + two(d.getMinutes()) + two(d.getSeconds())
+            });
+          });
+        });
+      });
+    }).then(function (bytes) {
+      if (frame) frame.parentNode.removeChild(frame);
+      return bytes;
+    }, function (e) {
+      if (frame && frame.parentNode) frame.parentNode.removeChild(frame);
+      throw e;
+    });
+  }
+  function pdfName(d) {
+    var two = function (v) { return ("0" + v).slice(-2); };
+    return "Kitchen Cleanup - " + (me ? me.replace(/[\\/:*?"<>|]/g, "") + " - " : "") + d.getFullYear() + "-" + two(d.getMonth() + 1) + "-" + two(d.getDate()) + ".pdf";
+  }
+  function download(bytes, name) {
+    var url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" })), a = document.createElement("a");
+    a.href = url; a.download = name; a.rel = "noopener";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+  }
+
+  var dlg = $("pdf-dlg"), go = $("pdf-go"), busy = false;
+  function pdfBusy(on) { busy = on; go.disabled = on; dlg.querySelector(".dlg-no").disabled = on; }
+  function pdfReset() {
+    pdfBusy(false);
+    go.removeAttribute("data-print");
+    go.textContent = t("pdf_go");
+    $("pdf-msg").hidden = true;
+  }
+  function pdfStart() {
+    if (busy) return;
+    if (go.hasAttribute("data-print")) { if (dlg.open) dlg.close(); window.print(); return; }
+    pdfBusy(true);
+    go.textContent = t("pdf_making");
+    buildPDF(function (k, n) { go.textContent = t("pdf_making") + " " + k + "/" + n; }).then(function (bytes) {
+      download(bytes, pdfName(new Date()));
+      if (dlg.open) dlg.close();
+      pdfReset();
+    }, function () {
+      pdfBusy(false);
+      go.setAttribute("data-print", "");
+      go.textContent = t("pdf_print");
+      $("pdf-msg").textContent = t("pdf_failed");
+      $("pdf-msg").hidden = false;
+      if (!dlg.open && dlg.showModal) dlg.showModal();
+    });
+  }
   $("pdf-btn").addEventListener("click", function () {
-    var help = $("pdf-help"), ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    help.setAttribute("data-which", ios ? "pdf_ios" : "pdf_other");
-    help.textContent = t(help.getAttribute("data-which"));
-    help.hidden = false;
-    window.print();
+    pdfReset();
+    if (dlg.showModal) dlg.showModal();
+    else if (window.confirm(t("pdf_q") + "\n\n" + t("pdf_what"))) pdfStart();
   });
-  if (location.protocol === "file:" || typeof window.print !== "function") $("pdf").hidden = true;
+  go.addEventListener("click", pdfStart);
+  dlg.addEventListener("cancel", function (e) { if (busy) e.preventDefault(); });
+  if (location.protocol === "file:") $("pdf").hidden = true;
 
   /* ------------------------------------------------------------ start */
   route(); renderAll();

@@ -31,14 +31,15 @@ function sandbox() {
     FILES: { shifts: "shifts.csv", students: "students.csv", roles: "roles.csv" },
     CONFIG: { contacts: [{ role: "Student Kitchen Manager", name: "Art" }, { role: "Work Study Manager", name: "Nahelia" }],
               portal: "https://www.drbu.edu/timesheet" },
-    settingsProblems: [], data: null
+    settingsProblems: [], data: null, PDF_H: 844, PDF_TOP: 18
   };
   vm.createContext(box);
   /* the strings, in every language */
   vm.runInContext(html.slice(html.indexOf("var STR = {"), html.indexOf("/* END STRINGS */")) + "; this.STR = STR; var lang = 'en';", box);
   ["esc", "parseCSV", "dayIndex", "lower", "header", "cell", "list", "personGender", "roleGender", "yes",
    "readRoles", "readStudents", "canDo", "canCover", "buildData", "roleRank", "applySettings", "dateKey",
-   "nextDate", "longDate", "shortDate", "whenPill", "t", "dayName", "dayShort"].forEach(function (n) {
+   "nextDate", "longDate", "shortDate", "whenPill", "t", "dayName", "dayShort",
+   "stripMedia", "pdfCuts", "pdfText", "makePDF"].forEach(function (n) {
     vm.runInContext(lift(n), box);
   });
   return box;
@@ -280,6 +281,33 @@ check("longDate", [b.longDate(sun), b.longDate(new Date(2027, 0, 1))], ["Sunday,
 check("shortDate", b.shortDate(new Date(2026, 8, 30)), "Sep 30");
 check("whenPill: Today, Tomorrow (Sunday into Monday), nothing", [b.whenPill(6, 6), b.whenPill(0, 6), b.whenPill(2, 6)],
   ['<span class="when">Today</span>', '<span class="when tmrw">Tomorrow</span>', ""]);
+
+/* ------------------------------------------------------ Save as PDF */
+check("stripMedia drops @media blocks, nested ones too", b.stripMedia("a{x:1}@media (min-width:9px){b{y:2}c{z:3}}d{w:4}@media print{@page{m:0}e{v:5}}"), "a{x:1}d{w:4}");
+check("the app's own CSS keeps balanced braces without its @media blocks", (function () {
+  var css = b.stripMedia(html.slice(html.indexOf("<style>") + 7, html.indexOf("</style>")));
+  return [css.indexOf("@media"), (css.match(/\{/g) || []).length === (css.match(/\}/g) || []).length];
+})(), [-1, true]);
+check("pdfCuts: a short part is one page", JSON.stringify(b.pdfCuts(500, [100, 300])), "[[0,500,0]]");
+check("pdfCuts: cut at the last gap that fits, later pages with a top margin", JSON.stringify(b.pdfCuts(2000, [100, 700, 830, 900, 1500, 1640])),
+  "[[0,830,0],[830,1640,18],[1640,2000,18]]");
+check("pdfCuts: no gap that fits: cut at the page's foot", JSON.stringify(b.pdfCuts(1000, [10])), "[[0,844,0],[844,1000,18]]");
+check("pdfText: plain text, and anything else as UTF-16", [b.pdfText("a (b) \\c"), b.pdfText("班 · x")], ["(a \\(b\\) \\\\c)", "<FEFF73ED002000B700200078>"]);
+var pdfBytes = b.makePDF([
+  { w: 390, h: 844, iw: 2, ih: 2, jpg: new Uint8Array([255, 216, 1, 2, 255, 217]), links: [{ x: 10, y: 20, w: 100, h: 30, page: 1 }] },
+  { w: 390, h: 844, iw: 2, ih: 2, jpg: new Uint8Array([255, 216, 3, 255, 217]), links: [{ x: 0, y: 800, w: 50, h: 20, uri: "https://www.drbu.edu/timesheet" }] }
+], [{ title: "My shifts", page: 0 }, { title: "請假", page: 1 }], { title: "Kitchen Cleanup · Ann", date: "20261006090000" });
+var pdf = Buffer.from(pdfBytes).toString("latin1");
+check("makePDF: a PDF from header to end", [pdf.slice(0, 8), /%%EOF\n$/.test(pdf)], ["%PDF-1.4", true]);
+check("makePDF: every object where the cross-reference table says", (function () {
+  var xr = pdf.lastIndexOf("\nxref\n") + 1, x = pdf.slice(xr).split("\n"), n = +x[1].split(" ")[1], bad = [];
+  for (var i = 1; i < n; i++) { var at = +x[2 + i].slice(0, 10); if (pdf.slice(at, at + String(i).length + 6) !== i + " 0 obj") bad.push(i); }
+  return [n > 10, bad, +pdf.slice(pdf.lastIndexOf("startxref\n") + 10).split("\n")[0] === xr];
+})(), [true, [], true]);
+check("makePDF: two pages, a link to page 2, a web link, two bookmarks, the pictures",
+  [(pdf.match(/\/Type \/Page /g) || []).length, /\/Rect \[10\.00 794\.00 110\.00 824\.00\] \/Dest \[\d+ 0 R \/XYZ 0 844 0\]/.test(pdf), pdf.indexOf("/URI (https://www.drbu.edu/timesheet)") > 0,
+   /\/Outlines \d+ 0 R/.test(pdf) && /\/Count 2 >>/.test(pdf), pdf.indexOf("<FEFF8ACB5047>") > 0, (pdf.match(/\/Filter \/DCTDecode \/Length \d+ >>\nstream\n\xff\xd8/g) || []).length],
+  [2, true, true, true, true, 2]);
 
 /* ------------------------------------------------------ the languages */
 var langs = Object.keys(b.STR);
