@@ -300,19 +300,23 @@ p{margin:0}
 .backups .cover-lead{font-size:15px;color:var(--ink-2);margin-bottom:6px}
 .backups .cover{margin-bottom:4px}
 /* ------------------------------------------------- My availability */
-/* one card per day you may be asked to cover, topped in the day's hue like
-   the shift cards; under it, each shift of yours they'd take in exchange,
-   then the role you'd cover as (a small label), then the names */
-.avail-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:20px}
-.avail-list li{border-top:4px solid var(--c);gap:10px}
-.avail-list .d{color:var(--ci)}
-/* each line a plain sentence; the names, jobs and days in it stand out:
-   names and jobs in bold ink, days as tags in their hue */
-.avail-list .ax{padding-top:10px;border-top:1px solid var(--line-soft);font-size:15.5px;line-height:1.7;color:var(--ink-2)}
-.avail-list .nm,.avail-list .rl{font-weight:600;color:var(--ink)}
-.avail-list .dp{font-size:11.5px;padding:3px 8px;vertical-align:1px}
-.avail-list .ax.lr{font-size:14.5px;color:var(--ink-3)}
-.avail-list .ax.lr .nm,.avail-list .ax.lr .rl{font-weight:500;color:var(--ink-2)}
+/* one table: the day you'd work merged across the top of its rows, then
+   the job merged down them; each day's rows framed by a rule in its hue */
+.avt{padding:4px 10px 8px}
+.avt table{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.35}
+.avt th{text-align:left;vertical-align:bottom;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:10px 6px 8px}
+.avt tbody{border-top:2px solid var(--c)}
+.avt td{vertical-align:top;padding:9px 6px;border-top:1px solid var(--line-soft);color:var(--ink)}
+.avt tr.avd th{padding:10px 6px 2px;text-align:left;font-weight:400}
+.avt tr.avd .dp{font-size:12.5px;padding:4px 10px}
+.avt tr.avd+tr td{border-top:0}
+.avt .avr{font-weight:600}
+.avt .avb span{display:block}
+.avt .avb .dp{display:inline-block;margin-bottom:4px}
+.avt .avb span+span{font-weight:600}
+.avt .avn{color:var(--ink-2);overflow-wrap:break-word}
+.avt tr.lr .avb span,.avt tr.lr .avn{color:var(--ink-3);font-weight:400}
+:root[lang="th"] .avt th{letter-spacing:0}
 .cover{margin:0;padding:0 0 0 1.6em;font-size:15px}
 /* each backup: the name on its own line, then what they work, as role
    labels each followed by day tags in that day's colour */
@@ -474,8 +478,8 @@ p{margin:0}
   .print-only{display:block}
   main.view[hidden]{display:block !important}
   main.view+main.view{break-before:page}
-  .cover li,.crew li,.step,.tpl,.ax,.shift-h,.path-h,.panel.due,.contacts li{break-inside:avoid}
-  .path-h,.shift-h,.sit h3,.avail-list .d{break-after:avoid}
+  .cover li,.crew li,.step,.tpl,.avt tr,.shift-h,.path-h,.panel.due,.contacts li{break-inside:avoid}
+  .path-h,.shift-h,.sit h3{break-after:avoid}
   .me-pill::after,.backups>summary::after{display:none}
   .head .in{padding-top:18px;padding-bottom:16px}
   .stamp{max-width:var(--max);margin:0 auto;padding:12px var(--gutter);font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--line)}
@@ -740,11 +744,11 @@ p{margin:0}
       avail_no_name: "Choose your name on My shifts to see the days you may be asked to cover.",
       avail_failed: "The shift list didn't load. See My shifts.",
       avail_none: "You're not listed as a backup on any day.",
-      av_ask: "{names} may ask you to work their {role} shift on {day}.",
-      av_back: "In exchange, they would work your {role} shift on {day}.",
-      av_last: "As a last resort, {names} may also ask you to work their {role} shift on {day}.",
       list_sep: ", ",
-      list_or: " or ",
+      av_h_work: "You may be asked to work",
+      av_h_back: "In exchange, they would work your",
+      av_h_who: "Who may ask",
+      av_no_trade: "Last resort: no trade",
       wrong_info: "Something here wrong or out of date? Send an email to the Student Kitchen Manager ({name}).",
 
       ts_eyebrow: "Work study hours",
@@ -880,11 +884,11 @@ p{margin:0}
       avail_no_name: "在「我的班次」选择你的名字，就能看到你可能被请求替班的日子。",
       avail_failed: "班表没有载入，请看「我的班次」。",
       avail_none: "你目前不是任何一天的替班人选。",
-      av_ask: "{names}可能会请你替他们上{day}的{role}班。",
-      av_back: "作为交换，对方会替你上{day}的{role}班。",
-      av_last: "最后选择：{names}也可能会请你替他们上{day}的{role}班。",
       list_sep: "、",
-      list_or: "或",
+      av_h_work: "你可能被请求上的班",
+      av_h_back: "作为交换，对方替你上的班",
+      av_h_who: "可能来问你的人",
+      av_no_trade: "最后选择：不交换",
       wrong_info: "这里的信息有误或已过时？请发电子邮件给 Student Kitchen Manager（{name}）。",
 
       ts_eyebrow: "勤工助学工时",
@@ -1020,11 +1024,11 @@ p{margin:0}
       avail_no_name: "在「我的班次」選擇你的名字，就能看到你可能被請求代班的日子。",
       avail_failed: "班表沒有載入，請看「我的班次」。",
       avail_none: "你目前不是任何一天的代班人選。",
-      av_ask: "{names}可能會請你幫他們上{day}的{role}班。",
-      av_back: "作為交換，對方會幫你上{day}的{role}班。",
-      av_last: "最後選擇：{names}也可能會請你幫他們上{day}的{role}班。",
       list_sep: "、",
-      list_or: "或",
+      av_h_work: "你可能被請求上的班",
+      av_h_back: "作為交換，對方幫你上的班",
+      av_h_who: "可能來問你的人",
+      av_no_trade: "最後選擇：不交換",
       wrong_info: "這裡的資訊有誤或已過時？請寄電子郵件給 Student Kitchen Manager（{name}）。",
 
       ts_eyebrow: "工讀時數",
@@ -1160,11 +1164,11 @@ p{margin:0}
       avail_no_name: "เลือกชื่อของคุณที่หน้า “กะของฉัน” เพื่อดูวันที่คุณอาจถูกขอให้แทน",
       avail_failed: "โหลดตารางกะไม่สำเร็จ ดูที่หน้า “กะของฉัน”",
       avail_none: "คุณยังไม่ได้เป็นตัวสำรองในวันใดเลย",
-      av_ask: "{names} อาจขอให้คุณทำกะ {role} ของเขาใน{day}",
-      av_back: "เป็นการแลกเปลี่ยน เขาจะทำกะ {role} ของคุณใน{day}",
-      av_last: "ทางเลือกสุดท้าย: {names} อาจขอให้คุณทำกะ {role} ของเขาใน{day}ด้วย",
       list_sep: ", ",
-      list_or: " หรือ ",
+      av_h_work: "คุณอาจถูกขอให้ทำกะ",
+      av_h_back: "เป็นการแลกเปลี่ยน เขาจะทำกะของคุณ",
+      av_h_who: "ใครอาจขอ",
+      av_no_trade: "ทางเลือกสุดท้าย: ไม่แลก",
       wrong_info: "ข้อมูลตรงนี้ผิดหรือไม่เป็นปัจจุบัน? ส่งอีเมลถึง Student Kitchen Manager ({name})",
 
       ts_eyebrow: "ชั่วโมงงาน Work Study",
@@ -1300,11 +1304,11 @@ p{margin:0}
       avail_no_name: "Chọn tên của bạn ở trang “Ca của tôi” để xem những ngày bạn có thể được nhờ làm thay.",
       avail_failed: "Không tải được lịch ca. Xem trang “Ca của tôi”.",
       avail_none: "Bạn chưa là người dự phòng vào ngày nào.",
-      av_ask: "{names} có thể nhờ bạn làm ca {role} của họ vào {day}.",
-      av_back: "Đổi lại, họ sẽ làm ca {role} của bạn vào {day}.",
-      av_last: "Phương án cuối cùng: {names} cũng có thể nhờ bạn làm ca {role} của họ vào {day}.",
       list_sep: ", ",
-      list_or: " hoặc ",
+      av_h_work: "Bạn có thể được nhờ làm",
+      av_h_back: "Đổi lại, họ sẽ làm ca của bạn",
+      av_h_who: "Ai có thể nhờ",
+      av_no_trade: "Phương án cuối cùng: không đổi ca",
       wrong_info: "Thông tin ở đây sai hoặc đã cũ? Hãy gửi email cho Student Kitchen Manager ({name}).",
 
       ts_eyebrow: "Giờ làm Work Study",
@@ -1725,46 +1729,50 @@ p{margin:0}
     }).join("");
   }
 
-  /* The days this student appears in someone's backup list, one card per
-     day, each spelled out in sentences: who may ask you to work their
-     shift that day (as the job it is: a Shift Leader's shift counts as Pots
-     & Pans), and which shift of yours they would work in exchange. One
-     sentence for each day of yours and job. Where you're only their last
-     resort, a quieter sentence at the end. */
-  function names(list) {
-    list = list.slice().sort(function (a, b) { return a.localeCompare(b); }).map(function (n) { return '<b class="nm">' + esc(n) + "</b>"; });
-    return list.length < 2 ? list.join("") : list.slice(0, -1).join(t("list_sep")) + t("list_or") + list[list.length - 1];
-  }
-  function dayPill(d) { return '<span class="dp k' + d + '">' + dayName(d) + "</span>"; }
-  function rolePill(r) { return '<b class="rl">' + esc(r) + "</b>"; }
+  /* The days this student appears in someone's backup list, as one table:
+     the shift you may be asked to work (its day merged across the top of
+     that day's rows, then its job merged down them), the shift of yours
+     they would work in exchange, and who may ask. A Shift Leader's shift
+     counts as Pots & Pans. Where you're only someone's last resort, a
+     quieter row ends that job's rows: no trade. Each row also carries
+     data-trade, plain words for the tests. */
   function availability() {
     var days = [];
     data.shifts.forEach(function (s) {
       var i = s.cover.indexOf(me);
       if (i < 0) return;
-      var day = days[s.day] = days[s.day] || { swaps: {}, keys: [], last: {} };
-      if (i >= s.lastFrom) { (day.last[s.as] = day.last[s.as] || []).push(s.who); return; }
+      var day = days[s.day] = days[s.day] || {};
+      var job = day[s.as] = day[s.as] || { swaps: {}, last: [] };
+      if (i >= s.lastFrom) { job.last.push(s.who); return; }
       s.swap[me].forEach(function (x) {
-        var key = x.day + "|" + roleRank(s.as) + "|" + s.as;
-        if (!day.swaps[key]) { day.swaps[key] = { back: x.day, mine: x.as, theirs: s.as, who: [] }; day.keys.push(key); }
-        day.swaps[key].who.push(s.who);
+        (job.swaps[x.day] = job.swaps[x.day] || { back: x.day, mine: x.as, who: [] }).who.push(s.who);
       });
     });
-    var rows = [];
+    var who = function (list) { return list.slice().sort(function (a, b) { return a.localeCompare(b); }).map(esc).join(t("list_sep")); };
+    var groups = [];
     days.forEach(function (day, d) {
       if (!day) return;
-      /* by your day in exchange, Monday first, then the job */
-      var lines = day.keys.sort().map(function (k) {
-        var g = day.swaps[k];
-        return '<div class="ax"><p>' + t("av_ask", { names: names(g.who), role: rolePill(g.theirs), day: dayPill(d) }) + (/^zh/.test(lang) ? "" : " ") +
-          t("av_back", { role: rolePill(g.mine), day: dayPill(g.back) }) + "</p></div>";
-      }).concat(Object.keys(day.last).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
-        return '<div class="ax lr"><p>' + t("av_last", { names: names(day.last[as]), role: rolePill(as), day: dayPill(d) }) + "</p></div>";
-      }));
-      rows.push('<li class="panel k' + d + '"><h2 class="d">' + dayName(d) + "</h2>" + lines.join("") + "</li>");
+      var rows = [];
+      Object.keys(day).sort(function (a, b) { return roleRank(a) - roleRank(b); }).forEach(function (as) {
+        var job = day[as], lines = [];
+        Object.keys(job.swaps).sort().forEach(function (k) {
+          var g = job.swaps[k];
+          lines.push({ trade: [DAYS[d], as, DAYS[g.back], g.mine].join("|"), back: '<span class="dp k' + g.back + '">' + dayShort(g.back) + "</span><span>" + esc(g.mine) + "</span>", who: who(g.who) });
+        });
+        if (job.last.length) lines.push({ trade: [DAYS[d], as, "", ""].join("|"), back: "<span>" + t("av_no_trade") + "</span>", who: who(job.last), lr: true });
+        lines.forEach(function (l, i) {
+          rows.push('<tr data-trade="' + esc(l.trade) + '"' + (l.lr ? ' class="lr"' : "") + ">" +
+            (i ? "" : '<td class="avr" rowspan="' + lines.length + '">' + esc(as) + "</td>") +
+            '<td class="avb">' + l.back + '</td><td class="avn">' + l.who + "</td></tr>");
+        });
+      });
+      /* the day, merged across the top of its rows */
+      groups.push('<tbody class="k' + d + '"><tr class="avd"><th colspan="3" scope="rowgroup"><span class="dp k' + d + '">' + dayName(d) + "</span></th></tr>" + rows.join("") + "</tbody>");
     });
-    return rows.length ? '<ul class="avail-list">' + rows.join("") + "</ul>" : '<p class="note">' + t("avail_none") + "</p>";
+    return groups.length ? '<div class="panel avt"><table><thead><tr><th>' + t("av_h_work") + "</th><th>" + t("av_h_back") + "</th><th>" + t("av_h_who") +
+      "</th></tr></thead>" + groups.join("") + "</table></div>" : '<p class="note">' + t("avail_none") + "</p>";
   }
+
 
   /* the My availability tab: the head's lead names who it's for */
   function renderAvailability() {
@@ -2125,7 +2133,7 @@ p{margin:0}
      dialog offers the print window instead. */
   var PDF_W = 390, PDF_H = 844, PDF_S = 2, PDF_TOP = 18;
   var PDF_BREAKS = ".head, .body .in > *, .shift-h, .part, .crew li, .backups summary, .cover-lead, .cover li, .last-h, .last-n, .path-h, .sit, .sit h3, " +
-    ".step, .tpl, .avail-list > li, .ax, .ag, .panel, .motto, .contacts li, .foot, .gl li, .co-how, .portal, .portal-url";
+    ".step, .tpl, .avt tbody, .avt tr, .panel, .motto, .contacts li, .foot, .gl li, .co-how, .portal, .portal-url";
 
   /* CSS without its @media blocks: the copy is always phone-sized and on
      screen, whatever the phone it's made on */
@@ -2142,6 +2150,12 @@ p{margin:0}
     }
     return out + css.slice(i);
   }
+  /* vw units in pixels at the PDF's phone width: the picture's own width is
+     twice that (it's drawn at 2x), so vw there would make headings too big
+     and push everything below a page cut out of line */
+  function fixedVw(css) {
+    return css.replace(/(\d*\.?\d+)vw\b/g, function (m, v) { return Math.round(v * PDF_W) / 100 + "px"; });
+  }
   function base64(bytes) {
     var s = "", i;
     for (i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
@@ -2156,7 +2170,7 @@ p{margin:0}
   var snapCSS = null;
   function pdfCSS() {
     if (snapCSS) return snapCSS;
-    var css = stripMedia(document.querySelector("style").textContent), files = [];
+    var css = fixedVw(stripMedia(document.querySelector("style").textContent)), files = [];
     css.replace(/url\((fonts\/[^)]+\.woff2)\)/g, function (m, f) { if (files.indexOf(f) < 0) files.push(f); return m; });
     snapCSS = Promise.all(files.map(function (f) {
       return fetch(f).then(function (r) { if (!r.ok) throw new Error(f); return r.arrayBuffer(); })
@@ -2340,6 +2354,7 @@ p{margin:0}
       return chain.then(function () {
         var starts = [], n = 1;
         parts.forEach(function (p) { p.cuts = pdfCuts(p.h, p.breaks); p.first = n; starts.push(n); n += p.cuts.length; });
+        window.__parts = parts.map(function (p) { return { h: p.h, cuts: p.cuts, breaks: p.breaks.slice().sort(function (a, b) { return a - b; }) }; });
         return pdfLayout(frame, coverHTML(starts, when)).then(function (cover) {
           cover.cuts = [[0, Math.min(cover.h, PDF_H), 0]];
           cover.first = 0;

@@ -31,7 +31,7 @@ function sandbox() {
     FILES: { shifts: "shifts.csv", students: "students.csv", roles: "roles.csv" },
     CONFIG: { contacts: [{ role: "Student Kitchen Manager", name: "Art" }, { role: "Work Study Manager", name: "Nahelia" }],
               portal: "https://www.drbu.edu/timesheet" },
-    settingsProblems: [], data: null, PDF_H: 844, PDF_TOP: 18
+    settingsProblems: [], data: null, PDF_H: 844, PDF_TOP: 18, PDF_W: 390
   };
   vm.createContext(box);
   /* the strings, in every language */
@@ -39,7 +39,7 @@ function sandbox() {
   ["esc", "parseCSV", "dayIndex", "lower", "header", "cell", "list", "personGender", "roleGender", "yes",
    "readRoles", "readStudents", "canDo", "canCover", "buildData", "roleRank", "applySettings", "dateKey",
    "nextDate", "longDate", "shortDate", "whenPill", "t", "dayName", "dayShort",
-   "stripMedia", "pdfCuts", "pdfText", "makePDF"].forEach(function (n) {
+   "stripMedia", "fixedVw", "pdfCuts", "pdfText", "makePDF"].forEach(function (n) {
     vm.runInContext(lift(n), box);
   });
   return box;
@@ -288,6 +288,7 @@ check("the app's own CSS keeps balanced braces without its @media blocks", (func
   var css = b.stripMedia(html.slice(html.indexOf("<style>") + 7, html.indexOf("</style>")));
   return [css.indexOf("@media"), (css.match(/\{/g) || []).length === (css.match(/\}/g) || []).length];
 })(), [-1, true]);
+check("fixedVw: vw units become pixels at the PDF's width", b.fixedVw("h1{font-size:clamp(28px,7vw,36px)}.m{width:12.5vw}a{b:c}"), "h1{font-size:clamp(28px,27.3px,36px)}.m{width:48.75px}a{b:c}");
 check("pdfCuts: a short part is one page", JSON.stringify(b.pdfCuts(500, [100, 300])), "[[0,500,0]]");
 check("pdfCuts: cut at the last gap that fits, later pages with a top margin", JSON.stringify(b.pdfCuts(2000, [100, 700, 830, 900, 1500, 1640])),
   "[[0,830,0],[830,1640,18],[1640,2000,18]]");

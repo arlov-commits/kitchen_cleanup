@@ -30,7 +30,7 @@ dependencies. Served over the web, it installs as an app on a phone.
 | --- | --- |
 | **My shifts** | Choose your name from the list. The phone remembers it, and shows it as a small pill beside the heading. Under the heading, **the week at a glance**: today's date, then each of your shifts by the next date it falls on, with a **Today** or **Tomorrow** pill. Then, for each of your shifts: the day (with the same pill) and your job, and who else from your work group is on that day, with their roles, in `roles.csv` order (left out when no one else in your group is on). Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. |
 | **Call out** | What to do when you can't make a shift, in plain words. At the top, **What's happening?** has a button for each situation that jumps to it: "I can't make it today", "Not sure if I can make it today", "I'm too sick to get out of bed", "I forgot my shift, and it has already started" (Sick or Unplanned Absence), "I will miss a shift in the future" (Planned Absence), and "Oh no! I missed my shift" (Missed Shift: message the Student Kitchen Manager and the Shift Leader, then wait for a make-up shift, and don't come in for another shift without approval). Each is written to be read on its own. Then **Afterward**, "It's not covered until someone says yes", and the contacts. Under each step that needs one is the message to send, in English, with a **Copy message** button. Your name and the Student Kitchen Manager's name are filled in, and your role too if you only ever do one job. |
-| **My availability** | The days the chosen student is a backup on, one card per day in its colour, spelled out in sentences: "Beth, Priya or Roxanne may ask you to work their Pots & Pans shift on Wednesday. In exchange, they would work your Buckets & Composting shift on Tuesday." Then a line to email the Student Kitchen Manager (Art) if anything is wrong. |
+| **My availability** | The days the chosen student is a backup on, as one table: **You may be asked to work** (each day across the top of its rows, then the job), **In exchange, they would work your** (day and job), and **Who may ask**. Then a line to email the Student Kitchen Manager (Art) if anything is wrong. |
 | **Submit Timesheet** | The deadline, Sunday at 5 pm, a button to the timesheet portal at drbu.edu/timesheet, and "It's not done until your hours are submitted". On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). |
 
 There are no phone numbers and no call buttons in the app.
@@ -63,7 +63,7 @@ and the tests follow it. In short:
 
 A Shift Leader shift counts as Pots & Pans everywhere except **On with
 you**, which shows only the shift's own work group. Backup lines show the
-swap options. **My availability** spells each swap out in a sentence.
+swap options. **My availability** lists each swap as a table row.
 
 The footer checks all three files and names anything that looks wrong:
 - a missing column, or a role or student that isn't defined;

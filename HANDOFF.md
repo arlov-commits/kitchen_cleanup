@@ -170,11 +170,10 @@ take one of their shifts in return: on another day, and allowed by Rules
   shows it only when two or more do Recycling that day.
 - **Shift Backups:** each backup's name, then their shifts you could take
   in return, same job first (all their shifts, in the last resort).
-- **My availability** (its own tab): the days you're on someone's list,
-  one card per day, spelled out in sentences: who may ask you to work
-  their shift that day (as the job it is), and which shift of yours they
-  would work in exchange. Anyone whose last resort you are gets a quieter
-  sentence at the end of that day.
+- **My availability** (its own tab): one table of the shifts you may be
+  asked to work, by day and then job, each with the shift of yours they
+  would work in exchange and who may ask. Anyone whose last resort you are
+  closes that job's rows: no trade.
 
 **Where instructions pulled against each other, and how it's settled.**
 For the record, so a later rule change starts from here:

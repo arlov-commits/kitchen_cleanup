@@ -41,14 +41,15 @@ and the tab shell from the second.
 - "Can cover for you" shows each backup as a bold name, then their swap
   options (`shiftsHTML()`, the shift's own job first), or all their
   shifts in the last resort: each role as a quiet label followed by day
-  tags (`.dp`) in that day's hue. My availability spells everything out
-  in sentences, never a grid of labels to decode. One card per day
-  covered (`li`), then one sentence per day of yours in exchange and job
-  (`.ax`, from `s.swap[me]`): "**Beth**, **Priya** or **Roxanne** may ask
-  you to work their **Pots & Pans** shift on WEDNESDAY. In exchange, they
-  would work your **Buckets & Composting** shift on TUESDAY." Names and
-  jobs are bold ink, days are full-name tags in their hue. Anyone whose
-  last resort you are gets a quieter sentence (`.ax.lr`) at the end.
+  tags (`.dp`) in that day's hue. My availability is one table
+  (`.avt`), chosen by the user from three mockups: **You may be asked to
+  work** | **In exchange, they would work your** | **Who may ask**. Each day
+  is a `tbody` topped by a merged row with its full-name tag (`tr.avd`).
+  The job is merged down its rows (`.avr`, rowspan). Each trade is a row:
+  their day tag and job, then the names. A job's last resorts close its
+  rows: "Last resort: no trade" (`tr.lr`). Rows carry `data-trade` for the
+  tests. A merged day column was tried and left no room for the names at
+  phone width.
 - The head of My shifts: the heading with the name beside it as a pill
   (`.who.set`: the select sits unseen over `#me-pill`; before a name is
   chosen it is a full-width labelled select). Under it, the week at a
@@ -180,6 +181,9 @@ and the tab shell from the second.
     (`forPrint()`). The print styles also serve the browser's own Print.
   - Never give the PDF cover a class an app element already uses (it once
     took `.cover`, the backup lists').
+  - `vw` units become pixels at 390px (`fixedVw()`). The picture is twice
+    as wide, so `vw` there enlarged the headings and pushed page cuts
+    mid-row.
 - The footer's Install as app button uses `beforeinstallprompt` where the
   browser offers it, and otherwise shows short instructions (iPhone:
   Share, then Add to Home Screen). It is hidden when running installed.

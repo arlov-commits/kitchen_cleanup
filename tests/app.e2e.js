@@ -219,48 +219,48 @@ function serve(dir, port) {
 
   /* My availability: day covered, then your day in exchange, then the
      role you'd cover as, then who; the last resort at the end of the day */
-  /* My availability, as sentences: who may ask you to work their shift
-     that day, and which of your shifts they'd work in exchange; last
-     resorts at the end of the day */
-  function nameList(list) {
-    list = list.slice().sort();
-    return list.length < 2 ? list[0] : list.slice(0, -1).join(", ") + " or " + list[list.length - 1];
-  }
+  /* My availability, as one table: each trade a row (day and job you may
+     be asked to work, the shift of yours they'd work, who may ask); each
+     job's last resorts close its rows */
   function availOf(me) {
     var avail = {};
     ROWS.forEach(function (r) {
       var at = r.cover.indexOf(me);
       if (at < 0) return;
-      var day = avail[r.day] = avail[r.day] || { swaps: {}, last: {} }, as = ROLE[r.role].as;
-      if (at >= r.before) { (day.last[as] = day.last[as] || []).push(r.who); return; }
-      r.swaps[me].forEach(function (x) {
-        var key = DAYS.indexOf(x.day) + "|" + ROLE[as].rank;
-        (day.swaps[key] = day.swaps[key] || { back: x.day, mine: x.as, theirs: as, who: [] }).who.push(r.who);
+      var as = ROLE[r.role].as, day = avail[r.day] = avail[r.day] || {}, job = day[as] = day[as] || { swaps: {}, last: [] };
+      if (at >= r.before) { job.last.push(r.who); return; }
+      r.swaps[me].forEach(function (x) { (job.swaps[x.day] = job.swaps[x.day] || { mine: x.as, who: [] }).who.push(r.who); });
+    });
+    var out = [];
+    DAYS.forEach(function (d) {
+      if (!avail[d]) return;
+      Object.keys(avail[d]).sort(function (x, y) { return ROLE[x].rank - ROLE[y].rank; }).forEach(function (as) {
+        var job = avail[d][as];
+        DAYS.filter(function (b) { return job.swaps[b]; }).forEach(function (b) { out.push([d, as, b, job.swaps[b].mine].join("|") + " = " + job.swaps[b].who.sort().join(", ")); });
+        if (job.last.length) out.push([d, as, "", ""].join("|") + " = " + job.last.sort().join(", "));
       });
     });
-    return DAYS.filter(function (d) { return avail[d]; }).map(function (d) {
-      var day = avail[d];
-      return [d].concat(Object.keys(day.swaps).sort().map(function (k) {
-        var g = day.swaps[k];
-        return nameList(g.who) + " may ask you to work their " + g.theirs + " shift on " + d + ". In exchange, they would work your " + g.mine + " shift on " + g.back + ".";
-      }), Object.keys(day.last).sort(function (x, y) { return ROLE[x].rank - ROLE[y].rank; }).map(function (as) {
-        return "As a last resort, " + nameList(day.last[as]) + " may also ask you to work their " + as + " shift on " + d + ".";
-      })).join(" | ");
-    });
+    return out;
   }
   function availOnPage() {
-    return p.$$eval(".avail-list li", function (l) {
-      return l.map(function (x) {
-        return [x.querySelector(".d").textContent].concat([].map.call(x.querySelectorAll(".ax"), function (g) { return g.textContent; })).join(" | ");
-      });
+    return p.$$eval(".avt tr[data-trade]", function (l) {
+      return l.map(function (x) { return x.getAttribute("data-trade") + " = " + x.querySelector(".avn").textContent; });
     });
   }
-  check("availability: spelled out in sentences, by day", await availOnPage(), availOf("Aryashree"));
-  check("availability: the days in a sentence carry their colour", await p.$$eval(".avail-list .ax .dp", function (t) {
-    var k = { Monday: "k0", Tuesday: "k1", Wednesday: "k2", Thursday: "k3", Friday: "k4", Saturday: "k5", Sunday: "k6" };
-    return t.length > 0 && t.every(function (x) { return x.classList.contains(k[x.textContent]); });
-  }), true);
-  check("availability: no all-caps labels to decode", await p.$$eval(".avail-list .ar, .avail-list .xh", function (n) { return n.length; }), 0);
+  check("availability: one row per trade, in order", await availOnPage(), availOf("Aryashree"));
+  check("availability: the day merged across the top of its rows, the job merged down them", await p.evaluate(function () {
+    return [].map.call(document.querySelectorAll(".avt tbody"), function (g) {
+      var head = g.querySelector("tr.avd .dp"), rows = g.querySelectorAll("tr[data-trade]").length, spans = 0;
+      [].forEach.call(g.querySelectorAll(".avr"), function (c) { spans += +c.getAttribute("rowspan"); });
+      return head.textContent + " " + (spans === rows) + " " + head.classList.contains(g.className);
+    });
+  }), (function () {
+    var days = [];
+    availOf("Aryashree").forEach(function (r) { var d = r.split("|")[0]; if (days.indexOf(d) < 0) days.push(d); });
+    return days.map(function (d) { return d + " true true"; });
+  })());
+  check("availability: the headings", await p.$$eval(".avt thead th", function (h) { return h.map(function (x) { return x.textContent; }); }),
+    ["You may be asked to work", "In exchange, they would work your", "Who may ask"]);
   for (var who of ["Adam", "Ben Kong", "Ivwananji", "Thanh"]) {
     await p.selectOption("#me", who);
     check("availability: " + who, await availOnPage(), availOf(who));
