@@ -65,9 +65,31 @@ and the tab shell from the second.
 - **It is information, not a tool.** Each tab shows everything at once,
   phone first. Don't add toggles, in-card links or buttons, a whole-team
   view, phone numbers or call buttons, or a shift time. The user ruled
-  these out. The one exception the user asked for: each shift's backups
+  these out. The exceptions the user asked for: each shift's backups
   are a closed `<details>` always titled "Shift Backups · N", with "Can
-  cover for you" as body text above the list.
+  cover for you" as body text above the list; and on Call out, a Copy
+  message button under each message.
+- **Call out** (`renderCallout()`) is the user's own procedure, in plain,
+  exact English for readers whose first language is Chinese, Vietnamese,
+  Thai or another Asian language: Sick or Unplanned Absence first (too
+  sick to get out of bed; not sure yet; forgot the shift), then Planned
+  Absence. Its clock times (10:00 am, 11:00 am, 12:15 pm, 12:40 pm) are
+  the user's and belong there; still never show shift hours elsewhere.
+  Each message (`MSG`) is always English, with the student's name, the
+  role of today's shift (else their only role) and the Student Kitchen
+  Manager's name filled in; anything else stays in `[brackets]`, marked.
+  Questions are gold diamonds (`.step.ask`).
+- **Languages.** English, 简体中文, 繁體中文, ไทย and Tiếng Việt, all in
+  `STR` in `index.html` and shown through `t()`; fixed page text carries
+  `data-t`. A round language button (`[data-lang-btn]`) sits beside the
+  appearance button and steps through them (`kitchen.lang`; absent means
+  the phone's language if offered, else English). Names, roles (Pots &
+  Pans, Shift Leader), the managers' titles, DRBU, the shift files' checks
+  in the footer and every message students send stay in English. Write
+  natural translations, never word for word, and keep every language's
+  keys, `{names}`, tags and `[brackets]` the same as English's
+  (`tests/data.test.js` checks). No italics in Chinese or Thai, and no
+  letter-spacing in Thai. Vietnamese has its own font subsets.
 - "My availability" is its own tab, between Call out and Submit
   Timesheet (the user moved it there from a sage band under the shift
   cards). Its head lead names the chosen student. The body has one card

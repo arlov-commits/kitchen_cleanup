@@ -34,9 +34,11 @@ function sandbox() {
     settingsProblems: [], data: null
   };
   vm.createContext(box);
+  /* the strings, in every language */
+  vm.runInContext(html.slice(html.indexOf("var STR = {"), html.indexOf("/* END STRINGS */")) + "; this.STR = STR; var lang = 'en';", box);
   ["esc", "parseCSV", "dayIndex", "lower", "header", "cell", "list", "personGender", "roleGender", "yes",
    "readRoles", "readStudents", "canDo", "canCover", "buildData", "roleRank", "applySettings", "dateKey",
-   "nextDate", "longDate", "shortDate", "whenPill"].forEach(function (n) {
+   "nextDate", "longDate", "shortDate", "whenPill", "t", "dayName", "dayShort"].forEach(function (n) {
     vm.runInContext(lift(n), box);
   });
   return box;
@@ -278,6 +280,41 @@ check("longDate", [b.longDate(sun), b.longDate(new Date(2027, 0, 1))], ["Sunday,
 check("shortDate", b.shortDate(new Date(2026, 8, 30)), "Sep 30");
 check("whenPill: Today, Tomorrow (Sunday into Monday), nothing", [b.whenPill(6, 6), b.whenPill(0, 6), b.whenPill(2, 6)],
   ['<span class="when">Today</span>', '<span class="when tmrw">Tomorrow</span>', ""]);
+
+/* ------------------------------------------------------ the languages */
+var langs = Object.keys(b.STR);
+check("languages", langs, ["en", "zh-Hans", "zh-Hant", "th", "vi"]);
+function marks(v) {
+  if (Array.isArray(v)) return "list of " + v.length;
+  return JSON.stringify([(v.match(/\{\w+\}/g) || []).sort(), (v.match(/<\/?\w+/g) || []).sort(), (v.match(/\[/g) || []).length]);
+}
+langs.slice(1).forEach(function (l) {
+  check(l + ": the same strings as English", Object.keys(b.STR[l]).sort(), Object.keys(b.STR.en).sort());
+  check(l + ": each keeps English's {names}, tags and [brackets]", Object.keys(b.STR.en).filter(function (k) {
+    return k in b.STR[l] && marks(b.STR[l][k]) !== marks(b.STR.en[k]);
+  }), []);
+  check(l + ": nothing left empty or in English by mistake", Object.keys(b.STR.en).filter(function (k) {
+    var v = b.STR[l][k];
+    return !v || (typeof v === "string" && v === b.STR.en[k]);
+  }), []);
+});
+check("roles and the managers' titles stay in English", langs.every(function (l) {
+  return /Student Kitchen Manager/.test(b.STR[l].a3t) && /Shift Leader/.test(b.STR[l].c3) && /DRBU/.test(b.STR[l].c2);
+}), true);
+var dates = langs.map(function (l) {
+  b.lang = l;
+  var r = [b.longDate(new Date(2026, 9, 4)), b.shortDate(new Date(2026, 9, 5)), b.dayShort(0), b.t("shift_backups", { n: 3 })];
+  return r;
+});
+b.lang = "en";
+check("dates and words in each language", dates, [
+  ["Sunday, October 4", "Oct 5", "Mon", "Shift Backups · 3"],
+  ["10月4日 星期日", "10月5日", "周一", "替班人选 · 3"],
+  ["10月4日 星期日", "10月5日", "週一", "代班人選 · 3"],
+  ["วันอาทิตย์ที่ 4 ตุลาคม", "5 ต.ค.", "จ.", "ตัวสำรอง · 3"],
+  ["Chủ nhật, 4 tháng 10", "5/10", "T2", "Người dự phòng · 3"]]);
+check("a missing string falls back to English, then to its key", [b.t("nope"), (b.lang = "th", b.t("covered")), (delete b.STR.th.covered, b.t("covered"))], ["nope", "มีคนแทนแล้ว", "Covered"]);
+b.lang = "en";
 
 console.log(passed + " passed, " + failed + " failed");
 process.exit(failed ? 1 : 0);

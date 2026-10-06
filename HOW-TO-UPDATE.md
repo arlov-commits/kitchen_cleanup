@@ -244,7 +244,8 @@ handover log. Then send them the files link and point them to this page.
 ## Something else needs changing
 
 These are part of the app itself, so they're not in the two files:
-- the wording on the Call out steps;
+- the wording on the Call out steps and messages, and the translations
+  (Chinese, Thai, Vietnamese);
 - the tab names;
 - the timesheet deadline (Sunday, 5 pm);
 - the colours.

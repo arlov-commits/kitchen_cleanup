@@ -45,6 +45,9 @@ window.kitchenTheme();
 @font-face{font-family:'Playfair Display';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-italic-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-italic-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/inter-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-italic-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
 
 :root{
   color-scheme:light;
@@ -64,7 +67,6 @@ window.kitchenTheme();
   --gold:#e0a93f;
   --mark-bg:#14181f; --mark-fg:#ffffff;   /* the Today/Tomorrow marker: neutral, so no day hue swallows it */
   --rust-btn:#8c2f12;     /* rust under white text: the portal button, the badge */
-  --yes-ink:#1d4a2a; --no-ink:#5a2a18;
   /* One hue per weekday (Mon first): a fill, a deeper ink for text, a wash. */
   --k0:#b8431c; --k0-ink:#8c2f12; --k0-w:rgba(184,67,28,.09);   /* rust   */
   --k1:#0c8599; --k1-ink:#0b7285; --k1-w:rgba(12,133,153,.10);  /* teal   */
@@ -75,8 +77,9 @@ window.kitchenTheme();
   --k6:#559986; --k6-ink:#386a5b; --k6-w:rgba(85,153,134,.12);  /* sage   */
   /* -f: a day's hue as a fill under white text, the same in both modes */
   --k0-f:#8c2f12; --k1-f:#0b7285; --k2-f:#6741d9; --k3-f:#24733a; --k4-f:#c2255c; --k5-f:#b8420b; --k6-f:#386a5b;
-  --display:'Playfair Display',Georgia,'Times New Roman',serif;
-  --body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC",sans-serif;
+  /* Chinese and Thai have no Playfair or Inter: they fall to the phone's own */
+  --display:'Playfair Display',Georgia,'Times New Roman',"Songti SC","Noto Serif CJK SC","Noto Serif Thai",serif;
+  --body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC","Noto Sans Thai","Leelawadee UI",sans-serif;
   --cjk:'PingFang TC','Apple LiGothic Medium','Microsoft JhengHei',serif;
   --max:720px;
   --gutter:16px;
@@ -99,7 +102,6 @@ window.kitchenTheme();
   --rust-deep:#ec8a66;    /* rust as text */
   --mark-bg:#eceef1; --mark-fg:#14181f;
   --rust-btn:#a33a17;
-  --yes-ink:#b2f2bb; --no-ink:#ffc9b5;
   --k0:#d0582c; --k0-ink:#f0906b; --k0-w:rgba(240,144,107,.14);
   --k1:#1098ad; --k1-ink:#4fd1e3; --k1-w:rgba(79,209,227,.13);
   --k2:#845ef7; --k2-ink:#b9a2fd; --k2-w:rgba(185,162,253,.14);
@@ -110,6 +112,10 @@ window.kitchenTheme();
 }
 
 *,*::before,*::after{box-sizing:border-box}
+:root[lang="zh-Hant"]{--display:'Playfair Display',Georgia,"Songti TC","Noto Serif CJK TC",serif;
+  --body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif}
+:root[lang^="zh"] em,:root[lang="th"] em{font-style:normal}
+:root[lang="th"] body *{letter-spacing:0}   /* spaced-out Thai falls apart */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--white)}
 body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
@@ -177,6 +183,7 @@ p{margin:0}
 .topnav{display:flex;align-items:stretch;gap:2px;height:100%}
 .top-right{display:flex;align-items:stretch;gap:12px;height:100%}
 .top-right .theme-btn{align-self:center}
+.top-right{gap:10px}
 /* appearance: one round icon button that cycles Auto, Light, Dark */
 .theme-btn{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;
   background:var(--white);border:1px solid var(--line);color:var(--ink-2);cursor:pointer;padding:0}
@@ -185,10 +192,14 @@ p{margin:0}
 .theme-btn[data-mode="light"]{--ic:var(--ic-light)}
 .theme-btn[data-mode="dark"]{--ic:var(--ic-dark)}
 .theme-btn[data-mode="auto"]{--ic:var(--ic-auto)}
+/* the language button: the same round button, with the language's short name */
+.lang-btn{font-family:var(--body);font-size:12.5px;font-weight:700;letter-spacing:0;color:var(--ink-2)}
+.lang-btn::before{display:none}
+.head-btns{display:flex;gap:8px;flex:0 0 auto}
 /* on a phone the button sits at the right of each view's first line; on a
    wide screen the menu bar carries it instead */
 .head-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px;margin-top:-6px}
-@media (min-width:820px){.head-top .theme-btn{display:none}}
+@media (min-width:820px){.head-top .head-btns{display:none}}
 .nav-item{display:flex;align-items:center;gap:8px;border-bottom:2px solid transparent;color:var(--ink-3);font-size:15px;font-weight:600;
   padding:0 14px;text-decoration:none}
 .nav-item .nav-icon{width:18px;height:18px}
@@ -325,8 +336,12 @@ p{margin:0}
 .path-h{display:flex;align-items:center;gap:12px;background:var(--cf);color:#fff;border-radius:10px 10px 0 0;padding:12px 16px}
 .path-h h2{color:#fff;font-size:21px}
 .path-h .nav-icon{background-color:#fff;width:24px;height:24px}
-.steps{list-style:none;margin:0;padding:16px 16px 18px;background:var(--white);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;
-  display:flex;flex-direction:column;counter-reset:step}
+/* under the header, one white box; in it, one section per situation */
+.path-b{background:var(--white);border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;padding:0 16px 18px}
+.sit{padding-top:18px}
+.sit+.sit{margin-top:4px;border-top:1px solid var(--line-soft)}
+.sit h3{font-size:19px;color:var(--ci);margin-bottom:14px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;counter-reset:step}
 /* each step hangs off a numbered disc, the discs joined by a line in the path's hue */
 .step{position:relative;padding:0 0 18px 44px;counter-increment:step;display:flex;flex-direction:column;gap:4px}
 .step::before{content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;background:var(--cw);color:var(--ci);
@@ -334,17 +349,28 @@ p{margin:0}
 .step::after{content:"";position:absolute;left:14px;top:32px;bottom:2px;width:2px;background:var(--cw)}
 .step .t{font-size:16px;font-weight:600;line-height:1.35;color:var(--ink)}
 .step .s{font-size:14.5px;color:var(--ink-2)}
-/* the 30-minute question: a decision, so a diamond, not a number */
+.step .act{font-size:15.5px;font-weight:500;color:var(--ink)}
+.step:last-child{padding-bottom:0}
+.step:last-child::after{display:none}
+/* a question ("No one has said yes by 10:00 am?"): a diamond, not a number */
 .step.ask{counter-increment:none}
 .step.ask::before{content:"?";left:-1px;top:-3px;width:32px;height:32px;border-radius:0;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
   background:var(--gold);color:#14181f}
-.branch{display:flex;flex-direction:column;gap:6px;margin-top:4px}
-.br{border-radius:8px;padding:9px 12px;font-size:14.5px}
-.br b{font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
-.br.yes{background:var(--k3-w);color:var(--yes-ink)}
-.br.yes b{color:var(--k3-ink)}
-.br.no{background:var(--k0-w);color:var(--no-ink)}
-.br.no b{color:var(--k0-ink)}
+/* a message to send: always English, in a wash of the path's hue, with
+   anything still to fill in marked, and a button that copies it */
+.tpl{margin-top:8px;padding:12px 14px 14px;border-radius:10px;background:var(--cw);display:flex;flex-direction:column;gap:8px}
+.tpl-h{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ci)}
+.tpl-t{font-size:15px;line-height:1.5;color:var(--ink);white-space:pre-line;-webkit-user-select:text;user-select:text}
+.ph{background:var(--white);color:var(--ci);font-weight:600;border-radius:4px;padding:0 3px}
+.copy-btn{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 14px;border:0;border-radius:8px;
+  background:var(--cf);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+.copy-btn::before{content:"";width:17px;height:17px;background-color:currentColor;
+  -webkit-mask:var(--ic-copy) center/contain no-repeat;mask:var(--ic-copy) center/contain no-repeat}
+.copy-btn.ok::before{-webkit-mask-image:var(--ic-ok);mask-image:var(--ic-ok)}
+:root{--ic-copy:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2'/%3E%3Cpath d='M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3'/%3E%3C/svg%3E");
+  --ic-ok:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
+#callout-paths{display:flex;flex-direction:column;gap:20px}
+.co-how{padding:12px 14px;border-left:4px solid var(--gold);border-radius:4px 10px 10px 4px;background:var(--white);color:var(--ink-2)}
 .step.done{counter-increment:none;padding-bottom:0}
 .step.done::after{display:none}
 .step.done::before{content:"";background:var(--k3-f) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/18px no-repeat}
@@ -393,6 +419,7 @@ p{margin:0}
     <span class="brand"><span class="cjk" lang="zh" aria-hidden="true">淨</span>Kitchen Cleanup</span>
     <div class="top-right">
       <nav class="topnav" id="top-nav" aria-label="Views"></nav>
+      <button type="button" class="theme-btn lang-btn" data-lang-btn></button>
       <button type="button" class="theme-btn" data-theme-btn></button>
     </div>
   </header>
@@ -402,69 +429,39 @@ p{margin:0}
 <!-- ============================================================ MY SHIFTS -->
 <main class="view" id="view-shifts">
   <div class="head"><div class="in">
-    <div class="head-top"><span class="eyebrow">Kitchen cleanup</span><button type="button" class="theme-btn" data-theme-btn></button></div>
+    <div class="head-top"><span class="eyebrow" data-t="shifts_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
     <div class="title">
-      <h1>Your <em>shifts</em></h1>
+      <h1 data-t="shifts_h1"></h1>
       <div class="who" id="who">
-        <label for="me">Your name</label>
+        <label for="me" data-t="your_name"></label>
         <span class="me-pill" id="me-pill" aria-hidden="true"></span>
         <select id="me"><option value="">Choose your name…</option></select>
       </div>
     </div>
     <div class="glance" id="glance" hidden></div>
   </div></div>
-  <div class="body"><div class="in" id="shifts-body">
-    <p class="note">Loading the shift list…</p>
-  </div></div>
+  <div class="body"><div class="in" id="shifts-body"></div></div>
 </main>
 
 <!-- ============================================================ CALL OUT -->
 <main class="view" id="view-callout" hidden>
   <div class="head"><div class="in">
-    <div class="head-top"><span class="eyebrow">Substitute shift replacement</span><button type="button" class="theme-btn" data-theme-btn></button></div>
-    <h1>Can't make your <em>shift?</em></h1>
-    <p class="lead">Every shift is done in full, no matter who shows up. An uncovered absence becomes overtime for your teammates.</p>
+    <div class="head-top"><span class="eyebrow" data-t="co_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
+    <h1 data-t="co_h1"></h1>
+    <p class="lead" data-t="co_lead"></p>
   </div></div>
   <div class="body"><div class="in">
-
-    <div class="path k1">
-      <div class="path-h"><span class="nav-icon" style="--icon:var(--nv-shifts)" aria-hidden="true"></span><h2>Planned Absence</h2></div>
-      <ol class="steps">
-        <li class="step"><span class="t">Get Student Kitchen Manager approval at least 1 week ahead.</span></li>
-        <li class="step"><span class="t">Call your backups to arrange a substitute.</span>
-          <span class="s">Your backups for each shift are listed on My shifts, in the order to ask them.</span></li>
-        <li class="step"><span class="t">Your substitute confirms with the Student Kitchen Manager.</span></li>
-        <li class="step done"><span class="t">Covered</span></li>
-      </ol>
-    </div>
-
-    <div class="path k5">
-      <div class="path-h"><span class="nav-icon" style="--icon:var(--nv-sick)" aria-hidden="true"></span><h2>Sick or Unexpected Absence</h2></div>
-      <ol class="steps">
-        <li class="step"><span class="t">Act as soon as you feel unwell, even if you're unsure.</span>
-          <span class="s">Don't wait for the shift.</span></li>
-        <li class="step"><span class="t">Email the Student Kitchen Manager and Work Study Manager.</span></li>
-        <li class="step"><span class="t">Phone your backups. Call, don't just text.</span>
-          <span class="s">Your backups are listed on My shifts.</span></li>
-        <li class="step ask"><span class="t">Did someone say yes within 30 minutes?</span>
-          <div class="branch">
-            <p class="br yes"><b>Yes</b>Your substitute confirms with the Student Kitchen Manager.</p>
-            <p class="br no"><b>No</b>Call the Student Kitchen Manager directly.</p>
-          </div>
-        </li>
-        <li class="step done"><span class="t">Covered</span></li>
-      </ol>
-    </div>
+    <div id="callout-paths"></div>
 
     <div class="panel after">
-      <span class="eyebrow">Afterward</span>
-      <p>Make up your missed hours. If you swapped, do your substitute's duty as agreed.</p>
+      <span class="eyebrow" data-t="afterward"></span>
+      <p data-t="after_text"></p>
     </div>
 
-    <p class="motto">It's not covered until someone <em>says yes.</em></p>
+    <p class="motto" data-t="co_motto"></p>
 
     <div class="panel">
-      <h4>Contacts</h4>
+      <h4 data-t="contacts"></h4>
       <ul class="contacts" id="contacts"></ul>
     </div>
 
@@ -474,40 +471,38 @@ p{margin:0}
 <!-- ====================================================== MY AVAILABILITY -->
 <main class="view" id="view-availability" hidden>
   <div class="head"><div class="in">
-    <div class="head-top"><span class="eyebrow">My availability</span><button type="button" class="theme-btn" data-theme-btn></button></div>
-    <h1>Days you may be <em>asked to cover</em></h1>
+    <div class="head-top"><span class="eyebrow" data-t="avail_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
+    <h1 data-t="avail_h1"></h1>
     <p class="lead" id="avail-lead" hidden></p>
   </div></div>
-  <div class="body"><div class="in" id="avail-body">
-    <p class="note">Loading the shift list…</p>
-  </div></div>
+  <div class="body"><div class="in" id="avail-body"></div></div>
 </main>
 
 <!-- ============================================================ TIMESHEET -->
 <main class="view" id="view-timesheet" hidden>
   <div class="head"><div class="in">
-    <div class="head-top"><span class="eyebrow">Work study hours</span><button type="button" class="theme-btn" data-theme-btn></button></div>
-    <h1>Submit your <em>timesheet</em></h1>
+    <div class="head-top"><span class="eyebrow" data-t="ts_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
+    <h1 data-t="ts_h1"></h1>
   </div></div>
   <div class="body"><div class="in">
     <div class="panel due">
-      <span class="eyebrow">Due every week</span>
-      <p class="big"><em>Sunday</em>, 5 pm</p>
-      <p>Your timesheet needs to be submitted by Sunday at 5 pm.</p>
+      <span class="eyebrow" data-t="ts_due"></span>
+      <p class="big" data-t="ts_big"></p>
+      <p data-t="ts_text"></p>
     </div>
-    <a class="portal" href="https://www.drbu.edu/timesheet" target="_blank" rel="noopener">Open the timesheet portal<span class="arr" aria-hidden="true">&#8599;</span></a>
+    <a class="portal" href="https://www.drbu.edu/timesheet" target="_blank" rel="noopener"><span data-t="ts_portal"></span><span class="arr" aria-hidden="true">&#8599;</span></a>
     <p class="portal-url">drbu.edu/timesheet</p>
-    <p class="motto">It's not done until your hours are <em>submitted.</em></p>
+    <p class="motto" data-t="ts_motto"></p>
   </div></div>
 </main>
 
       <footer class="foot">
         <div class="in">
           <span class="brand"><span class="cjk" lang="zh" aria-hidden="true">淨</span>Kitchen Cleanup</span>
-          <p id="data-status">Shift list: loading…</p>
-          <p>Your name is saved on this phone only.</p>
+          <p id="data-status"></p>
+          <p data-t="saved_here"></p>
           <div class="install" id="install">
-            <button type="button" class="install-btn" id="install-btn">Install as app</button>
+            <button type="button" class="install-btn" id="install-btn" data-t="install"></button>
             <p class="install-help" id="install-help" hidden></p>
           </div>
         </div>
@@ -536,15 +531,574 @@ p{margin:0}
   var FILES = { shifts: "shifts.csv", students: "students.csv", roles: "roles.csv" };
   var SETTINGS_FILE = "settings.csv", settingsProblems = [];
 
+  /* English day names for the shift files and their checks; what the
+     app shows comes from STR, in the chosen language */
   var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  var TABS = [
-    { id: "shifts", label: "My shifts", title: "My shifts" },
-    { id: "callout", label: "Call out", title: "Call out" },
-    { id: "availability", label: "My availability", title: "My availability" },
-    { id: "timesheet", label: "Submit Timesheet", title: "Submit timesheet" }
-  ];
-  var ME_KEY = "kitchen.me", TS_KEY = "kitchen.timesheet";
+  var TABS = ["shifts", "callout", "availability", "timesheet"];
+  var ME_KEY = "kitchen.me", TS_KEY = "kitchen.timesheet", LANG_KEY = "kitchen.lang";
+
+  /* STRINGS: every word the app shows, in each language it offers. Names,
+     roles (Pots & Pans, Shift Leader…), the managers' titles and the
+     messages students send stay in English in every language. {name}
+     marks something filled in. Keep each language's keys, {names} and
+     tags the same as English's (tests/data.test.js checks). */
+  var STR = {
+    en: {
+      days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      dshort: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      mshort: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      date_long: "{wd}, {month} {d}",
+      date_short: "{mon} {d}",
+      tab_shifts: "My shifts",
+      tab_callout: "Call out",
+      tab_availability: "My availability",
+      tab_timesheet: "Submit Timesheet",
+      views: "Views",
+      due_today: "(due today)",
+      lang_label: "Language: {name}. Tap for {next}.",
+      mode_auto: "Auto (dark 7 pm to 7 am)",
+      mode_light: "Light",
+      mode_dark: "Dark",
+      theme_label: "Appearance: {mode}. Tap for {next}.",
+      theme_title: "Appearance: {mode}",
+
+      shifts_eyebrow: "Kitchen cleanup",
+      shifts_h1: "Your <em>shifts</em>",
+      your_name: "Your name",
+      choose_name: "Choose your name…",
+      loading: "Loading the shift list…",
+      choose_prompt: "Choose your name above to see your shifts and who can cover them.",
+      load_failed: "The shift list didn't load.",
+      load_file: "Open the app from its web address. A page opened straight off the disk can't read the list.",
+      load_retry: "Close the app and open it again. If it still doesn't load, tell the Student Kitchen Manager.",
+      today_is: "Today is {date}",
+      glance_label: "Your shifts this week",
+      today: "Today",
+      tomorrow: "Tomorrow",
+      on_with_you: "On with you",
+      shift_backups: "Shift Backups · {n}",
+      can_cover: "Can cover for you",
+      last_resort: "Last resort",
+      last_resort_note: "They can cover for you, but you can't cover their shifts in return, or they're already working that day.",
+      no_cover: "No one is listed to cover this shift yet.",
+
+      co_eyebrow: "Absences",
+      co_h1: "Can't make your <em>shift?</em>",
+      co_lead: "Every shift is done in full, no matter who shows up. An uncovered absence becomes overtime for your teammates.",
+      co_how: "The messages below are in English, ready to send. Tap Copy message, paste it into WhatsApp or a text, and change any words in [brackets] first.",
+      msg_noname: "Choose your name on My shifts, and the messages will include it.",
+      msg_h: "Message",
+      copy: "Copy message",
+      copied: "Copied",
+      copy_failed: "Press and hold the message to copy it.",
+      sick_h: "Sick or Unplanned Absence",
+      sick_a: "Too sick to get out of bed",
+      a1: "Right away, message each of your backups, one by one.",
+      a1s: "By text or WhatsApp. Send it to each person separately, not in a group. Your backups for each shift are on My shifts.",
+      a2: "When someone says yes, tell everyone else.",
+      a3: "No one has said yes by 10:00 am?",
+      a3t: "Message the Student Kitchen Manager ({km}) on WhatsApp.",
+      a4: "Then do what the Student Kitchen Manager tells you.",
+      sick_b: "Not sure yet if you'll be well enough",
+      b1: "Still find a backup now. Message each of your backups, one by one.",
+      b2: "By 11:00 am, decide: either a backup has said yes, or you will come in yourself.",
+      b2s: "Tell your backup which it is.",
+      b3: "11:00 am, no backup, and you can't come in?",
+      b3t: "Message the Student Kitchen Manager ({km}) right away.",
+      sick_c: "Forgot your shift, and it has already started",
+      c1: "Go to work right now, even if it's already 12:15 pm.",
+      c2: "Don't stop at the DRBU building for gloves or an apron.",
+      c3: "Tell the Shift Leader what happened.",
+      c4: "Already after 12:40 pm?",
+      c4t: "Message the Student Kitchen Manager ({km}) and explain what happened.",
+      planned_h: "Planned Absence",
+      p1: "Find a backup in advance. Message each of your backups, one by one.",
+      p2: "No backup by 5 days before your absence?",
+      p2t: "Message the Student Kitchen Manager ({km}). Say who did not reply, and who could not cover.",
+      p3: "Only 1 or 2 days before your absence?",
+      p3t: "Follow Sick or Unplanned Absence, above.",
+      covered: "Covered",
+      afterward: "Afterward",
+      after_text: "Do the shift you promised in return, when you agreed to.",
+      co_motto: "It's not covered until someone <em>says yes.</em>",
+      contacts: "Contacts",
+
+      avail_eyebrow: "My availability",
+      avail_h1: "Days you may be <em>asked to cover</em>",
+      avail_lead: "<b>{name}</b>, you're a backup on these days. Someone on that shift may ask you to cover, in exchange for a shift of yours.",
+      avail_no_name: "Choose your name on My shifts to see the days you may be asked to cover.",
+      avail_failed: "The shift list didn't load. See My shifts.",
+      avail_none: "You're not listed as a backup on any day.",
+      exchange_for: "In exchange for your {day}",
+      cover_as: "As {role}",
+      wrong_info: "Something here wrong or out of date? Send an email to the Student Kitchen Manager ({name}).",
+
+      ts_eyebrow: "Work study hours",
+      ts_h1: "Submit your <em>timesheet</em>",
+      ts_due: "Due every week",
+      ts_big: "<em>Sunday</em>, 5 pm",
+      ts_text: "Your timesheet needs to be submitted by Sunday at 5 pm.",
+      ts_portal: "Open the timesheet portal",
+      ts_motto: "It's not done until your hours are <em>submitted.</em>",
+
+      status_loading: "Shift list: loading…",
+      status_ok: "Shift list: {students} students, {shifts} shifts a week.",
+      status_failed: "Shift list: not loaded.",
+      saved_here: "Your name is saved on this phone only.",
+      install: "Install as app",
+      install_ios: "In Safari, tap the Share button, then Add to Home Screen.",
+      install_other: "Open your browser's menu and choose Install app or Add to Home screen."
+    },
+
+    "zh-Hans": {
+      days: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"],
+      dshort: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+      months: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      mshort: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      date_long: "{month}月{d}日 {wd}",
+      date_short: "{mon}月{d}日",
+      tab_shifts: "我的班次",
+      tab_callout: "请假",
+      tab_availability: "我的替班",
+      tab_timesheet: "提交工时表",
+      views: "页面",
+      due_today: "（今天截止）",
+      lang_label: "语言：{name}。点按切换为{next}。",
+      mode_auto: "自动（晚上7点至早上7点为深色）",
+      mode_light: "浅色",
+      mode_dark: "深色",
+      theme_label: "外观：{mode}。点按切换为{next}。",
+      theme_title: "外观：{mode}",
+
+      shifts_eyebrow: "厨房清洁",
+      shifts_h1: "你的<em>班次</em>",
+      your_name: "你的名字",
+      choose_name: "选择你的名字…",
+      loading: "正在载入班表…",
+      choose_prompt: "在上方选择你的名字，查看你的班次，以及谁可以替你。",
+      load_failed: "班表没有载入。",
+      load_file: "请从网址打开本应用。直接从本机文件打开的页面无法读取班表。",
+      load_retry: "请关闭本应用后重新打开。如果仍然无法载入，请告诉 Student Kitchen Manager。",
+      today_is: "今天是{date}",
+      glance_label: "你本周的班次",
+      today: "今天",
+      tomorrow: "明天",
+      on_with_you: "同班同学",
+      shift_backups: "替班人选 · {n}",
+      can_cover: "可以替你的人",
+      last_resort: "最后选择",
+      last_resort_note: "他们可以替你，但你无法回替他们的班，或者他们当天已经有班。",
+      no_cover: "这个班次还没有可以替班的人。",
+
+      co_eyebrow: "请假",
+      co_h1: "无法来<em>上班？</em>",
+      co_lead: "无论谁来，每个班次都必须完整完成。没有人替的缺勤，会变成同事的加班。",
+      co_how: "下面的消息是英文的，可以直接发送。点按「复制消息」，粘贴到 WhatsApp 或短信里，先修改 [方括号] 里的字，再发送。",
+      msg_noname: "在「我的班次」选择你的名字，消息里就会填上你的名字。",
+      msg_h: "消息（英文）",
+      copy: "复制消息",
+      copied: "已复制",
+      copy_failed: "长按消息即可复制。",
+      sick_h: "生病或临时请假",
+      sick_a: "病得起不了床",
+      a1: "马上给你的每一位替班人选发消息，一个一个发。",
+      a1s: "用短信或 WhatsApp 分别发给每个人，不要发在群组里。每个班次的替班人选在「我的班次」里。",
+      a2: "有人答应后，告诉其他所有人。",
+      a3: "到上午10:00还没有人答应？",
+      a3t: "在 WhatsApp 上给 Student Kitchen Manager（{km}）发消息。",
+      a4: "然后按照 Student Kitchen Manager 的指示去做。",
+      sick_b: "还不确定身体能不能好转",
+      b1: "仍然要现在就找替班。给你的每一位替班人选发消息，一个一个发。",
+      b2: "上午11:00前做好决定：已经有替班人答应，或者你自己来上班。",
+      b2s: "无论是哪一种，都要告诉你的替班人。",
+      b3: "到了上午11:00，没有替班，你也来不了？",
+      b3t: "马上给 Student Kitchen Manager（{km}）发消息。",
+      sick_c: "忘了上班，班次已经开始",
+      c1: "马上去上班，即使已经中午12:15了。",
+      c2: "不要先去 DRBU 大楼拿手套或围裙。",
+      c3: "告诉 Shift Leader 发生了什么。",
+      c4: "已经过了中午12:40？",
+      c4t: "给 Student Kitchen Manager（{km}）发消息，说明发生了什么。",
+      planned_h: "预先请假",
+      p1: "提前找好替班。给你的每一位替班人选发消息，一个一个发。",
+      p2: "请假日前5天还没有找到替班？",
+      p2t: "给 Student Kitchen Manager（{km}）发消息，说明谁没有回复，谁无法替班。",
+      p3: "离请假日只剩1到2天？",
+      p3t: "按照上面的「生病或临时请假」去做。",
+      covered: "已有人替班",
+      afterward: "之后",
+      after_text: "在约定的时间，替对方上你答应的那个班。",
+      co_motto: "有人<em>答应</em>了，才算有人替班。",
+      contacts: "联系人",
+
+      avail_eyebrow: "我的替班",
+      avail_h1: "你可能被请求<em>替班</em>的日子",
+      avail_lead: "<b>{name}</b>，你是以下日子的替班人选。当天有班的同学可能会请你替班，作为交换，对方会替你上一个班。",
+      avail_no_name: "在「我的班次」选择你的名字，就能看到你可能被请求替班的日子。",
+      avail_failed: "班表没有载入，请看「我的班次」。",
+      avail_none: "你目前不是任何一天的替班人选。",
+      exchange_for: "对方替你上{day}的班",
+      cover_as: "岗位：{role}",
+      wrong_info: "这里的信息有误或已过时？请发电子邮件给 Student Kitchen Manager（{name}）。",
+
+      ts_eyebrow: "勤工助学工时",
+      ts_h1: "提交你的<em>工时表</em>",
+      ts_due: "每周截止",
+      ts_big: "<em>星期日</em> 下午5点",
+      ts_text: "你的工时表必须在星期日下午5点前提交。",
+      ts_portal: "打开工时表网站",
+      ts_motto: "工时<em>提交</em>了，才算完成。",
+
+      status_loading: "班表：载入中…",
+      status_ok: "班表：{students}位学生，每周{shifts}个班次。",
+      status_failed: "班表：未载入。",
+      saved_here: "你的名字只保存在这部手机上。",
+      install: "安装为应用",
+      install_ios: "在 Safari 中点按“分享”按钮，然后选择“添加到主屏幕”。",
+      install_other: "打开浏览器的菜单，选择“安装应用”或“添加到主屏幕”。"
+    },
+
+    "zh-Hant": {
+      days: ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"],
+      dshort: ["週一", "週二", "週三", "週四", "週五", "週六", "週日"],
+      months: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      mshort: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      date_long: "{month}月{d}日 {wd}",
+      date_short: "{mon}月{d}日",
+      tab_shifts: "我的班次",
+      tab_callout: "請假",
+      tab_availability: "我的代班",
+      tab_timesheet: "提交工時表",
+      views: "頁面",
+      due_today: "（今天截止）",
+      lang_label: "語言：{name}。點按切換為{next}。",
+      mode_auto: "自動（晚上7點至早上7點為深色）",
+      mode_light: "淺色",
+      mode_dark: "深色",
+      theme_label: "外觀：{mode}。點按切換為{next}。",
+      theme_title: "外觀：{mode}",
+
+      shifts_eyebrow: "廚房清潔",
+      shifts_h1: "你的<em>班次</em>",
+      your_name: "你的名字",
+      choose_name: "選擇你的名字…",
+      loading: "正在載入班表…",
+      choose_prompt: "在上方選擇你的名字，查看你的班次，以及誰可以幫你代班。",
+      load_failed: "班表沒有載入。",
+      load_file: "請從網址開啟本應用程式。直接從本機檔案開啟的頁面無法讀取班表。",
+      load_retry: "請關閉本應用程式後重新開啟。如果仍然無法載入，請告訴 Student Kitchen Manager。",
+      today_is: "今天是{date}",
+      glance_label: "你本週的班次",
+      today: "今天",
+      tomorrow: "明天",
+      on_with_you: "同班同學",
+      shift_backups: "代班人選 · {n}",
+      can_cover: "可以幫你代班的人",
+      last_resort: "最後選擇",
+      last_resort_note: "他們可以幫你代班，但你無法回代他們的班，或者他們當天已經有班。",
+      no_cover: "這個班次還沒有可以代班的人。",
+
+      co_eyebrow: "請假",
+      co_h1: "無法來<em>上班？</em>",
+      co_lead: "無論誰來，每個班次都必須完整完成。沒有人代班的缺勤，會變成同事的加班。",
+      co_how: "下面的訊息是英文的，可以直接傳送。點按「複製訊息」，貼到 WhatsApp 或簡訊裡，先修改 [方括號] 裡的字，再傳送。",
+      msg_noname: "在「我的班次」選擇你的名字，訊息裡就會填上你的名字。",
+      msg_h: "訊息（英文）",
+      copy: "複製訊息",
+      copied: "已複製",
+      copy_failed: "長按訊息即可複製。",
+      sick_h: "生病或臨時請假",
+      sick_a: "病得起不了床",
+      a1: "馬上傳訊息給你的每一位代班人選，一個一個傳。",
+      a1s: "用簡訊或 WhatsApp 分別傳給每個人，不要傳在群組裡。每個班次的代班人選在「我的班次」裡。",
+      a2: "有人答應後，告訴其他所有人。",
+      a3: "到上午10:00還沒有人答應？",
+      a3t: "在 WhatsApp 上傳訊息給 Student Kitchen Manager（{km}）。",
+      a4: "然後依照 Student Kitchen Manager 的指示去做。",
+      sick_b: "還不確定身體能不能好轉",
+      b1: "仍然要現在就找代班。傳訊息給你的每一位代班人選，一個一個傳。",
+      b2: "上午11:00前做好決定：已經有代班人答應，或者你自己來上班。",
+      b2s: "無論是哪一種，都要告訴你的代班人。",
+      b3: "到了上午11:00，沒有代班，你也來不了？",
+      b3t: "馬上傳訊息給 Student Kitchen Manager（{km}）。",
+      sick_c: "忘了上班，班次已經開始",
+      c1: "馬上去上班，即使已經中午12:15了。",
+      c2: "不要先去 DRBU 大樓拿手套或圍裙。",
+      c3: "告訴 Shift Leader 發生了什麼事。",
+      c4: "已經過了中午12:40？",
+      c4t: "傳訊息給 Student Kitchen Manager（{km}），說明發生了什麼事。",
+      planned_h: "預先請假",
+      p1: "提前找好代班。傳訊息給你的每一位代班人選，一個一個傳。",
+      p2: "請假日前5天還沒有找到代班？",
+      p2t: "傳訊息給 Student Kitchen Manager（{km}），說明誰沒有回覆，誰無法代班。",
+      p3: "離請假日只剩1到2天？",
+      p3t: "依照上面的「生病或臨時請假」去做。",
+      covered: "已有人代班",
+      afterward: "之後",
+      after_text: "在約定的時間，幫對方上你答應的那個班。",
+      co_motto: "有人<em>答應</em>了，才算有人代班。",
+      contacts: "聯絡人",
+
+      avail_eyebrow: "我的代班",
+      avail_h1: "你可能被請求<em>代班</em>的日子",
+      avail_lead: "<b>{name}</b>，你是以下日子的代班人選。當天有班的同學可能會請你代班，作為交換，對方會幫你上一個班。",
+      avail_no_name: "在「我的班次」選擇你的名字，就能看到你可能被請求代班的日子。",
+      avail_failed: "班表沒有載入，請看「我的班次」。",
+      avail_none: "你目前不是任何一天的代班人選。",
+      exchange_for: "對方幫你上{day}的班",
+      cover_as: "職務：{role}",
+      wrong_info: "這裡的資訊有誤或已過時？請寄電子郵件給 Student Kitchen Manager（{name}）。",
+
+      ts_eyebrow: "工讀時數",
+      ts_h1: "提交你的<em>工時表</em>",
+      ts_due: "每週截止",
+      ts_big: "<em>星期日</em> 下午5點",
+      ts_text: "你的工時表必須在星期日下午5點前提交。",
+      ts_portal: "開啟工時表網站",
+      ts_motto: "時數<em>提交</em>了，才算完成。",
+
+      status_loading: "班表：載入中…",
+      status_ok: "班表：{students}位學生，每週{shifts}個班次。",
+      status_failed: "班表：未載入。",
+      saved_here: "你的名字只儲存在這支手機上。",
+      install: "安裝為應用程式",
+      install_ios: "在 Safari 中點按「分享」按鈕，然後選擇「加入主畫面」。",
+      install_other: "開啟瀏覽器的選單，選擇「安裝應用程式」或「加到主畫面」。"
+    },
+
+    th: {
+      days: ["วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์", "วันอาทิตย์"],
+      dshort: ["จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."],
+      months: ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"],
+      mshort: ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."],
+      date_long: "{wd}ที่ {d} {month}",
+      date_short: "{d} {mon}",
+      tab_shifts: "กะของฉัน",
+      tab_callout: "แจ้งลา",
+      tab_availability: "รับแทนกะ",
+      tab_timesheet: "ส่งใบลงเวลา",
+      views: "หน้า",
+      due_today: "(ครบกำหนดวันนี้)",
+      lang_label: "ภาษา: {name} แตะเพื่อเปลี่ยนเป็น{next}",
+      mode_auto: "อัตโนมัติ (โหมดมืดตั้งแต่ 19:00 ถึง 07:00 น.)",
+      mode_light: "สว่าง",
+      mode_dark: "มืด",
+      theme_label: "การแสดงผล: {mode} แตะเพื่อเปลี่ยนเป็น{next}",
+      theme_title: "การแสดงผล: {mode}",
+
+      shifts_eyebrow: "ทีมทำความสะอาดครัว",
+      shifts_h1: "กะ<em>ของคุณ</em>",
+      your_name: "ชื่อของคุณ",
+      choose_name: "เลือกชื่อของคุณ…",
+      loading: "กำลังโหลดตารางกะ…",
+      choose_prompt: "เลือกชื่อของคุณด้านบน เพื่อดูกะของคุณ และดูว่าใครแทนคุณได้",
+      load_failed: "โหลดตารางกะไม่สำเร็จ",
+      load_file: "โปรดเปิดแอปจากที่อยู่เว็บ หน้าที่เปิดจากไฟล์ในเครื่องโดยตรงจะอ่านตารางกะไม่ได้",
+      load_retry: "ปิดแอปแล้วเปิดใหม่ ถ้ายังโหลดไม่ได้ ให้แจ้ง Student Kitchen Manager",
+      today_is: "วันนี้คือ{date}",
+      glance_label: "กะของคุณในสัปดาห์นี้",
+      today: "วันนี้",
+      tomorrow: "พรุ่งนี้",
+      on_with_you: "ทำงานกับคุณ",
+      shift_backups: "ตัวสำรอง · {n}",
+      can_cover: "คนที่แทนคุณได้",
+      last_resort: "ทางเลือกสุดท้าย",
+      last_resort_note: "พวกเขาแทนคุณได้ แต่คุณแทนกะของพวกเขาคืนไม่ได้ หรือพวกเขามีกะในวันนั้นอยู่แล้ว",
+      no_cover: "ยังไม่มีใครที่แทนกะนี้ได้",
+
+      co_eyebrow: "การลา",
+      co_h1: "มา<em>ทำกะ</em>ไม่ได้?",
+      co_lead: "ทุกกะต้องทำให้ครบ ไม่ว่าใครจะมา การขาดงานที่ไม่มีคนแทน จะกลายเป็นงานล่วงเวลาของเพื่อนร่วมทีม",
+      co_how: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แตะ “คัดลอกข้อความ” แล้ววางใน WhatsApp หรือ SMS และแก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
+      msg_noname: "เลือกชื่อของคุณที่หน้า “กะของฉัน” แล้วข้อความจะมีชื่อของคุณ",
+      msg_h: "ข้อความ (ภาษาอังกฤษ)",
+      copy: "คัดลอกข้อความ",
+      copied: "คัดลอกแล้ว",
+      copy_failed: "กดค้างที่ข้อความเพื่อคัดลอก",
+      sick_h: "ป่วยหรือลากะทันหัน",
+      sick_a: "ป่วยจนลุกจากเตียงไม่ไหว",
+      a1: "ส่งข้อความหาตัวสำรองทุกคนทันที ทีละคน",
+      a1s: "ทาง SMS หรือ WhatsApp ส่งแยกให้แต่ละคน ไม่ส่งในกลุ่ม ดูตัวสำรองของแต่ละกะได้ที่หน้า “กะของฉัน”",
+      a2: "เมื่อมีคนตอบตกลง ให้แจ้งทุกคนที่เหลือ",
+      a3: "ถึง 10:00 น. แล้วยังไม่มีใครตอบตกลง?",
+      a3t: "ส่งข้อความทาง WhatsApp ถึง Student Kitchen Manager ({km})",
+      a4: "จากนั้นทำตามที่ Student Kitchen Manager บอก",
+      sick_b: "ยังไม่แน่ใจว่าจะหายดีพอหรือไม่",
+      b1: "ยังต้องหาตัวสำรองตอนนี้เลย ส่งข้อความหาตัวสำรองทุกคน ทีละคน",
+      b2: "ภายใน 11:00 น. ต้องตัดสินใจ: มีตัวสำรองตอบตกลงแล้ว หรือคุณจะมาทำงานเอง",
+      b2s: "บอกตัวสำรองของคุณว่าเป็นแบบไหน",
+      b3: "11:00 น. แล้ว ไม่มีตัวสำรอง และคุณมาไม่ได้?",
+      b3t: "ส่งข้อความถึง Student Kitchen Manager ({km}) ทันที",
+      sick_c: "ลืมกะ และกะเริ่มไปแล้ว",
+      c1: "ไปทำงานเดี๋ยวนี้ แม้จะ 12:15 น. แล้วก็ตาม",
+      c2: "ไม่ต้องแวะไปเอาถุงมือหรือผ้ากันเปื้อนที่อาคาร DRBU",
+      c3: "บอก Shift Leader ว่าเกิดอะไรขึ้น",
+      c4: "เลย 12:40 น. ไปแล้ว?",
+      c4t: "ส่งข้อความถึง Student Kitchen Manager ({km}) และอธิบายสิ่งที่เกิดขึ้น",
+      planned_h: "ลาล่วงหน้า",
+      p1: "หาตัวสำรองไว้ล่วงหน้า ส่งข้อความหาตัวสำรองทุกคน ทีละคน",
+      p2: "เหลือ 5 วันก่อนวันลาแล้ว ยังไม่มีตัวสำรอง?",
+      p2t: "ส่งข้อความถึง Student Kitchen Manager ({km}) บอกว่าใครไม่ตอบ และใครแทนไม่ได้",
+      p3: "เหลือแค่ 1 หรือ 2 วันก่อนวันลา?",
+      p3t: "ทำตามขั้นตอน “ป่วยหรือลากะทันหัน” ด้านบน",
+      covered: "มีคนแทนแล้ว",
+      afterward: "หลังจากนั้น",
+      after_text: "ทำกะที่คุณสัญญาว่าจะแทนคืน ตามเวลาที่ตกลงกันไว้",
+      co_motto: "ยังไม่ถือว่ามีคนแทน จนกว่าจะมีคน<em>ตอบตกลง</em>",
+      contacts: "ผู้ติดต่อ",
+
+      avail_eyebrow: "รับแทนกะ",
+      avail_h1: "วันที่คุณอาจถูก<em>ขอให้แทน</em>",
+      avail_lead: "<b>{name}</b> คุณเป็นตัวสำรองในวันเหล่านี้ คนที่มีกะในวันนั้นอาจขอให้คุณแทน และจะทำกะหนึ่งของคุณเป็นการแลกเปลี่ยน",
+      avail_no_name: "เลือกชื่อของคุณที่หน้า “กะของฉัน” เพื่อดูวันที่คุณอาจถูกขอให้แทน",
+      avail_failed: "โหลดตารางกะไม่สำเร็จ ดูที่หน้า “กะของฉัน”",
+      avail_none: "คุณยังไม่ได้เป็นตัวสำรองในวันใดเลย",
+      exchange_for: "แลกกับกะ{day}ของคุณ",
+      cover_as: "ตำแหน่ง: {role}",
+      wrong_info: "ข้อมูลตรงนี้ผิดหรือไม่เป็นปัจจุบัน? ส่งอีเมลถึง Student Kitchen Manager ({name})",
+
+      ts_eyebrow: "ชั่วโมงงาน Work Study",
+      ts_h1: "ส่ง<em>ใบลงเวลา</em>",
+      ts_due: "ครบกำหนดทุกสัปดาห์",
+      ts_big: "<em>วันอาทิตย์</em> 17:00 น.",
+      ts_text: "ต้องส่งใบลงเวลาภายในวันอาทิตย์ เวลา 17:00 น.",
+      ts_portal: "เปิดเว็บไซต์ใบลงเวลา",
+      ts_motto: "งานยังไม่เสร็จ จนกว่าจะ<em>ส่งชั่วโมงงาน</em>แล้ว",
+
+      status_loading: "ตารางกะ: กำลังโหลด…",
+      status_ok: "ตารางกะ: นักศึกษา {students} คน, {shifts} กะต่อสัปดาห์",
+      status_failed: "ตารางกะ: โหลดไม่สำเร็จ",
+      saved_here: "ชื่อของคุณบันทึกไว้ในโทรศัพท์เครื่องนี้เท่านั้น",
+      install: "ติดตั้งเป็นแอป",
+      install_ios: "ใน Safari แตะปุ่มแชร์ แล้วเลือก “เพิ่มไปยังหน้าจอโฮม”",
+      install_other: "เปิดเมนูของเบราว์เซอร์ แล้วเลือก “ติดตั้งแอป” หรือ “เพิ่มไปยังหน้าจอหลัก”"
+    },
+
+    vi: {
+      days: ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ nhật"],
+      dshort: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"],
+      months: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      mshort: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      date_long: "{wd}, {d} tháng {month}",
+      date_short: "{d}/{mon}",
+      tab_shifts: "Ca của tôi",
+      tab_callout: "Báo nghỉ",
+      tab_availability: "Thay ca",
+      tab_timesheet: "Nộp bảng giờ",
+      views: "Trang",
+      due_today: "(hạn hôm nay)",
+      lang_label: "Ngôn ngữ: {name}. Chạm để đổi sang {next}.",
+      mode_auto: "Tự động (tối từ 19:00 đến 7:00)",
+      mode_light: "Sáng",
+      mode_dark: "Tối",
+      theme_label: "Giao diện: {mode}. Chạm để đổi sang {next}.",
+      theme_title: "Giao diện: {mode}",
+
+      shifts_eyebrow: "Dọn dẹp bếp",
+      shifts_h1: "Ca <em>của bạn</em>",
+      your_name: "Tên của bạn",
+      choose_name: "Chọn tên của bạn…",
+      loading: "Đang tải lịch ca…",
+      choose_prompt: "Chọn tên của bạn ở trên để xem các ca của bạn và ai có thể làm thay.",
+      load_failed: "Không tải được lịch ca.",
+      load_file: "Hãy mở ứng dụng từ địa chỉ web. Trang mở trực tiếp từ tệp trên máy không đọc được lịch ca.",
+      load_retry: "Hãy đóng ứng dụng rồi mở lại. Nếu vẫn không tải được, hãy báo cho Student Kitchen Manager.",
+      today_is: "Hôm nay là {date}",
+      glance_label: "Các ca của bạn tuần này",
+      today: "Hôm nay",
+      tomorrow: "Ngày mai",
+      on_with_you: "Làm cùng bạn",
+      shift_backups: "Người dự phòng · {n}",
+      can_cover: "Có thể làm thay bạn",
+      last_resort: "Lựa chọn cuối cùng",
+      last_resort_note: "Họ có thể làm thay bạn, nhưng bạn không thể làm lại ca của họ, hoặc hôm đó họ đã có ca.",
+      no_cover: "Chưa có ai có thể làm thay ca này.",
+
+      co_eyebrow: "Nghỉ làm",
+      co_h1: "Không thể đến <em>làm ca?</em>",
+      co_lead: "Dù ai đến làm, mỗi ca đều phải làm trọn vẹn. Vắng mặt mà không có người thay sẽ thành giờ làm thêm của đồng đội.",
+      co_how: "Các tin nhắn bên dưới bằng tiếng Anh, sẵn sàng để gửi. Chạm “Sao chép tin nhắn”, dán vào WhatsApp hoặc tin nhắn điện thoại, và sửa chữ trong [ngoặc vuông] trước khi gửi.",
+      msg_noname: "Chọn tên của bạn ở trang “Ca của tôi”, tin nhắn sẽ có sẵn tên bạn.",
+      msg_h: "Tin nhắn (tiếng Anh)",
+      copy: "Sao chép tin nhắn",
+      copied: "Đã sao chép",
+      copy_failed: "Nhấn giữ tin nhắn để sao chép.",
+      sick_h: "Ốm hoặc nghỉ đột xuất",
+      sick_a: "Ốm đến mức không dậy nổi",
+      a1: "Nhắn tin ngay cho từng người dự phòng của bạn, lần lượt từng người.",
+      a1s: "Bằng tin nhắn điện thoại hoặc WhatsApp. Gửi riêng cho từng người, không gửi trong nhóm. Người dự phòng của mỗi ca có ở trang “Ca của tôi”.",
+      a2: "Khi có người đồng ý, hãy báo cho tất cả những người còn lại.",
+      a3: "Đến 10:00 sáng vẫn chưa ai đồng ý?",
+      a3t: "Nhắn WhatsApp cho Student Kitchen Manager ({km}).",
+      a4: "Sau đó làm theo hướng dẫn của Student Kitchen Manager.",
+      sick_b: "Chưa chắc sẽ đủ khỏe để đi làm",
+      b1: "Vẫn phải tìm người dự phòng ngay bây giờ. Nhắn tin cho từng người dự phòng của bạn, lần lượt từng người.",
+      b2: "Trước 11:00 sáng, hãy quyết định: đã có người dự phòng đồng ý, hoặc bạn sẽ tự đến làm.",
+      b2s: "Báo cho người dự phòng biết bạn chọn cách nào.",
+      b3: "Đã 11:00 sáng, không có người dự phòng, và bạn không đến được?",
+      b3t: "Nhắn tin ngay cho Student Kitchen Manager ({km}).",
+      sick_c: "Quên ca, và ca đã bắt đầu",
+      c1: "Đi làm ngay, kể cả khi đã 12:15 trưa.",
+      c2: "Đừng ghé tòa nhà DRBU để lấy găng tay hay tạp dề.",
+      c3: "Kể cho Shift Leader chuyện gì đã xảy ra.",
+      c4: "Đã quá 12:40 trưa?",
+      c4t: "Nhắn tin cho Student Kitchen Manager ({km}) và giải thích chuyện đã xảy ra.",
+      planned_h: "Nghỉ có kế hoạch",
+      p1: "Tìm người dự phòng trước. Nhắn tin cho từng người dự phòng của bạn, lần lượt từng người.",
+      p2: "Còn 5 ngày trước ngày nghỉ mà chưa có người dự phòng?",
+      p2t: "Nhắn tin cho Student Kitchen Manager ({km}). Nói rõ ai không trả lời, và ai không thể làm thay.",
+      p3: "Chỉ còn 1 hoặc 2 ngày trước ngày nghỉ?",
+      p3t: "Hãy làm theo phần “Ốm hoặc nghỉ đột xuất” ở trên.",
+      covered: "Đã có người thay",
+      afterward: "Sau đó",
+      after_text: "Làm ca mà bạn đã hứa làm lại, vào lúc đã thỏa thuận.",
+      co_motto: "Chưa có người thay cho đến khi có người <em>đồng ý.</em>",
+      contacts: "Liên hệ",
+
+      avail_eyebrow: "Thay ca",
+      avail_h1: "Những ngày bạn có thể được <em>nhờ làm thay</em>",
+      avail_lead: "<b>{name}</b>, bạn là người dự phòng vào những ngày này. Người có ca hôm đó có thể nhờ bạn làm thay, và đổi lại họ sẽ làm một ca của bạn.",
+      avail_no_name: "Chọn tên của bạn ở trang “Ca của tôi” để xem những ngày bạn có thể được nhờ làm thay.",
+      avail_failed: "Không tải được lịch ca. Xem trang “Ca của tôi”.",
+      avail_none: "Bạn chưa là người dự phòng vào ngày nào.",
+      exchange_for: "Đổi lấy ca {day} của bạn",
+      cover_as: "Vị trí: {role}",
+      wrong_info: "Thông tin ở đây sai hoặc đã cũ? Hãy gửi email cho Student Kitchen Manager ({name}).",
+
+      ts_eyebrow: "Giờ làm Work Study",
+      ts_h1: "Nộp <em>bảng giờ</em>",
+      ts_due: "Hạn mỗi tuần",
+      ts_big: "<em>Chủ nhật</em>, 17:00",
+      ts_text: "Bảng giờ của bạn phải được nộp trước 17:00 Chủ nhật.",
+      ts_portal: "Mở trang nộp bảng giờ",
+      ts_motto: "Chưa xong cho đến khi giờ làm <em>được nộp.</em>",
+
+      status_loading: "Lịch ca: đang tải…",
+      status_ok: "Lịch ca: {students} sinh viên, {shifts} ca mỗi tuần.",
+      status_failed: "Lịch ca: chưa tải được.",
+      saved_here: "Tên của bạn chỉ được lưu trên điện thoại này.",
+      install: "Cài làm ứng dụng",
+      install_ios: "Trong Safari, chạm nút Chia sẻ, rồi chọn “Thêm vào MH chính”.",
+      install_other: "Mở menu của trình duyệt và chọn “Cài đặt ứng dụng” hoặc “Thêm vào màn hình chính”."
+    }
+  };
+  /* END STRINGS */
+
+  /* the languages, in the order the language button steps through them */
+  var LANGS = ["en", "zh-Hans", "zh-Hant", "th", "vi"];
+  var LANG_SHORT = { en: "EN", "zh-Hans": "简", "zh-Hant": "繁", th: "ไทย", vi: "VI" };
+  var LANG_NAME = { en: "English", "zh-Hans": "简体中文", "zh-Hant": "繁體中文", th: "ภาษาไทย", vi: "Tiếng Việt" };
+  var lang = "en";
+
+  /* a string in the chosen language (English if it's missing), with any
+     {name} filled in from v */
+  function t(k, v) {
+    var s = STR[lang] && STR[lang][k] != null ? STR[lang][k] : STR.en[k] != null ? STR.en[k] : k;
+    return v ? s.replace(/\{(\w+)\}/g, function (m, n) { return n in v ? v[n] : m; }) : s;
+  }
+  function dayName(d) { return t("days")[d]; }
+  function dayShort(d) { return t("dshort")[d]; }
 
   var store = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -553,6 +1107,22 @@ p{margin:0}
   };
 
   var data = null, loadError = null, me = store.get(ME_KEY) || "", shownDay = "";
+  /* the language: as chosen on this phone, or else the phone's own if the
+     app has it, or else English */
+  function pickLang() {
+    var saved = store.get(LANG_KEY);
+    if (LANGS.indexOf(saved) >= 0) return saved;
+    var want = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]);
+    for (var i = 0; i < want.length; i++) {
+      var w = String(want[i]).toLowerCase();
+      if (/^zh/.test(w)) return /hant|tw|hk|mo/.test(w) ? "zh-Hant" : "zh-Hans";
+      if (/^th/.test(w)) return "th";
+      if (/^vi/.test(w)) return "vi";
+      if (/^en/.test(w)) return "en";
+    }
+    return "en";
+  }
+  lang = pickLang();
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -786,7 +1356,7 @@ p{margin:0}
 
   function renderPicker() {
     var sel = $("me");
-    var opts = '<option value="">Choose your name…</option>';
+    var opts = '<option value="">' + t("choose_name") + "</option>";
     if (data) opts += data.names.map(function (n) {
       return '<option value="' + esc(n) + '"' + (n === me ? " selected" : "") + ">" + esc(n) + "</option>";
     }).join("");
@@ -806,11 +1376,13 @@ p{margin:0}
     t.setDate(t.getDate() + (d - (now.getDay() + 6) % 7 + 7) % 7);
     return t;
   }
-  /* "Sunday, October 4" and "Oct 4" */
-  function longDate(t) { return DAYS[(t.getDay() + 6) % 7] + ", " + MONTHS[t.getMonth()] + " " + t.getDate(); }
-  function shortDate(t) { return MONTHS[t.getMonth()].slice(0, 3) + " " + t.getDate(); }
+  /* "Sunday, October 4" and "Oct 4", in the chosen language */
+  function longDate(x) {
+    return t("date_long", { wd: dayName((x.getDay() + 6) % 7), month: t("months")[x.getMonth()], d: x.getDate() });
+  }
+  function shortDate(x) { return t("date_short", { mon: t("mshort")[x.getMonth()], d: x.getDate() }); }
   function whenPill(d, today) {
-    return d === today ? '<span class="when">Today</span>' : d === (today + 1) % 7 ? '<span class="when tmrw">Tomorrow</span>' : "";
+    return d === today ? '<span class="when">' + t("today") + "</span>" : d === (today + 1) % 7 ? '<span class="when tmrw">' + t("tomorrow") + "</span>" : "";
   }
 
   /* the week at a glance, in the head: today's date, then each of your
@@ -819,9 +1391,9 @@ p{margin:0}
   function glance(mine, now) {
     var today = (now.getDay() + 6) % 7;
     var next = mine.map(function (s) { return { s: s, t: nextDate(s.day, now) }; }).sort(function (a, b) { return a.t - b.t; });
-    return '<p class="today">Today is ' + longDate(now) + "</p>" +
-      '<ul class="gl" aria-label="Your shifts this week">' + next.map(function (x) {
-        return '<li class="k' + x.s.day + '"><span class="gd">' + DAYS[x.s.day].slice(0, 3) + '</span><span class="gt">' + shortDate(x.t) +
+    return '<p class="today">' + t("today_is", { date: longDate(now) }) + "</p>" +
+      '<ul class="gl" aria-label="' + t("glance_label") + '">' + next.map(function (x) {
+        return '<li class="k' + x.s.day + '"><span class="gd">' + dayShort(x.s.day) + '</span><span class="gt">' + shortDate(x.t) +
           '</span><span class="gr">' + esc(x.s.as) + "</span>" + (whenPill(x.s.day, today) || "<span></span>") + "</li>";
       }).join("") + "</ul>";
   }
@@ -831,13 +1403,12 @@ p{margin:0}
     $("glance").hidden = true;
     shownDay = dateKey(new Date());
     if (loadError) {
-      body.innerHTML = '<div class="panel msg"><b>The shift list didn\'t load.</b><p class="note">' + esc(loadError) +
-        "</p><p class=\"note\">" + (location.protocol === "file:" ? "Open the app from its web address. A page opened straight off the disk can't read the list." :
-        "Close the app and open it again. If it still doesn't load, tell the Student Kitchen Manager.") + "</p></div>";
+      body.innerHTML = '<div class="panel msg"><b>' + t("load_failed") + '</b><p class="note">' + esc(loadError) +
+        '</p><p class="note">' + t(location.protocol === "file:" ? "load_file" : "load_retry") + "</p></div>";
       return;
     }
-    if (!data) { body.innerHTML = '<p class="note">Loading the shift list…</p>'; return; }
-    if (!me) { body.innerHTML = '<p class="note">Choose your name above to see your shifts and who can cover them.</p>'; return; }
+    if (!data) { body.innerHTML = '<p class="note">' + t("loading") + "</p>"; return; }
+    if (!me) { body.innerHTML = '<p class="note">' + t("choose_prompt") + "</p>"; return; }
 
     var now = new Date(), today = (now.getDay() + 6) % 7;
     var mine = data.shifts.filter(function (s) { return s.who === me; }).sort(function (a, b) { return a.day - b.day; });
@@ -848,18 +1419,18 @@ p{margin:0}
         var crew = data.shifts.filter(function (x) { return x.day === s.day && x.group === s.group && x.who !== me; })
           .sort(function (a, b) { return roleRank(a.role) - roleRank(b.role) || a.who.localeCompare(b.who); });
         return '<section class="panel shift k' + s.day + '">' +
-          '<div class="shift-h"><h2>' + DAYS[s.day] + whenPill(s.day, today) + "</h2>" +
+          '<div class="shift-h"><h2>' + dayName(s.day) + whenPill(s.day, today) + "</h2>" +
           '<span class="role">' + esc(s.as) + "</span></div>" +
-          (crew.length ? '<div class="part"><h4>On with you</h4><ul class="crew">' + crew.map(function (x) {
+          (crew.length ? '<div class="part"><h4>' + t("on_with_you") + '</h4><ul class="crew">' + crew.map(function (x) {
             return "<li><span>" + esc(x.who) + '</span><span class="r">' + esc(x.role) + "</span></li>";
           }).join("") + "</ul></div>" : "") +
-          '<details class="backups"><summary><span>Shift Backups · ' + s.cover.length + "</span></summary>" +
-          (s.cover.length ? '<p class="cover-lead">Can cover for you</p>' +
+          '<details class="backups"><summary><span>' + t("shift_backups", { n: s.cover.length }) + "</span></summary>" +
+          (s.cover.length ? '<p class="cover-lead">' + t("can_cover") + "</p>" +
             backupList(s.cover.slice(0, s.lastFrom), 1, s.swap, s.as) +
-            (s.lastFrom < s.cover.length ? '<div class="last"><p class="last-h">Last resort</p>' +
-              "<p class=\"last-n\">They can cover for you, but you can't cover their shifts in return, or they're already working that day.</p>" +
+            (s.lastFrom < s.cover.length ? '<div class="last"><p class="last-h">' + t("last_resort") + "</p>" +
+              '<p class="last-n">' + t("last_resort_note") + "</p>" +
               backupList(s.cover.slice(s.lastFrom), s.lastFrom + 1, s.swap, s.as) + "</div>" : "") :
-            '<p class="cover-lead">No one is listed to cover this shift yet.</p>') + "</details>" +
+            '<p class="cover-lead">' + t("no_cover") + "</p>") + "</details>" +
           "</section>";
       }).join("");
   }
@@ -881,7 +1452,7 @@ p{margin:0}
   /* shifts as each role (as it's covered: a Shift Leader shift shows as
      Pots & Pans) followed by its days as tags in each day's colour. The
      given role first, then roles.csv order. */
-  function dayTag(d) { return '<span class="dp k' + d + '">' + DAYS[d].slice(0, 3) + "</span>"; }
+  function dayTag(d) { return '<span class="dp k' + d + '">' + dayShort(d) + "</span>"; }
   function shiftsHTML(shifts, first) {
     var by = {}, order = [];
     shifts.forEach(function (x) {
@@ -915,31 +1486,131 @@ p{margin:0}
     days.forEach(function (day, d) {
       if (!day) return;
       /* by your day in exchange, Monday first; 7 is the last resort */
-      rows.push('<li class="panel k' + d + '"><h2 class="d">' + DAYS[d] + "</h2>" + day.map(function (roles, back) {
+      rows.push('<li class="panel k' + d + '"><h2 class="d">' + dayName(d) + "</h2>" + day.map(function (roles, back) {
         return '<div class="ax' + (back < 7 ? "" : " lr") + '"><p class="xh">' +
-          (back < 7 ? "In exchange for your " + dayTag(back) : "Last resort") + "</p>" +
+          (back < 7 ? t("exchange_for", { day: dayTag(back) }) : t("last_resort")) + "</p>" +
           Object.keys(roles).sort(function (a, b) { return roleRank(a) - roleRank(b); }).map(function (as) {
-            return '<p class="ag"><span class="ar">As ' + esc(as) + '</span><span class="an">' +
+            return '<p class="ag"><span class="ar">' + t("cover_as", { role: esc(as) }) + '</span><span class="an">' +
               roles[as].sort(function (a, b) { return a.localeCompare(b); }).map(esc).join(", ") + "</span></p>";
           }).join("") + "</div>";
       }).filter(Boolean).join("") + "</li>");
     });
-    return rows.length ? '<ul class="avail-list">' + rows.join("") + "</ul>" : '<p class="note">You\'re not listed as a backup on any day.</p>';
+    return rows.length ? '<ul class="avail-list">' + rows.join("") + "</ul>" : '<p class="note">' + t("avail_none") + "</p>";
   }
 
   /* the My availability tab: the head's lead names who it's for */
   function renderAvailability() {
     var body = $("avail-body"), lead = $("avail-lead");
     lead.hidden = true;
-    if (loadError) { body.innerHTML = '<p class="note">The shift list didn\'t load. See My shifts.</p>'; return; }
-    if (!data) { body.innerHTML = '<p class="note">Loading the shift list…</p>'; return; }
-    if (!me) { body.innerHTML = '<p class="note">Choose your name on My shifts to see the days you may be asked to cover.</p>'; return; }
-    lead.innerHTML = "<b>" + esc(me) + "</b>, you\'re a backup on these days. Someone on that shift may ask you to cover, in exchange for a shift of yours.";
+    if (loadError) { body.innerHTML = '<p class="note">' + t("avail_failed") + "</p>"; return; }
+    if (!data) { body.innerHTML = '<p class="note">' + t("loading") + "</p>"; return; }
+    if (!me) { body.innerHTML = '<p class="note">' + t("avail_no_name") + "</p>"; return; }
+    lead.innerHTML = t("avail_lead", { name: esc(me) });
     lead.hidden = false;
-    var km = CONFIG.contacts.filter(function (c) { return /kitchen manager/i.test(c.role); })[0];
-    body.innerHTML = availability() +
-      (km ? '<p class="note">Something here wrong or out of date? Send an email to the ' + esc(km.role) + " (" + esc(km.name) + ").</p>" : "");
+    body.innerHTML = availability() + '<p class="note">' + t("wrong_info", { name: esc(kmName()) }) + "</p>";
   }
+
+  /* -------------------------------------------------------- Call out */
+  /* The messages students send, always in English, with their name, the
+     role of today's shift (or their only role) and the Student Kitchen
+     Manager's name filled in. Anything still in [brackets] is theirs to
+     change before sending. */
+  var MSG = {
+    sick: "Hello friend, I woke up sick and I am not sure I can come to my {role} shift today. Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\n{me}",
+    thanks: "Thank you, but [name] has already agreed to cover my shift today. Have a good day!",
+    km_sick: "Hello {km}, I woke up sick and cannot come to my {role} shift today. I messaged [names], but [nobody replied / nobody can cover]. Please advise.\n{me}",
+    maybe: "Hi friend, I have a {role} shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 11:00 am? I will let you know by 11:00 am.\nThank you,\n{me}",
+    km_maybe: "Hello {km}, I am not feeling well and may not be able to come to my {role} shift today. I messaged [names], but [nobody replied / nobody can cover]. Please advise.\n{me}",
+    km_late: "Hello {km}, I forgot my {role} shift today and only remembered after 12:40 pm. I am sorry. Please advise.\n{me}",
+    planned: "Hello friend, I cannot come to my {role} shift on [day and date]. Could you cover it for me? In return, I will work one of your shifts.\nThank you,\n{me}",
+    km_planned: "Hello {km}, I cannot come to my {role} shift on [day and date]. I messaged [names]. [names] did not reply, and [names] cannot cover. Please advise.\n{me}"
+  };
+  function kmName() {
+    var km = CONFIG.contacts.filter(function (c) { return /kitchen manager/i.test(c.role); })[0];
+    return km ? km.name : "";
+  }
+  /* the role of your shift that day (as covered: Pots & Pans for a Shift
+     Leader), or the one role you do, or "" */
+  function myRole(day) {
+    if (!data || !me) return "";
+    var mine = data.shifts.filter(function (s) { return s.who === me; });
+    var on = mine.filter(function (s) { return s.day === day; })[0];
+    if (on) return on.as;
+    var roles = mine.map(function (s) { return s.as; }).filter(function (r, i, a) { return a.indexOf(r) === i; });
+    return roles.length === 1 ? roles[0] : "";
+  }
+  function message(key, day) {
+    var v = { me: me || "[your name]", role: myRole(day) || "[your role]", km: kmName() || "Student Kitchen Manager" };
+    return MSG[key].replace(/\{(\w+)\}/g, function (m, k) { return v[k]; });
+  }
+  /* a message in its box, with what's left to fill in marked, and a copy button */
+  function tpl(key, day) {
+    var text = message(key, day);
+    return '<div class="tpl"><p class="tpl-h">' + t("msg_h") + '</p><p class="tpl-t" lang="en">' +
+      esc(text).replace(/\[[^\]]+\]/g, function (m) { return '<mark class="ph">' + m + "</mark>"; }) + "</p>" +
+      '<button type="button" class="copy-btn" data-copy="' + esc(text) + '">' + t("copy") + "</button></div>";
+  }
+  function step(text, sub, extra, cls) {
+    return '<li class="step' + (cls ? " " + cls : "") + '"><span class="t">' + text + "</span>" + (sub || "") + (extra || "") + "</li>";
+  }
+  function sub(text) { return '<span class="s">' + text + "</span>"; }
+  function act(text) { return '<span class="act">' + text + "</span>"; }
+  function sit(title, steps) { return '<section class="sit">' + (title ? "<h3>" + title + "</h3>" : "") + '<ol class="steps">' + steps.join("") + "</ol></section>"; }
+  function path(cls, icon, title, body) {
+    return '<div class="path ' + cls + '"><div class="path-h"><span class="nav-icon" style="--icon:var(--nv-' + icon + ')" aria-hidden="true"></span><h2>' +
+      title + '</h2></div><div class="path-b">' + body + "</div></div>";
+  }
+  /* sick or unplanned first, then planned; each step in plain words, with
+     the message to send under it */
+  function renderCallout() {
+    var today = (new Date().getDay() + 6) % 7, km = { km: esc(kmName()) }, done = step(t("covered"), "", "", "done");
+    $("callout-paths").innerHTML =
+      '<p class="co-how">' + t("co_how") + (me ? "" : " " + t("msg_noname")) + "</p>" +
+      path("k5", "sick", t("sick_h"),
+        sit(t("sick_a"), [
+          step(t("a1"), sub(t("a1s")), tpl("sick", today)),
+          step(t("a2"), "", tpl("thanks", today)),
+          step(t("a3"), act(t("a3t", km)), tpl("km_sick", today), "ask"),
+          step(t("a4")),
+          done]) +
+        sit(t("sick_b"), [
+          step(t("b1"), "", tpl("maybe", today)),
+          step(t("b2"), sub(t("b2s"))),
+          step(t("b3"), act(t("b3t", km)), tpl("km_maybe", today), "ask")]) +
+        sit(t("sick_c"), [
+          step(t("c1")),
+          step(t("c2")),
+          step(t("c3")),
+          step(t("c4"), act(t("c4t", km)), tpl("km_late", today), "ask")])) +
+      path("k1", "shifts", t("planned_h"),
+        sit("", [
+          step(t("p1"), "", tpl("planned", -1)),
+          step(t("p2"), act(t("p2t", km)), tpl("km_planned", -1), "ask"),
+          step(t("p3"), act(t("p3t")), "", "ask"),
+          done]));
+  }
+  /* copy a message: the clipboard where the browser allows it, else the
+     old way; if both fail, say how to copy it by hand */
+  function copyOldWay(text) {
+    var a = document.createElement("textarea"), ok = false;
+    a.value = text; a.setAttribute("readonly", ""); a.style.position = "absolute"; a.style.left = "-9999px";
+    document.body.appendChild(a); a.select();
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(a);
+    return ok;
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-copy]") : null;
+    if (!b) return;
+    var text = b.getAttribute("data-copy");
+    function shown(ok) {
+      b.textContent = t(ok ? "copied" : "copy_failed");
+      b.classList.toggle("ok", ok);
+      setTimeout(function () { b.textContent = t("copy"); b.classList.remove("ok"); }, 2500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { shown(true); }, function () { shown(copyOldWay(text)); });
+    else shown(copyOldWay(text));
+  });
 
   /* settings.csv: two columns, Setting and Value. Rows are matched by the
      Setting text, so their order doesn't matter. */
@@ -977,14 +1648,24 @@ p{margin:0}
 
   function renderStatus() {
     var el = $("data-status");
-    if (loadError) { el.innerHTML = '<span class="warn">Shift list: not loaded.</span>'; return; }
-    if (!data) return;
-    el.innerHTML = "Shift list: " + data.names.length + " students, " + data.shifts.length + " shifts a week." +
+    if (loadError) { el.innerHTML = '<span class="warn">' + t("status_failed") + "</span>"; return; }
+    if (!data) { el.innerHTML = t("status_loading"); return; }
+    el.innerHTML = t("status_ok", { students: data.names.length, shifts: data.shifts.length }) +
       (data.problems.length ? ' <span class="warn">Check the shift files: ' + esc(data.problems.join(" ")) + "</span>" : "") +
       (settingsProblems.length ? ' <span class="warn">Check ' + SETTINGS_FILE + ": " + esc(settingsProblems.join(" ")) + "</span>" : "");
   }
 
-  function renderAll() { renderPicker(); renderShifts(); renderAvailability(); renderContacts(); renderPortal(); renderStatus(); }
+  /* the fixed words on the page (data-t), in the chosen language */
+  function translatePage() {
+    document.documentElement.lang = lang;
+    var els = document.querySelectorAll("[data-t]");
+    for (var i = 0; i < els.length; i++) els[i].innerHTML = t(els[i].getAttribute("data-t"));
+    $("top-nav").setAttribute("aria-label", t("views"));
+    $("bottom-nav").setAttribute("aria-label", t("views"));
+    var help = $("install-help");
+    if (!help.hidden) help.textContent = t(help.getAttribute("data-which"));
+  }
+  function renderAll() { renderPicker(); renderShifts(); renderAvailability(); renderCallout(); renderContacts(); renderPortal(); renderStatus(); }
 
   $("me").addEventListener("change", function () {
     me = this.value;
@@ -992,13 +1673,13 @@ p{margin:0}
     drawWho();
     renderShifts();
     renderAvailability();
+    renderCallout();
   });
 
   /* ------------------------------------------------------------- tabs */
   function current() {
     var h = location.hash.replace(/^#/, "");
-    for (var i = 0; i < TABS.length; i++) if (TABS[i].id === h) return h;
-    return "shifts";
+    return TABS.indexOf(h) >= 0 ? h : "shifts";
   }
   /* On a Sunday the timesheet is due, so its tab carries a "1" until the
      portal button is pressed that day. Next Sunday it comes back. */
@@ -1009,23 +1690,24 @@ p{margin:0}
   }
   function drawNavs() {
     var cur = current(), due = timesheetDue();
-    function item(cls, t) {
-      var on = t.id === cur, badge = due && t.id === "timesheet";
-      return '<a class="' + cls + (on ? " active" : "") + '" href="#' + t.id + '"' + (on ? ' aria-current="page"' : "") + ">" +
-        '<span class="ico"><span class="nav-icon" aria-hidden="true" style="--icon:var(--nv-' + t.id + ')"></span>' +
-        (badge ? '<span class="badge" aria-hidden="true">1</span>' : "") + "</span>" + t.label +
-        (badge ? '<span class="sr">(due today)</span>' : "") + "</a>";
+    function item(cls, id) {
+      var on = id === cur, badge = due && id === "timesheet";
+      return '<a class="' + cls + (on ? " active" : "") + '" href="#' + id + '"' + (on ? ' aria-current="page"' : "") + ">" +
+        '<span class="ico"><span class="nav-icon" aria-hidden="true" style="--icon:var(--nv-' + id + ')"></span>' +
+        (badge ? '<span class="badge" aria-hidden="true">1</span>' : "") + "</span>" + t("tab_" + id) +
+        (badge ? '<span class="sr">' + t("due_today") + "</span>" : "") + "</a>";
     }
-    $("top-nav").innerHTML = TABS.map(function (t) { return item("nav-item", t); }).join("");
-    $("bottom-nav").innerHTML = TABS.map(function (t) { return item("bn-item", t); }).join("");
+    $("top-nav").innerHTML = TABS.map(function (id) { return item("nav-item", id); }).join("");
+    $("bottom-nav").innerHTML = TABS.map(function (id) { return item("bn-item", id); }).join("");
   }
   function route() {
     var cur = current();
-    TABS.forEach(function (t) { $("view-" + t.id).hidden = t.id !== cur; });
+    TABS.forEach(function (id) { $("view-" + id).hidden = id !== cur; });
     drawNavs();
     $("scroll").scrollTop = 0;
-    document.title = TABS.filter(function (t) { return t.id === cur; })[0].title + " · Kitchen Cleanup";
+    drawTitle();
   }
+  function drawTitle() { document.title = t("tab_" + current()) + " · Kitchen Cleanup"; }
   window.addEventListener("hashchange", route);
   document.querySelector(".portal").addEventListener("click", function () {
     store.set(TS_KEY, dateKey(new Date())); drawNavs();
@@ -1034,18 +1716,18 @@ p{margin:0}
      Tomorrow, Sunday's timesheet) and the hour, when it comes back on
      screen or at the next minute's check */
   function newDay() {
-    if (shownDay && shownDay !== dateKey(new Date())) { renderShifts(); drawNavs(); }
+    if (shownDay && shownDay !== dateKey(new Date())) { renderShifts(); renderCallout(); drawNavs(); }
   }
   document.addEventListener("visibilitychange", function () { if (!document.hidden) { newDay(); drawNavs(); drawTheme(); } });
 
   /* ------------------------------------------------------ appearance */
-  var MODES = { auto: "Auto (dark 7 pm to 7 am)", light: "Light", dark: "Dark" }, NEXT = { auto: "light", light: "dark", dark: "auto" };
+  var NEXT = { auto: "light", light: "dark", dark: "auto" };
   function drawTheme() {
     var m = window.kitchenTheme(), btns = document.querySelectorAll("[data-theme-btn]");
     for (var i = 0; i < btns.length; i++) {
       btns[i].setAttribute("data-mode", m);
-      btns[i].setAttribute("aria-label", "Appearance: " + MODES[m] + ". Tap for " + MODES[NEXT[m]] + ".");
-      btns[i].title = "Appearance: " + MODES[m];
+      btns[i].setAttribute("aria-label", t("theme_label", { mode: t("mode_" + m), next: t("mode_" + NEXT[m]) }));
+      btns[i].title = t("theme_title", { mode: t("mode_" + m) });
     }
   }
   document.addEventListener("click", function (e) {
@@ -1056,7 +1738,27 @@ p{margin:0}
     drawTheme();
   });
   setInterval(function () { drawTheme(); newDay(); }, 60000);   /* Auto turns over at 7 am and 7 pm */
-  drawTheme();
+
+  /* ------------------------------------------------------- language */
+  /* one round button beside the appearance button steps through the
+     languages, kept on this phone as kitchen.lang */
+  function drawLang() {
+    var next = LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length], btns = document.querySelectorAll("[data-lang-btn]");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].textContent = LANG_SHORT[lang];
+      btns[i].setAttribute("lang", lang);
+      btns[i].setAttribute("aria-label", t("lang_label", { name: LANG_NAME[lang], next: LANG_NAME[next] }));
+      btns[i].title = LANG_NAME[lang];
+    }
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-lang-btn]") : null;
+    if (!b) return;
+    lang = LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length];
+    store.set(LANG_KEY, lang);
+    translatePage(); drawLang(); drawTheme(); drawNavs(); drawTitle(); renderAll();
+  });
+  translatePage(); drawLang(); drawTheme();
 
   /* -------------------------------------------------- install as app */
   /* Chrome and Edge hand over an install prompt; Safari on iPhone never
@@ -1077,8 +1779,8 @@ p{margin:0}
       return;
     }
     var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    help.textContent = ios ? "In Safari, tap the Share button, then Add to Home Screen." :
-      "Open your browser's menu and choose Install app or Add to Home screen.";
+    help.setAttribute("data-which", ios ? "install_ios" : "install_other");
+    help.textContent = t(help.getAttribute("data-which"));
     help.hidden = false;
   });
 

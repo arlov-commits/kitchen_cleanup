@@ -29,7 +29,7 @@ dependencies. Served over the web, it installs as an app on a phone.
 | Tab | What it shows |
 | --- | --- |
 | **My shifts** | Choose your name from the list. The phone remembers it, and shows it as a small pill beside the heading. Under the heading, **the week at a glance**: today's date, then each of your shifts by the next date it falls on, with a **Today** or **Tomorrow** pill. Then, for each of your shifts: the day (with the same pill) and your job, and who else from your work group is on that day, with their roles, in `roles.csv` order (left out when no one else in your group is on). Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. |
-| **Call out** | The substitute-replacement steps from the poster: **Planned Absence**, then **Sick or Unexpected Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. |
+| **Call out** | What to do when you can't make a shift. **Sick or Unplanned Absence** first, in three situations (too sick to get out of bed; not sure yet if you'll be well enough; forgot your shift), then **Planned Absence**, then **Afterward**, "It's not covered until someone says yes", and the contacts. Under each step that needs one is the message to send, in English, with your name, your role and the Student Kitchen Manager's name already filled in, and a **Copy message** button. |
 | **My availability** | The days the chosen student is a backup on, one card per day in its colour, grouped by the day, the shift of theirs taken in exchange, the job, then who, with a line to email the Student Kitchen Manager (Art) if anything is wrong. |
 | **Submit Timesheet** | The deadline, Sunday at 5 pm, a button to the timesheet portal at drbu.edu/timesheet, and "It's not done until your hours are submitted". On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). |
 
@@ -104,7 +104,7 @@ phone numbers.
 | `HOW-TO-UPDATE.md` | For whoever is taking the app over or looking after it, written for someone who has never used GitHub. |
 | `HANDOFF.md` | For whoever is handing it over: the steps, the handover log, how the cover lists are worked out, and the one-time move into a shared organization. |
 | `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
-| `fonts/` | Inter and Playfair Display, self-hosted, with their SIL Open Font Licenses. |
+| `fonts/` | Inter and Playfair Display (Latin and Vietnamese), self-hosted, with their SIL Open Font Licenses. Chinese and Thai use the phone's own fonts. |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |
 
 ## Installing it
@@ -162,10 +162,17 @@ and a menu bar across the top from 820px.
 
 Each day of the week has its own colour, used on its heading and rule:
 Mon rust, Tue teal, Wed violet, Thu green, Fri pink. The Call out paths
-follow the poster: Planned in teal, Sick in orange, and Covered in green.
-The 30-minute question is a gold diamond.
+are Sick in orange, Planned in teal, and Covered in green. Each question
+("No one has said yes by 10:00 am?") is a gold diamond.
 
 There are no shadows, no hover effects and no motion.
+
+**Languages.** A second round button beside the appearance button steps
+through **English, 简体中文, 繁體中文, ไทย and Tiếng Việt**, kept on the
+phone as `kitchen.lang`. Until one is chosen, the app follows the phone's
+language if it's one of these, and English otherwise. Names, roles (Pots
+& Pans, Shift Leader), the managers' titles and every message students
+send stay in English in all of them.
 
 **Appearance.** A round icon button in the header cycles **Auto → Light →
 Dark**, kept on the phone as `kitchen.theme`. It sits at the right of each

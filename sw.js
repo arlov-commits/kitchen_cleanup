@@ -10,7 +10,7 @@
    The new worker then replaces the old one and reloads any page the old one
    left open, so no phone is stuck on an old page asking for files that are
    gone. */
-var CACHE = "kitchen-v23";
+var CACHE = "kitchen-v24";
 var SHELL = [
   "./",
   "index.html",
@@ -30,7 +30,10 @@ var SHELL = [
   "fonts/playfair-display-latin.woff2",
   "fonts/playfair-display-latin-ext.woff2",
   "fonts/playfair-display-italic-latin.woff2",
-  "fonts/playfair-display-italic-latin-ext.woff2"
+  "fonts/playfair-display-italic-latin-ext.woff2",
+  "fonts/inter-vietnamese.woff2",
+  "fonts/playfair-display-vietnamese.woff2",
+  "fonts/playfair-display-italic-vietnamese.woff2"
 ];
 
 self.addEventListener("install", function (e) {
