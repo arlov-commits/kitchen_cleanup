@@ -310,6 +310,8 @@ function serve(dir, port) {
   check("call out: the deadlines and the questions", await p.$$eval(".step.ask .t", function (h) { return h.map(function (x) { return x.textContent; }); }),
     ["It's 10:00 am and no one has said yes?", "It's 10:30 am, no one has said yes, and you still can't come?", "It's 10:00 am and no one has said yes?", "Is it already after 12:40 pm?",
      "Your absence is 4 days away, and you still have no backup?", "Your absence is only 1 or 2 days away?"]);
+  check("call out: no Covered step", await p.$$eval(".step.done", function (n) { return n.length; }), 0);
+  check("call out: a future absence 1 or 2 days away follows I can't make it today", await text(p, "#sit-plan .step:nth-child(3) .act"), "Then follow the steps in “I can't make it today”, above.");
   check("call out: once you arrive, tell the Shift Leader", await text(p, "#sit-forgot .step:nth-child(3) .t"), "Once you arrive, tell the Shift Leader what happened.");
   var msgs = await p.$$eval(".tpl", function (b) { return b.map(function (x) { return [x.querySelector(".tpl-t").getAttribute("lang"), x.querySelector(".copy-btn").getAttribute("data-copy")]; }); });
   check("call out: thirteen messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [13, true]);

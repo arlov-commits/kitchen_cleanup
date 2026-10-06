@@ -341,7 +341,7 @@ check("dates and words in each language", dates, [
   ["10月4日 星期日", "10月5日", "週一", "代班人選 · 3"],
   ["วันอาทิตย์ที่ 4 ตุลาคม", "5 ต.ค.", "จ.", "ตัวสำรอง · 3"],
   ["Chủ nhật, 4 tháng 10", "5/10", "T2", "Người dự phòng · 3"]]);
-check("a missing string falls back to English, then to its key", [b.t("nope"), (b.lang = "th", b.t("covered")), (delete b.STR.th.covered, b.t("covered"))], ["nope", "มีคนแทนแล้ว", "Covered"]);
+check("a missing string falls back to English, then to its key", [b.t("nope"), (b.lang = "th", b.t("copied")), (delete b.STR.th.copied, b.t("copied"))], ["nope", "คัดลอกแล้ว", "Copied"]);
 b.lang = "en";
 
 console.log(passed + " passed, " + failed + " failed");

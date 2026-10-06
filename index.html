@@ -382,10 +382,6 @@ p{margin:0}
 .sit-s{font-size:15px;color:var(--ink-2);margin:-8px 0 14px}
 .sit h3:focus{outline:none}
 .co-how{padding:12px 14px;border-left:4px solid var(--gold);border-radius:4px 10px 10px 4px;background:var(--white);color:var(--ink-2)}
-.step.done{counter-increment:none;padding-bottom:0}
-.step.done::after{display:none}
-.step.done::before{content:"";background:var(--k3-f) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/18px no-repeat}
-.step.done .t{font-family:var(--display);font-size:21px;color:var(--k3-ink);letter-spacing:.02em}
 .after{border-left:4px solid var(--rust);border-radius:4px 10px 10px 4px}
 .motto{text-align:center;font-family:var(--display);font-weight:600;font-size:clamp(22px,6vw,28px);line-height:1.2;
   padding:18px 8px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-wrap:balance}
@@ -722,7 +718,7 @@ p{margin:0}
       p2: "Your absence is 4 days away, and you still have no backup?",
       p2t: "Message the Student Kitchen Manager ({km}). Say who didn't reply, and who couldn't cover.",
       p3: "Your absence is only 1 or 2 days away?",
-      p3t: "Then follow the steps in “I'm too sick to get out of bed”, above.",
+      p3t: "Then follow the steps in “I can't make it today”, above.",
       after_text: "Work the shift you promised in return, on the day you agreed.",
       missed_h: "Missed Shift",
       sit_missed: "Oh no! I missed my shift",
@@ -732,7 +728,6 @@ p{margin:0}
       x3s: "You will be given a make-up shift. <b>Do not</b> come in for another shift on your own, without approval.",
       sit_today: "I can't make it today",
       sit_today_s: "Something came up, and I can't work my shift today.",
-      covered: "Covered",
       afterward: "Afterward",
       co_motto: "It's not covered until someone <em>says yes.</em>",
       contacts: "Contacts",
@@ -858,7 +853,7 @@ p{margin:0}
       p2: "离请假日只剩4天，还没有找到替班？",
       p2t: "给 Student Kitchen Manager（{km}）发消息，说明谁没有回复，谁无法替班。",
       p3: "离请假日只剩1到2天？",
-      p3t: "那就按照上面「我病得起不了床」的步骤去做。",
+      p3t: "那就按照上面「我今天来不了」的步骤去做。",
       after_text: "在约定的那一天，上你答应回替的那个班。",
       missed_h: "错过班次",
       sit_missed: "糟了！我错过了我的班次",
@@ -868,7 +863,6 @@ p{margin:0}
       x3s: "你会被安排一个补班。<b>不要</b>在没有获得批准的情况下，自己来上别的班。",
       sit_today: "我今天来不了",
       sit_today_s: "我有事，今天无法上班。",
-      covered: "已有人替班",
       afterward: "之后",
       co_motto: "有人<em>答应</em>了，才算有人替班。",
       contacts: "联系人",
@@ -994,7 +988,7 @@ p{margin:0}
       p2: "離請假日只剩4天，還沒有找到代班？",
       p2t: "傳訊息給 Student Kitchen Manager（{km}），說明誰沒有回覆，誰無法代班。",
       p3: "離請假日只剩1到2天？",
-      p3t: "那就依照上面「我病得起不了床」的步驟去做。",
+      p3t: "那就依照上面「我今天來不了」的步驟去做。",
       after_text: "在約定的那一天，上你答應回代的那個班。",
       missed_h: "錯過班次",
       sit_missed: "糟了！我錯過了我的班次",
@@ -1004,7 +998,6 @@ p{margin:0}
       x3s: "你會被安排一個補班。<b>不要</b>在沒有獲得批准的情況下，自己來上別的班。",
       sit_today: "我今天來不了",
       sit_today_s: "我有事，今天無法上班。",
-      covered: "已有人代班",
       afterward: "之後",
       co_motto: "有人<em>答應</em>了，才算有人代班。",
       contacts: "聯絡人",
@@ -1130,7 +1123,7 @@ p{margin:0}
       p2: "อีก 4 วันจะถึงวันลา แต่ยังไม่มีตัวสำรอง?",
       p2t: "ส่งข้อความถึง Student Kitchen Manager ({km}) บอกว่าใครไม่ตอบ และใครแทนไม่ได้",
       p3: "อีกแค่ 1 หรือ 2 วันจะถึงวันลา?",
-      p3t: "ให้ทำตามขั้นตอนใน “ฉันป่วยจนลุกจากเตียงไม่ไหว” ด้านบน",
+      p3t: "ให้ทำตามขั้นตอนใน “วันนี้ฉันมาไม่ได้” ด้านบน",
       after_text: "ทำกะที่คุณสัญญาว่าจะแทนคืน ในวันที่ตกลงกันไว้",
       missed_h: "ขาดกะ",
       sit_missed: "แย่แล้ว! ฉันพลาดกะไป",
@@ -1140,7 +1133,6 @@ p{margin:0}
       x3s: "คุณจะได้รับกะชดเชย <b>อย่า</b>มาทำกะอื่นเองโดยไม่ได้รับอนุญาต",
       sit_today: "วันนี้ฉันมาไม่ได้",
       sit_today_s: "ฉันมีธุระ และวันนี้ทำงานไม่ได้",
-      covered: "มีคนแทนแล้ว",
       afterward: "หลังจากนั้น",
       co_motto: "ยังไม่ถือว่ามีคนแทน จนกว่าจะมีคน<em>ตอบตกลง</em>",
       contacts: "ผู้ติดต่อ",
@@ -1266,7 +1258,7 @@ p{margin:0}
       p2: "Còn 4 ngày nữa là đến ngày nghỉ mà vẫn chưa có người dự phòng?",
       p2t: "Nhắn tin cho Student Kitchen Manager ({km}). Nói rõ ai không trả lời, và ai không thể làm thay.",
       p3: "Chỉ còn 1 hoặc 2 ngày nữa là đến ngày nghỉ?",
-      p3t: "Hãy làm theo các bước trong “Tôi ốm đến mức không dậy nổi” ở trên.",
+      p3t: "Hãy làm theo các bước trong “Hôm nay tôi không đi làm được” ở trên.",
       after_text: "Làm ca bạn đã hứa làm lại, vào ngày đã thỏa thuận.",
       missed_h: "Lỡ ca",
       sit_missed: "Ôi không! Tôi đã lỡ ca làm",
@@ -1276,7 +1268,6 @@ p{margin:0}
       x3s: "Bạn sẽ được sắp xếp một ca làm bù. <b>Đừng</b> tự đến làm một ca khác khi chưa được cho phép.",
       sit_today: "Hôm nay tôi không đi làm được",
       sit_today_s: "Tôi có việc đột xuất, và hôm nay không thể đi làm.",
-      covered: "Đã có người thay",
       afterward: "Sau đó",
       co_motto: "Chưa có người thay cho đến khi có người <em>đồng ý.</em>",
       contacts: "Liên hệ",
@@ -1819,7 +1810,7 @@ p{margin:0}
      the message to send under the step that needs it. */
   var SITS = [["sit-today", "k5"], ["sit-maybe", "k5"], ["sit-sick", "k5"], ["sit-forgot", "k5"], ["sit-plan", "k1"], ["sit-missed", "k0"]];
   function renderCallout() {
-    var km = { km: esc(kmName()) }, done = step(t("covered"), "", "", "done");
+    var km = { km: esc(kmName()) };
     $("callout-paths").innerHTML =
       '<nav class="jump" aria-label="' + t("jump_h") + '"><h4>' + t("jump_h") + "</h4>" + SITS.map(function (x) {
         return '<button type="button" class="jump-b ' + x[1] + '" data-jump="' + x[0] + '">' + t(x[0].replace("-", "_")) + "</button>";
@@ -1830,8 +1821,7 @@ p{margin:0}
           step(t("s1"), sub(t("s1s")), tpl("today")),
           step(t("s2"), "", tpl("thanks")),
           step(t("s3"), act(t("s3t", km)), tpl("km_today"), "ask"),
-          step(t("s4")),
-          done]) +
+          step(t("s4"))]) +
         sit("sit-maybe", t("sit_maybe"), t("sit_maybe_s"), [
           step(t("m1"), sub(t("m1s")), tpl("maybe")),
           step(t("m2"), sub(t("m2s"))),
@@ -1840,8 +1830,7 @@ p{margin:0}
           step(t("s1"), sub(t("s1s")), tpl("sick")),
           step(t("s2"), "", tpl("thanks")),
           step(t("s3"), act(t("s3t", km)), tpl("km_sick"), "ask"),
-          step(t("s4")),
-          done]) +
+          step(t("s4"))]) +
         sit("sit-forgot", t("sit_forgot"), "", [
           step(t("f1")),
           step(t("f2")),
@@ -1851,8 +1840,7 @@ p{margin:0}
         sit("sit-plan", t("sit_plan"), "", [
           step(t("p1"), sub(t("p1s")), tpl("planned")),
           step(t("p2"), act(t("p2t", km)), tpl("km_planned"), "ask"),
-          step(t("p3"), act(t("p3t")), "", "ask"),
-          done])) +
+          step(t("p3"), act(t("p3t")), "", "ask")])) +
       path("k0", "missed", t("missed_h"),
         sit("sit-missed", t("sit_missed"), "", [
           step(t("x1", km), "", tpl("km_missed")),

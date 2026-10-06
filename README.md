@@ -179,7 +179,7 @@ and a menu bar across the top from 820px.
 
 Each day of the week has its own colour, used on its heading and rule:
 Mon rust, Tue teal, Wed violet, Thu green, Fri pink. The Call out paths
-are Sick in orange, Planned in teal, and Covered in green. Each question
+are Sick or Unplanned in orange, Planned in teal, and Missed in rust. Each question
 ("No one has said yes by 10:00 am?") is a gold diamond.
 
 There are no shadows, no hover effects and no motion.
