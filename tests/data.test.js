@@ -327,7 +327,7 @@ langs.slice(1).forEach(function (l) {
   }), []);
 });
 check("roles and the managers' titles stay in English", langs.every(function (l) {
-  return /Student Kitchen Manager/.test(b.STR[l].a3t) && /Shift Leader/.test(b.STR[l].c3) && /DRBU/.test(b.STR[l].c2);
+  return /Student Kitchen Manager/.test(b.STR[l].s3t) && /Shift Leader/.test(b.STR[l].f3) && /DRBU/.test(b.STR[l].f2);
 }), true);
 var dates = langs.map(function (l) {
   b.lang = l;

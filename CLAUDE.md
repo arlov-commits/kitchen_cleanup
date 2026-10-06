@@ -69,16 +69,28 @@ and the tab shell from the second.
   are a closed `<details>` always titled "Shift Backups · N", with "Can
   cover for you" as body text above the list; and on Call out, a Copy
   message button under each message.
-- **Call out** (`renderCallout()`) is the user's own procedure, in plain,
-  exact English for readers whose first language is Chinese, Vietnamese,
-  Thai or another Asian language: Sick or Unplanned Absence first (too
-  sick to get out of bed; not sure yet; forgot the shift), then Planned
-  Absence. Its clock times (10:00 am, 11:00 am, 12:15 pm, 12:40 pm) are
-  the user's and belong there; still never show shift hours elsewhere.
-  Each message (`MSG`) is always English, with the student's name, the
-  role of today's shift (else their only role) and the Student Kitchen
-  Manager's name filled in; anything else stays in `[brackets]`, marked.
-  Questions are gold diamonds (`.step.ask`).
+- **Call out** (`renderCallout()`) is the user's own procedure. Its
+  readers are mostly young women whose first language is Chinese,
+  Vietnamese, Thai or another Asian language, often in a panic. Write
+  short, calm, everyday sentences, never a clipped flowchart.
+  - **Jump list:** "What's happening?" has one button per situation
+    (`.jump-b`, `data-jump`). It scrolls `#scroll`; it isn't a link, as
+    the hash picks the tab. In the PDF the buttons link to their pages.
+  - **Order:** "Not sure if I can make it", "I forgot my shift, and it has
+    already started" and "I'm too sick to get out of bed" (Sick or
+    Unplanned Absence), then "I already know I'll miss a shift" (Planned
+    Absence). Situation titles are first person.
+  - **Standalone:** each situation is written to be read alone (`sit()`).
+  - **Times:** 10:30 am (not sure), 10:00 am (too sick), 12:15 pm and
+    12:40 pm (forgot), and 4 days ahead (planned). They are the user's
+    and belong here; still never show shift hours elsewhere.
+  - **Messages** (`MSG`) are always English. They fill in the student's
+    name and the Student Kitchen Manager's name. The role is filled only
+    for a student who only ever does one job (`myRole()`); otherwise it
+    stays `[your role]`, as the message may be for another day. Anything
+    else stays in `[brackets]`, marked, such as `[your explanation]` in
+    the forgot message.
+  - Questions are gold diamonds (`.step.ask`).
 - **Languages.** English, 简体中文, 繁體中文, ไทย and Tiếng Việt, all in
   `STR` in `index.html` and shown through `t()`; fixed page text carries
   `data-t`. A round language button (`[data-lang-btn]`) sits beside the

@@ -370,6 +370,15 @@ p{margin:0}
 :root{--ic-copy:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2'/%3E%3Cpath d='M15.5 8.5V5.5a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3'/%3E%3C/svg%3E");
   --ic-ok:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")}
 #callout-paths{display:flex;flex-direction:column;gap:20px}
+/* What's happening? one row per situation, in its path's hue */
+.jump{display:flex;flex-direction:column;gap:8px}
+.jump h4{margin-bottom:2px}
+.jump-b{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:52px;padding:12px 14px;text-align:left;
+  background:var(--white);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:6px 10px 10px 6px;
+  font-size:16px;font-weight:600;line-height:1.3;color:var(--ink);cursor:pointer}
+.jump-b::after{content:"";flex:0 0 auto;width:8px;height:8px;margin:-4px 4px 0 0;border-right:2px solid var(--ci);border-bottom:2px solid var(--ci);transform:rotate(45deg)}
+.sit-s{font-size:15px;color:var(--ink-2);margin:-8px 0 14px}
+.sit h3:focus{outline:none}
 .co-how{padding:12px 14px;border-left:4px solid var(--gold);border-radius:4px 10px 10px 4px;background:var(--white);color:var(--ink-2)}
 .step.done{counter-increment:none;padding-bottom:0}
 .step.done::after{display:none}
@@ -674,42 +683,49 @@ p{margin:0}
 
       co_eyebrow: "Absences",
       co_h1: "Can't make your <em>shift?</em>",
-      co_lead: "Every shift is done in full, no matter who shows up. An uncovered absence becomes overtime for your teammates.",
-      co_how: "The messages below are in English, ready to send. Tap Copy message, paste it into WhatsApp or a text, and change any words in [brackets] first.",
-      msg_noname: "Choose your name on My shifts, and the messages will include it.",
       msg_h: "Message",
       copy: "Copy message",
       copied: "Copied",
       copy_failed: "Press and hold the message to copy it.",
       sick_h: "Sick or Unplanned Absence",
-      sick_a: "Too sick to get out of bed",
-      a1: "Right away, message each of your backups, one by one.",
-      a1s: "By text or WhatsApp. Send it to each person separately, not in a group. Your backups for each shift are on My shifts.",
-      a2: "When someone says yes, tell everyone else.",
-      a3: "No one has said yes by 10:00 am?",
-      a3t: "Message the Student Kitchen Manager ({km}) on WhatsApp.",
-      a4: "Then do what the Student Kitchen Manager tells you.",
-      sick_b: "Not sure yet if you'll be well enough",
-      b1: "Still find a backup now. Message each of your backups, one by one.",
-      b2: "By 11:00 am, decide: either a backup has said yes, or you will come in yourself.",
-      b2s: "Tell your backup which it is.",
-      b3: "11:00 am, no backup, and you can't come in?",
-      b3t: "Message the Student Kitchen Manager ({km}) right away.",
-      sick_c: "Forgot your shift, and it has already started",
-      c1: "Go to work right now, even if it's already 12:15 pm.",
-      c2: "Don't stop at the DRBU building for gloves or an apron.",
-      c3: "Tell the Shift Leader what happened.",
-      c4: "Already after 12:40 pm?",
-      c4t: "Message the Student Kitchen Manager ({km}) and explain what happened.",
       planned_h: "Planned Absence",
-      p1: "Find a backup in advance. Message each of your backups, one by one.",
-      p2: "No backup by 5 days before your absence?",
-      p2t: "Message the Student Kitchen Manager ({km}). Say who did not reply, and who could not cover.",
-      p3: "Only 1 or 2 days before your absence?",
-      p3t: "Follow Sick or Unplanned Absence, above.",
+      co_lead: "Every shift must be done in full. If no one covers for you, your teammates have to work extra.",
+      co_how: "Each message below is in English and ready to send. Tap “Copy message”, paste it into WhatsApp or a text message, and change the words in [brackets] before you send it.",
+      co_how_print: "Each message below is in English and ready to send. Change the words in [brackets] before you send it.",
+      msg_noname: "Choose your name on the My shifts page, and your messages will have your name in them.",
+      jump_h: "What's happening?",
+      sit_maybe: "Not sure if I can make it",
+      sit_maybe_s: "I feel unwell, and I don't know yet if I can work today.",
+      m1: "Find a backup now, even if you might feel better later.",
+      m1s: "Message each of your backups on WhatsApp or by text. Send it to one person at a time, not in a group. Your backups are on the My shifts page.",
+      m2: "By 10:30 am, make your choice.",
+      m2s: "Either a backup works your shift, or you come in yourself. Tell your backup which one.",
+      m3: "It's 10:30 am, no one has said yes, and you still can't come?",
+      m3t: "Message the Student Kitchen Manager ({km}) right away.",
+      sit_forgot: "I forgot my shift, and it has already started",
+      f1: "Go to work right now, even if it is already 12:15 pm.",
+      f2: "Go straight there. Don't stop at the DRBU building for gloves or an apron.",
+      f3: "Once you arrive, tell the Shift Leader what happened.",
+      f4: "Is it already after 12:40 pm?",
+      f4t: "Message the Student Kitchen Manager ({km}) and explain what happened.",
+      sit_sick: "I'm too sick to get out of bed",
+      sit_sick_s: "I woke up sick, and I can't work today.",
+      s1: "Right away, message each of your backups.",
+      s1s: "Use WhatsApp or text. Send it to one person at a time, not in a group. Your backups are on the My shifts page.",
+      s2: "When someone says yes, tell everyone else, so they know.",
+      s3: "It's 10:00 am and no one has said yes?",
+      s3t: "Message the Student Kitchen Manager ({km}) on WhatsApp.",
+      s4: "Then do what the Student Kitchen Manager tells you.",
+      sit_plan: "I already know I'll miss a shift",
+      p1: "Find a backup early.",
+      p1s: "Message each of your backups, one person at a time.",
+      p2: "Your absence is 4 days away, and you still have no backup?",
+      p2t: "Message the Student Kitchen Manager ({km}). Say who didn't reply, and who couldn't cover.",
+      p3: "Your absence is only 1 or 2 days away?",
+      p3t: "Then follow the steps in “I'm too sick to get out of bed”, above.",
+      after_text: "Work the shift you promised in return, on the day you agreed.",
       covered: "Covered",
       afterward: "Afterward",
-      after_text: "Do the shift you promised in return, when you agreed to.",
       co_motto: "It's not covered until someone <em>says yes.</em>",
       contacts: "Contacts",
 
@@ -743,7 +759,6 @@ p{margin:0}
       pdf_stamp: "Saved {when}",
       pdf_for: "For {name}",
       pdf_note: "This copy doesn't change. For the latest shifts and backups, open the app: {link}",
-      co_how_print: "The messages below are in English, ready to send. Change any words in [brackets] first.",
       pdf_q: "Save the app as a PDF?",
       pdf_what: "This downloads the whole app to your phone as one PDF: your shifts, Call out, My availability and the timesheet, as they are now. Keep it for when you're offline. It won't update itself.",
       cancel: "Cancel",
@@ -798,42 +813,49 @@ p{margin:0}
 
       co_eyebrow: "请假",
       co_h1: "无法来<em>上班？</em>",
-      co_lead: "无论谁来，每个班次都必须完整完成。没有人替的缺勤，会变成同事的加班。",
-      co_how: "下面的消息是英文的，可以直接发送。点按「复制消息」，粘贴到 WhatsApp 或短信里，先修改 [方括号] 里的字，再发送。",
-      msg_noname: "在「我的班次」选择你的名字，消息里就会填上你的名字。",
       msg_h: "消息（英文）",
       copy: "复制消息",
       copied: "已复制",
       copy_failed: "长按消息即可复制。",
       sick_h: "生病或临时请假",
-      sick_a: "病得起不了床",
-      a1: "马上给你的每一位替班人选发消息，一个一个发。",
-      a1s: "用短信或 WhatsApp 分别发给每个人，不要发在群组里。每个班次的替班人选在「我的班次」里。",
-      a2: "有人答应后，告诉其他所有人。",
-      a3: "到上午10:00还没有人答应？",
-      a3t: "在 WhatsApp 上给 Student Kitchen Manager（{km}）发消息。",
-      a4: "然后按照 Student Kitchen Manager 的指示去做。",
-      sick_b: "还不确定身体能不能好转",
-      b1: "仍然要现在就找替班。给你的每一位替班人选发消息，一个一个发。",
-      b2: "上午11:00前做好决定：已经有替班人答应，或者你自己来上班。",
-      b2s: "无论是哪一种，都要告诉你的替班人。",
-      b3: "到了上午11:00，没有替班，你也来不了？",
-      b3t: "马上给 Student Kitchen Manager（{km}）发消息。",
-      sick_c: "忘了上班，班次已经开始",
-      c1: "马上去上班，即使已经中午12:15了。",
-      c2: "不要先去 DRBU 大楼拿手套或围裙。",
-      c3: "告诉 Shift Leader 发生了什么。",
-      c4: "已经过了中午12:40？",
-      c4t: "给 Student Kitchen Manager（{km}）发消息，说明发生了什么。",
       planned_h: "预先请假",
-      p1: "提前找好替班。给你的每一位替班人选发消息，一个一个发。",
-      p2: "请假日前5天还没有找到替班？",
+      co_lead: "每个班次都必须完整完成。如果没有人替你，同事就得多做。",
+      co_how: "下面每条消息都是英文的，可以直接发送。点按「复制消息」，粘贴到 WhatsApp 或短信里，发送前先改好 [方括号] 里的字。",
+      co_how_print: "下面每条消息都是英文的，可以直接发送。发送前先改好 [方括号] 里的字。",
+      msg_noname: "在「我的班次」页面选择你的名字，消息里就会有你的名字。",
+      jump_h: "发生了什么？",
+      sit_maybe: "我不确定能不能来",
+      sit_maybe_s: "我身体不舒服，还不知道今天能不能上班。",
+      m1: "现在就找替班，即使你之后可能会好起来。",
+      m1s: "用 WhatsApp 或短信给你的每一位替班人选发消息。一次发给一个人，不要发在群组里。你的替班人选在「我的班次」页面。",
+      m2: "上午10:30之前，做好决定。",
+      m2s: "要么请替班人帮你上这个班，要么你自己来。告诉你的替班人你选了哪一个。",
+      m3: "已经上午10:30了，没有人答应，你还是来不了？",
+      m3t: "马上给 Student Kitchen Manager（{km}）发消息。",
+      sit_forgot: "我忘了上班，班次已经开始了",
+      f1: "现在马上去上班，即使已经中午12:15了。",
+      f2: "直接过去。不要先去 DRBU 大楼拿手套或围裙。",
+      f3: "到了以后，告诉 Shift Leader 发生了什么。",
+      f4: "已经过了中午12:40？",
+      f4t: "给 Student Kitchen Manager（{km}）发消息，说明发生了什么。",
+      sit_sick: "我病得起不了床",
+      sit_sick_s: "我醒来就生病了，今天无法上班。",
+      s1: "马上给你的每一位替班人选发消息。",
+      s1s: "用 WhatsApp 或短信。一次发给一个人，不要发在群组里。你的替班人选在「我的班次」页面。",
+      s2: "有人答应后，告诉其他所有人，让他们知道。",
+      s3: "已经上午10:00了，还没有人答应？",
+      s3t: "在 WhatsApp 上给 Student Kitchen Manager（{km}）发消息。",
+      s4: "然后按照 Student Kitchen Manager 说的去做。",
+      sit_plan: "我已经知道某天不能来",
+      p1: "尽早找好替班。",
+      p1s: "给你的每一位替班人选发消息，一次发给一个人。",
+      p2: "离请假日只剩4天，还没有找到替班？",
       p2t: "给 Student Kitchen Manager（{km}）发消息，说明谁没有回复，谁无法替班。",
       p3: "离请假日只剩1到2天？",
-      p3t: "按照上面的「生病或临时请假」去做。",
+      p3t: "那就按照上面「我病得起不了床」的步骤去做。",
+      after_text: "在约定的那一天，上你答应回替的那个班。",
       covered: "已有人替班",
       afterward: "之后",
-      after_text: "在约定的时间，替对方上你答应的那个班。",
       co_motto: "有人<em>答应</em>了，才算有人替班。",
       contacts: "联系人",
 
@@ -867,7 +889,6 @@ p{margin:0}
       pdf_stamp: "保存于{when}",
       pdf_for: "姓名：{name}",
       pdf_note: "这份文件不会更新。要看最新的班次和替班人选，请打开本应用：{link}",
-      co_how_print: "下面的消息是英文的，可以直接发送。发送前，先修改 [方括号] 里的字。",
       pdf_q: "把本应用保存为 PDF？",
       pdf_what: "这会把整个应用下载到你的手机，保存成一个 PDF：你的班次、请假、我的替班和工时表，都是现在的内容。没有网络时可以用它。它不会自动更新。",
       cancel: "取消",
@@ -922,42 +943,49 @@ p{margin:0}
 
       co_eyebrow: "請假",
       co_h1: "無法來<em>上班？</em>",
-      co_lead: "無論誰來，每個班次都必須完整完成。沒有人代班的缺勤，會變成同事的加班。",
-      co_how: "下面的訊息是英文的，可以直接傳送。點按「複製訊息」，貼到 WhatsApp 或簡訊裡，先修改 [方括號] 裡的字，再傳送。",
-      msg_noname: "在「我的班次」選擇你的名字，訊息裡就會填上你的名字。",
       msg_h: "訊息（英文）",
       copy: "複製訊息",
       copied: "已複製",
       copy_failed: "長按訊息即可複製。",
       sick_h: "生病或臨時請假",
-      sick_a: "病得起不了床",
-      a1: "馬上傳訊息給你的每一位代班人選，一個一個傳。",
-      a1s: "用簡訊或 WhatsApp 分別傳給每個人，不要傳在群組裡。每個班次的代班人選在「我的班次」裡。",
-      a2: "有人答應後，告訴其他所有人。",
-      a3: "到上午10:00還沒有人答應？",
-      a3t: "在 WhatsApp 上傳訊息給 Student Kitchen Manager（{km}）。",
-      a4: "然後依照 Student Kitchen Manager 的指示去做。",
-      sick_b: "還不確定身體能不能好轉",
-      b1: "仍然要現在就找代班。傳訊息給你的每一位代班人選，一個一個傳。",
-      b2: "上午11:00前做好決定：已經有代班人答應，或者你自己來上班。",
-      b2s: "無論是哪一種，都要告訴你的代班人。",
-      b3: "到了上午11:00，沒有代班，你也來不了？",
-      b3t: "馬上傳訊息給 Student Kitchen Manager（{km}）。",
-      sick_c: "忘了上班，班次已經開始",
-      c1: "馬上去上班，即使已經中午12:15了。",
-      c2: "不要先去 DRBU 大樓拿手套或圍裙。",
-      c3: "告訴 Shift Leader 發生了什麼事。",
-      c4: "已經過了中午12:40？",
-      c4t: "傳訊息給 Student Kitchen Manager（{km}），說明發生了什麼事。",
       planned_h: "預先請假",
-      p1: "提前找好代班。傳訊息給你的每一位代班人選，一個一個傳。",
-      p2: "請假日前5天還沒有找到代班？",
+      co_lead: "每個班次都必須完整完成。如果沒有人幫你代班，同事就得多做。",
+      co_how: "下面每則訊息都是英文的，可以直接傳送。點按「複製訊息」，貼到 WhatsApp 或簡訊裡，傳送前先改好 [方括號] 裡的字。",
+      co_how_print: "下面每則訊息都是英文的，可以直接傳送。傳送前先改好 [方括號] 裡的字。",
+      msg_noname: "在「我的班次」頁面選擇你的名字，訊息裡就會有你的名字。",
+      jump_h: "發生了什麼事？",
+      sit_maybe: "我不確定能不能來",
+      sit_maybe_s: "我身體不舒服，還不知道今天能不能上班。",
+      m1: "現在就找代班，即使你之後可能會好起來。",
+      m1s: "用 WhatsApp 或簡訊傳訊息給你的每一位代班人選。一次傳給一個人，不要傳在群組裡。你的代班人選在「我的班次」頁面。",
+      m2: "上午10:30之前，做好決定。",
+      m2s: "要麼請代班人幫你上這個班，要麼你自己來。告訴你的代班人你選了哪一個。",
+      m3: "已經上午10:30了，沒有人答應，你還是來不了？",
+      m3t: "馬上傳訊息給 Student Kitchen Manager（{km}）。",
+      sit_forgot: "我忘了上班，班次已經開始了",
+      f1: "現在馬上去上班，即使已經中午12:15了。",
+      f2: "直接過去。不要先去 DRBU 大樓拿手套或圍裙。",
+      f3: "到了以後，告訴 Shift Leader 發生了什麼事。",
+      f4: "已經過了中午12:40？",
+      f4t: "傳訊息給 Student Kitchen Manager（{km}），說明發生了什麼事。",
+      sit_sick: "我病得起不了床",
+      sit_sick_s: "我醒來就生病了，今天無法上班。",
+      s1: "馬上傳訊息給你的每一位代班人選。",
+      s1s: "用 WhatsApp 或簡訊。一次傳給一個人，不要傳在群組裡。你的代班人選在「我的班次」頁面。",
+      s2: "有人答應後，告訴其他所有人，讓他們知道。",
+      s3: "已經上午10:00了，還沒有人答應？",
+      s3t: "在 WhatsApp 上傳訊息給 Student Kitchen Manager（{km}）。",
+      s4: "然後依照 Student Kitchen Manager 說的去做。",
+      sit_plan: "我已經知道某天不能來",
+      p1: "儘早找好代班。",
+      p1s: "傳訊息給你的每一位代班人選，一次傳給一個人。",
+      p2: "離請假日只剩4天，還沒有找到代班？",
       p2t: "傳訊息給 Student Kitchen Manager（{km}），說明誰沒有回覆，誰無法代班。",
       p3: "離請假日只剩1到2天？",
-      p3t: "依照上面的「生病或臨時請假」去做。",
+      p3t: "那就依照上面「我病得起不了床」的步驟去做。",
+      after_text: "在約定的那一天，上你答應回代的那個班。",
       covered: "已有人代班",
       afterward: "之後",
-      after_text: "在約定的時間，幫對方上你答應的那個班。",
       co_motto: "有人<em>答應</em>了，才算有人代班。",
       contacts: "聯絡人",
 
@@ -991,7 +1019,6 @@ p{margin:0}
       pdf_stamp: "儲存於{when}",
       pdf_for: "姓名：{name}",
       pdf_note: "這份文件不會更新。要看最新的班次和代班人選，請開啟本應用程式：{link}",
-      co_how_print: "下面的訊息是英文的，可以直接傳送。傳送前，先修改 [方括號] 裡的字。",
       pdf_q: "把本應用程式儲存為 PDF？",
       pdf_what: "這會把整個應用程式下載到你的手機，儲存成一個 PDF：你的班次、請假、我的代班和工時表，都是現在的內容。沒有網路時可以用它。它不會自動更新。",
       cancel: "取消",
@@ -1046,42 +1073,49 @@ p{margin:0}
 
       co_eyebrow: "การลา",
       co_h1: "มา<em>ทำกะ</em>ไม่ได้?",
-      co_lead: "ทุกกะต้องทำให้ครบ ไม่ว่าใครจะมา การขาดงานที่ไม่มีคนแทน จะกลายเป็นงานล่วงเวลาของเพื่อนร่วมทีม",
-      co_how: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แตะ “คัดลอกข้อความ” แล้ววางใน WhatsApp หรือ SMS และแก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
-      msg_noname: "เลือกชื่อของคุณที่หน้า “กะของฉัน” แล้วข้อความจะมีชื่อของคุณ",
       msg_h: "ข้อความ (ภาษาอังกฤษ)",
       copy: "คัดลอกข้อความ",
       copied: "คัดลอกแล้ว",
       copy_failed: "กดค้างที่ข้อความเพื่อคัดลอก",
       sick_h: "ป่วยหรือลากะทันหัน",
-      sick_a: "ป่วยจนลุกจากเตียงไม่ไหว",
-      a1: "ส่งข้อความหาตัวสำรองทุกคนทันที ทีละคน",
-      a1s: "ทาง SMS หรือ WhatsApp ส่งแยกให้แต่ละคน ไม่ส่งในกลุ่ม ดูตัวสำรองของแต่ละกะได้ที่หน้า “กะของฉัน”",
-      a2: "เมื่อมีคนตอบตกลง ให้แจ้งทุกคนที่เหลือ",
-      a3: "ถึง 10:00 น. แล้วยังไม่มีใครตอบตกลง?",
-      a3t: "ส่งข้อความทาง WhatsApp ถึง Student Kitchen Manager ({km})",
-      a4: "จากนั้นทำตามที่ Student Kitchen Manager บอก",
-      sick_b: "ยังไม่แน่ใจว่าจะหายดีพอหรือไม่",
-      b1: "ยังต้องหาตัวสำรองตอนนี้เลย ส่งข้อความหาตัวสำรองทุกคน ทีละคน",
-      b2: "ภายใน 11:00 น. ต้องตัดสินใจ: มีตัวสำรองตอบตกลงแล้ว หรือคุณจะมาทำงานเอง",
-      b2s: "บอกตัวสำรองของคุณว่าเป็นแบบไหน",
-      b3: "11:00 น. แล้ว ไม่มีตัวสำรอง และคุณมาไม่ได้?",
-      b3t: "ส่งข้อความถึง Student Kitchen Manager ({km}) ทันที",
-      sick_c: "ลืมกะ และกะเริ่มไปแล้ว",
-      c1: "ไปทำงานเดี๋ยวนี้ แม้จะ 12:15 น. แล้วก็ตาม",
-      c2: "ไม่ต้องแวะไปเอาถุงมือหรือผ้ากันเปื้อนที่อาคาร DRBU",
-      c3: "บอก Shift Leader ว่าเกิดอะไรขึ้น",
-      c4: "เลย 12:40 น. ไปแล้ว?",
-      c4t: "ส่งข้อความถึง Student Kitchen Manager ({km}) และอธิบายสิ่งที่เกิดขึ้น",
       planned_h: "ลาล่วงหน้า",
-      p1: "หาตัวสำรองไว้ล่วงหน้า ส่งข้อความหาตัวสำรองทุกคน ทีละคน",
-      p2: "เหลือ 5 วันก่อนวันลาแล้ว ยังไม่มีตัวสำรอง?",
+      co_lead: "ทุกกะต้องทำให้ครบ ถ้าไม่มีใครแทนคุณ เพื่อนร่วมทีมต้องทำงานเพิ่ม",
+      co_how: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แตะ “คัดลอกข้อความ” วางใน WhatsApp หรือ SMS แล้วแก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
+      co_how_print: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
+      msg_noname: "เลือกชื่อของคุณที่หน้า “กะของฉัน” แล้วข้อความจะมีชื่อของคุณ",
+      jump_h: "เกิดอะไรขึ้น?",
+      sit_maybe: "ไม่แน่ใจว่าจะมาได้ไหม",
+      sit_maybe_s: "ฉันรู้สึกไม่สบาย และยังไม่รู้ว่าวันนี้จะทำงานไหวไหม",
+      m1: "หาตัวสำรองตอนนี้เลย แม้คุณอาจจะดีขึ้นทีหลัง",
+      m1s: "ส่งข้อความหาตัวสำรองแต่ละคนทาง WhatsApp หรือ SMS ส่งทีละคน ไม่ส่งในกลุ่ม ดูตัวสำรองของคุณได้ที่หน้า “กะของฉัน”",
+      m2: "ก่อน 10:30 น. ให้ตัดสินใจ",
+      m2s: "ให้ตัวสำรองทำกะแทน หรือคุณมาทำเอง แล้วบอกตัวสำรองว่าเลือกแบบไหน",
+      m3: "10:30 น. แล้ว ยังไม่มีใครตอบตกลง และคุณยังมาไม่ได้?",
+      m3t: "ส่งข้อความถึง Student Kitchen Manager ({km}) ทันที",
+      sit_forgot: "ฉันลืมกะ และกะเริ่มไปแล้ว",
+      f1: "ไปทำงานเดี๋ยวนี้ แม้จะ 12:15 น. แล้วก็ตาม",
+      f2: "ไปที่ทำงานโดยตรง ไม่ต้องแวะเอาถุงมือหรือผ้ากันเปื้อนที่อาคาร DRBU",
+      f3: "เมื่อไปถึงแล้ว บอก Shift Leader ว่าเกิดอะไรขึ้น",
+      f4: "เลย 12:40 น. ไปแล้ว?",
+      f4t: "ส่งข้อความถึง Student Kitchen Manager ({km}) และอธิบายสิ่งที่เกิดขึ้น",
+      sit_sick: "ฉันป่วยจนลุกจากเตียงไม่ไหว",
+      sit_sick_s: "ฉันตื่นมาแล้วป่วย และวันนี้ทำงานไม่ได้",
+      s1: "ส่งข้อความหาตัวสำรองแต่ละคนทันที",
+      s1s: "ทาง WhatsApp หรือ SMS ส่งทีละคน ไม่ส่งในกลุ่ม ดูตัวสำรองของคุณได้ที่หน้า “กะของฉัน”",
+      s2: "เมื่อมีคนตอบตกลง ให้บอกคนอื่นทุกคนด้วย จะได้รู้",
+      s3: "10:00 น. แล้ว ยังไม่มีใครตอบตกลง?",
+      s3t: "ส่งข้อความทาง WhatsApp ถึง Student Kitchen Manager ({km})",
+      s4: "จากนั้นทำตามที่ Student Kitchen Manager บอก",
+      sit_plan: "ฉันรู้ล่วงหน้าแล้วว่าจะขาดกะ",
+      p1: "หาตัวสำรองไว้แต่เนิ่นๆ",
+      p1s: "ส่งข้อความหาตัวสำรองแต่ละคน ทีละคน",
+      p2: "อีก 4 วันจะถึงวันลา แต่ยังไม่มีตัวสำรอง?",
       p2t: "ส่งข้อความถึง Student Kitchen Manager ({km}) บอกว่าใครไม่ตอบ และใครแทนไม่ได้",
-      p3: "เหลือแค่ 1 หรือ 2 วันก่อนวันลา?",
-      p3t: "ทำตามขั้นตอน “ป่วยหรือลากะทันหัน” ด้านบน",
+      p3: "อีกแค่ 1 หรือ 2 วันจะถึงวันลา?",
+      p3t: "ให้ทำตามขั้นตอนใน “ฉันป่วยจนลุกจากเตียงไม่ไหว” ด้านบน",
+      after_text: "ทำกะที่คุณสัญญาว่าจะแทนคืน ในวันที่ตกลงกันไว้",
       covered: "มีคนแทนแล้ว",
       afterward: "หลังจากนั้น",
-      after_text: "ทำกะที่คุณสัญญาว่าจะแทนคืน ตามเวลาที่ตกลงกันไว้",
       co_motto: "ยังไม่ถือว่ามีคนแทน จนกว่าจะมีคน<em>ตอบตกลง</em>",
       contacts: "ผู้ติดต่อ",
 
@@ -1115,7 +1149,6 @@ p{margin:0}
       pdf_stamp: "บันทึกเมื่อ {when}",
       pdf_for: "สำหรับ {name}",
       pdf_note: "สำเนานี้จะไม่อัปเดต ดูกะและตัวสำรองล่าสุดได้ในแอป: {link}",
-      co_how_print: "ข้อความด้านล่างเป็นภาษาอังกฤษ พร้อมส่งได้เลย แก้คำใน [วงเล็บเหลี่ยม] ก่อนส่ง",
       pdf_q: "บันทึกแอปเป็น PDF?",
       pdf_what: "จะดาวน์โหลดแอปทั้งหมดลงโทรศัพท์ของคุณเป็น PDF ไฟล์เดียว: กะของคุณ การแจ้งลา การรับแทนกะ และใบลงเวลา ตามข้อมูลตอนนี้ เก็บไว้ใช้ตอนไม่มีอินเทอร์เน็ต ไฟล์นี้จะไม่อัปเดตเอง",
       cancel: "ยกเลิก",
@@ -1170,42 +1203,49 @@ p{margin:0}
 
       co_eyebrow: "Nghỉ làm",
       co_h1: "Không thể đến <em>làm ca?</em>",
-      co_lead: "Dù ai đến làm, mỗi ca đều phải làm trọn vẹn. Vắng mặt mà không có người thay sẽ thành giờ làm thêm của đồng đội.",
-      co_how: "Các tin nhắn bên dưới bằng tiếng Anh, sẵn sàng để gửi. Chạm “Sao chép tin nhắn”, dán vào WhatsApp hoặc tin nhắn điện thoại, và sửa chữ trong [ngoặc vuông] trước khi gửi.",
-      msg_noname: "Chọn tên của bạn ở trang “Ca của tôi”, tin nhắn sẽ có sẵn tên bạn.",
       msg_h: "Tin nhắn (tiếng Anh)",
       copy: "Sao chép tin nhắn",
       copied: "Đã sao chép",
       copy_failed: "Nhấn giữ tin nhắn để sao chép.",
       sick_h: "Ốm hoặc nghỉ đột xuất",
-      sick_a: "Ốm đến mức không dậy nổi",
-      a1: "Nhắn tin ngay cho từng người dự phòng của bạn, lần lượt từng người.",
-      a1s: "Bằng tin nhắn điện thoại hoặc WhatsApp. Gửi riêng cho từng người, không gửi trong nhóm. Người dự phòng của mỗi ca có ở trang “Ca của tôi”.",
-      a2: "Khi có người đồng ý, hãy báo cho tất cả những người còn lại.",
-      a3: "Đến 10:00 sáng vẫn chưa ai đồng ý?",
-      a3t: "Nhắn WhatsApp cho Student Kitchen Manager ({km}).",
-      a4: "Sau đó làm theo hướng dẫn của Student Kitchen Manager.",
-      sick_b: "Chưa chắc sẽ đủ khỏe để đi làm",
-      b1: "Vẫn phải tìm người dự phòng ngay bây giờ. Nhắn tin cho từng người dự phòng của bạn, lần lượt từng người.",
-      b2: "Trước 11:00 sáng, hãy quyết định: đã có người dự phòng đồng ý, hoặc bạn sẽ tự đến làm.",
-      b2s: "Báo cho người dự phòng biết bạn chọn cách nào.",
-      b3: "Đã 11:00 sáng, không có người dự phòng, và bạn không đến được?",
-      b3t: "Nhắn tin ngay cho Student Kitchen Manager ({km}).",
-      sick_c: "Quên ca, và ca đã bắt đầu",
-      c1: "Đi làm ngay, kể cả khi đã 12:15 trưa.",
-      c2: "Đừng ghé tòa nhà DRBU để lấy găng tay hay tạp dề.",
-      c3: "Kể cho Shift Leader chuyện gì đã xảy ra.",
-      c4: "Đã quá 12:40 trưa?",
-      c4t: "Nhắn tin cho Student Kitchen Manager ({km}) và giải thích chuyện đã xảy ra.",
       planned_h: "Nghỉ có kế hoạch",
-      p1: "Tìm người dự phòng trước. Nhắn tin cho từng người dự phòng của bạn, lần lượt từng người.",
-      p2: "Còn 5 ngày trước ngày nghỉ mà chưa có người dự phòng?",
+      co_lead: "Mỗi ca đều phải được làm trọn vẹn. Nếu không ai làm thay bạn, đồng đội sẽ phải làm thêm.",
+      co_how: "Mỗi tin nhắn bên dưới đều bằng tiếng Anh và sẵn sàng để gửi. Chạm “Sao chép tin nhắn”, dán vào WhatsApp hoặc tin nhắn điện thoại, rồi sửa chữ trong [ngoặc vuông] trước khi gửi.",
+      co_how_print: "Mỗi tin nhắn bên dưới đều bằng tiếng Anh và sẵn sàng để gửi. Hãy sửa chữ trong [ngoặc vuông] trước khi gửi.",
+      msg_noname: "Chọn tên của bạn ở trang “Ca của tôi”, tin nhắn sẽ có sẵn tên bạn.",
+      jump_h: "Chuyện gì đang xảy ra?",
+      sit_maybe: "Tôi không chắc có đi làm được không",
+      sit_maybe_s: "Tôi thấy không khỏe, và chưa biết hôm nay có làm được không.",
+      m1: "Tìm người dự phòng ngay bây giờ, kể cả khi lát nữa bạn có thể khỏe hơn.",
+      m1s: "Nhắn tin cho từng người dự phòng qua WhatsApp hoặc tin nhắn điện thoại. Gửi cho từng người một, không gửi trong nhóm. Người dự phòng của bạn có ở trang “Ca của tôi”.",
+      m2: "Trước 10:30 sáng, hãy quyết định.",
+      m2s: "Hoặc người dự phòng làm ca của bạn, hoặc bạn tự đến làm. Báo cho người dự phòng biết bạn chọn cách nào.",
+      m3: "Đã 10:30 sáng, chưa ai đồng ý, và bạn vẫn không đến được?",
+      m3t: "Nhắn tin ngay cho Student Kitchen Manager ({km}).",
+      sit_forgot: "Tôi quên ca, và ca đã bắt đầu",
+      f1: "Đi làm ngay bây giờ, kể cả khi đã 12:15 trưa.",
+      f2: "Đi thẳng đến chỗ làm. Đừng ghé tòa nhà DRBU để lấy găng tay hay tạp dề.",
+      f3: "Khi đến nơi, hãy kể cho Shift Leader chuyện gì đã xảy ra.",
+      f4: "Đã quá 12:40 trưa?",
+      f4t: "Nhắn tin cho Student Kitchen Manager ({km}) và giải thích chuyện đã xảy ra.",
+      sit_sick: "Tôi ốm đến mức không dậy nổi",
+      sit_sick_s: "Tôi thức dậy thấy ốm, và hôm nay không thể đi làm.",
+      s1: "Nhắn tin ngay cho từng người dự phòng của bạn.",
+      s1s: "Qua WhatsApp hoặc tin nhắn điện thoại. Gửi cho từng người một, không gửi trong nhóm. Người dự phòng của bạn có ở trang “Ca của tôi”.",
+      s2: "Khi có người đồng ý, hãy báo cho mọi người còn lại để họ biết.",
+      s3: "Đã 10:00 sáng mà chưa ai đồng ý?",
+      s3t: "Nhắn WhatsApp cho Student Kitchen Manager ({km}).",
+      s4: "Sau đó làm theo lời Student Kitchen Manager.",
+      sit_plan: "Tôi đã biết trước mình sẽ nghỉ một ca",
+      p1: "Tìm người dự phòng sớm.",
+      p1s: "Nhắn tin cho từng người dự phòng của bạn, từng người một.",
+      p2: "Còn 4 ngày nữa là đến ngày nghỉ mà vẫn chưa có người dự phòng?",
       p2t: "Nhắn tin cho Student Kitchen Manager ({km}). Nói rõ ai không trả lời, và ai không thể làm thay.",
-      p3: "Chỉ còn 1 hoặc 2 ngày trước ngày nghỉ?",
-      p3t: "Hãy làm theo phần “Ốm hoặc nghỉ đột xuất” ở trên.",
+      p3: "Chỉ còn 1 hoặc 2 ngày nữa là đến ngày nghỉ?",
+      p3t: "Hãy làm theo các bước trong “Tôi ốm đến mức không dậy nổi” ở trên.",
+      after_text: "Làm ca bạn đã hứa làm lại, vào ngày đã thỏa thuận.",
       covered: "Đã có người thay",
       afterward: "Sau đó",
-      after_text: "Làm ca mà bạn đã hứa làm lại, vào lúc đã thỏa thuận.",
       co_motto: "Chưa có người thay cho đến khi có người <em>đồng ý.</em>",
       contacts: "Liên hệ",
 
@@ -1239,7 +1279,6 @@ p{margin:0}
       pdf_stamp: "Lưu lúc {when}",
       pdf_for: "Dành cho {name}",
       pdf_note: "Bản này không tự cập nhật. Để xem ca và người dự phòng mới nhất, hãy mở ứng dụng: {link}",
-      co_how_print: "Các tin nhắn bên dưới bằng tiếng Anh, sẵn sàng để gửi. Hãy sửa chữ trong [ngoặc vuông] trước khi gửi.",
       pdf_q: "Lưu ứng dụng thành PDF?",
       pdf_what: "Thao tác này tải toàn bộ ứng dụng về điện thoại của bạn thành một tệp PDF: các ca của bạn, Báo nghỉ, Thay ca và bảng giờ, theo nội dung hiện tại. Hãy giữ để dùng khi không có mạng. Tệp này không tự cập nhật.",
       cancel: "Hủy",
@@ -1684,17 +1723,18 @@ p{margin:0}
   }
 
   /* -------------------------------------------------------- Call out */
-  /* The messages students send, always in English, with their name, the
-     role of today's shift (or their only role) and the Student Kitchen
-     Manager's name filled in. Anything still in [brackets] is theirs to
-     change before sending. */
+  /* The messages students send, always in English, with their name, their
+     role if they only ever do one, and the Student Kitchen Manager's name
+     filled in. Anything still in [brackets] is theirs to change before
+     sending. (Today's role isn't filled in: the message may be for
+     another day.) */
   var MSG = {
     sick: "Hello friend, I woke up sick and I am not sure I can come to my {role} shift today. Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\n{me}",
     thanks: "Thank you, but [name] has already agreed to cover my shift today. Have a good day!",
     km_sick: "Hello {km}, I woke up sick and cannot come to my {role} shift today. I messaged [names], but [nobody replied / nobody can cover]. Please advise.\n{me}",
-    maybe: "Hi friend, I have a {role} shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 11:00 am? I will let you know by 11:00 am.\nThank you,\n{me}",
+    maybe: "Hi friend, I have a {role} shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\n{me}",
     km_maybe: "Hello {km}, I am not feeling well and may not be able to come to my {role} shift today. I messaged [names], but [nobody replied / nobody can cover]. Please advise.\n{me}",
-    km_late: "Hello {km}, I forgot my {role} shift today and only remembered after 12:40 pm. I am sorry. Please advise.\n{me}",
+    km_late: "Hello {km}, I forgot my {role} shift today and only remembered after 12:40 pm. [your explanation] I am sorry. Please advise.\n{me}",
     planned: "Hello friend, I cannot come to my {role} shift on [day and date]. Could you cover it for me? In return, I will work one of your shifts.\nThank you,\n{me}",
     km_planned: "Hello {km}, I cannot come to my {role} shift on [day and date]. I messaged [names]. [names] did not reply, and [names] cannot cover. Please advise.\n{me}"
   };
@@ -1702,23 +1742,21 @@ p{margin:0}
     var km = CONFIG.contacts.filter(function (c) { return /kitchen manager/i.test(c.role); })[0];
     return km ? km.name : "";
   }
-  /* the role of your shift that day (as covered: Pots & Pans for a Shift
-     Leader), or the one role you do, or "" */
-  function myRole(day) {
+  /* your one role, if all your shifts are the same job (as covered: Pots
+     & Pans for a Shift Leader), or "" */
+  function myRole() {
     if (!data || !me) return "";
-    var mine = data.shifts.filter(function (s) { return s.who === me; });
-    var on = mine.filter(function (s) { return s.day === day; })[0];
-    if (on) return on.as;
-    var roles = mine.map(function (s) { return s.as; }).filter(function (r, i, a) { return a.indexOf(r) === i; });
+    var roles = data.shifts.filter(function (s) { return s.who === me; }).map(function (s) { return s.as; })
+      .filter(function (r, i, a) { return a.indexOf(r) === i; });
     return roles.length === 1 ? roles[0] : "";
   }
-  function message(key, day) {
-    var v = { me: me || "[your name]", role: myRole(day) || "[your role]", km: kmName() || "Student Kitchen Manager" };
+  function message(key) {
+    var v = { me: me || "[your name]", role: myRole() || "[your role]", km: kmName() || "Student Kitchen Manager" };
     return MSG[key].replace(/\{(\w+)\}/g, function (m, k) { return v[k]; });
   }
   /* a message in its box, with what's left to fill in marked, and a copy button */
-  function tpl(key, day) {
-    var text = message(key, day);
+  function tpl(key) {
+    var text = message(key);
     return '<div class="tpl"><p class="tpl-h">' + t("msg_h") + '</p><p class="tpl-t" lang="en">' +
       esc(text).replace(/\[[^\]]+\]/g, function (m) { return '<mark class="ph">' + m + "</mark>"; }) + "</p>" +
       '<button type="button" class="copy-btn" data-copy="' + esc(text) + '">' + t("copy") + "</button></div>";
@@ -1728,41 +1766,61 @@ p{margin:0}
   }
   function sub(text) { return '<span class="s">' + text + "</span>"; }
   function act(text) { return '<span class="act">' + text + "</span>"; }
-  function sit(title, steps) { return '<section class="sit">' + (title ? "<h3>" + title + "</h3>" : "") + '<ol class="steps">' + steps.join("") + "</ol></section>"; }
+  function sit(id, title, intro, steps) {
+    return '<section class="sit" id="' + id + '"><h3 tabindex="-1">' + title + "</h3>" + (intro ? '<p class="sit-s">' + intro + "</p>" : "") +
+      '<ol class="steps">' + steps.join("") + "</ol></section>";
+  }
   function path(cls, icon, title, body) {
     return '<div class="path ' + cls + '"><div class="path-h"><span class="nav-icon" style="--icon:var(--nv-' + icon + ')" aria-hidden="true"></span><h2>' +
       title + '</h2></div><div class="path-b">' + body + "</div></div>";
   }
-  /* sick or unplanned first, then planned; each step in plain words, with
-     the message to send under it */
+  /* What's happening? A list of the four situations at the top, each a
+     button that scrolls to it. Then sick or unplanned (not sure if I can
+     make it; I forgot my shift; too sick to get out of bed), then planned.
+     Each situation is written to be read on its own, in plain words, with
+     the message to send under the step that needs it. */
+  var SITS = [["sit-maybe", "k5"], ["sit-forgot", "k5"], ["sit-sick", "k5"], ["sit-plan", "k1"]];
   function renderCallout() {
-    var today = printing ? -1 : (new Date().getDay() + 6) % 7, km = { km: esc(kmName()) }, done = step(t("covered"), "", "", "done");
+    var km = { km: esc(kmName()) }, done = step(t("covered"), "", "", "done");
     $("callout-paths").innerHTML =
+      '<nav class="jump" aria-label="' + t("jump_h") + '"><h4>' + t("jump_h") + "</h4>" + SITS.map(function (x) {
+        return '<button type="button" class="jump-b ' + x[1] + '" data-jump="' + x[0] + '">' + t(x[0].replace("-", "_")) + "</button>";
+      }).join("") + "</nav>" +
       '<p class="co-how"><span class="screen-only">' + t("co_how") + "</span>" + '<span class="print-only">' + t("co_how_print") + "</span>" +
         (me ? "" : " " + t("msg_noname")) + "</p>" +
       path("k5", "sick", t("sick_h"),
-        sit(t("sick_a"), [
-          step(t("a1"), sub(t("a1s")), tpl("sick", today)),
-          step(t("a2"), "", tpl("thanks", today)),
-          step(t("a3"), act(t("a3t", km)), tpl("km_sick", today), "ask"),
-          step(t("a4")),
-          done]) +
-        sit(t("sick_b"), [
-          step(t("b1"), "", tpl("maybe", today)),
-          step(t("b2"), sub(t("b2s"))),
-          step(t("b3"), act(t("b3t", km)), tpl("km_maybe", today), "ask")]) +
-        sit(t("sick_c"), [
-          step(t("c1")),
-          step(t("c2")),
-          step(t("c3")),
-          step(t("c4"), act(t("c4t", km)), tpl("km_late", today), "ask")])) +
+        sit("sit-maybe", t("sit_maybe"), t("sit_maybe_s"), [
+          step(t("m1"), sub(t("m1s")), tpl("maybe")),
+          step(t("m2"), sub(t("m2s"))),
+          step(t("m3"), act(t("m3t", km)), tpl("km_maybe"), "ask")]) +
+        sit("sit-forgot", t("sit_forgot"), "", [
+          step(t("f1")),
+          step(t("f2")),
+          step(t("f3")),
+          step(t("f4"), act(t("f4t", km)), tpl("km_late"), "ask")]) +
+        sit("sit-sick", t("sit_sick"), t("sit_sick_s"), [
+          step(t("s1"), sub(t("s1s")), tpl("sick")),
+          step(t("s2"), "", tpl("thanks")),
+          step(t("s3"), act(t("s3t", km)), tpl("km_sick"), "ask"),
+          step(t("s4")),
+          done])) +
       path("k1", "shifts", t("planned_h"),
-        sit("", [
-          step(t("p1"), "", tpl("planned", -1)),
-          step(t("p2"), act(t("p2t", km)), tpl("km_planned", -1), "ask"),
+        sit("sit-plan", t("sit_plan"), "", [
+          step(t("p1"), sub(t("p1s")), tpl("planned")),
+          step(t("p2"), act(t("p2t", km)), tpl("km_planned"), "ask"),
           step(t("p3"), act(t("p3t")), "", "ask"),
           done]));
   }
+  /* a jump button: scroll the page so its situation is at the top (no
+     link, as the address picks the tab) */
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-jump]") : null;
+    if (!b) return;
+    var to = $(b.getAttribute("data-jump")), pane = $("scroll");
+    if (!to) return;
+    pane.scrollTop += to.getBoundingClientRect().top - pane.getBoundingClientRect().top - 12;
+    to.querySelector("h3").focus({ preventScroll: true });
+  });
   /* copy a message: the clipboard where the browser allows it, else the
      old way; if both fail, say how to copy it by hand */
   function copyOldWay(text) {
@@ -2086,10 +2144,11 @@ p{margin:0}
       return {
         h: Math.ceil(root.getBoundingClientRect().height),
         breaks: [].map.call(root.querySelectorAll(PDF_BREAKS), function (e) { return Math.floor(box(e).y); }),
-        links: [].map.call(root.querySelectorAll("a[href^='http'], [data-goto]"), function (e) {
-          var b = box(e);
+        links: [].map.call(root.querySelectorAll("a[href^='http'], [data-goto], [data-jump]"), function (e) {
+          var b = box(e), to = e.getAttribute("data-jump");
           b.uri = e.getAttribute("href");
           b.go = e.getAttribute("data-goto");
+          if (to && d.getElementById(to)) b.jumpY = box(d.getElementById(to)).y;
           return b;
         }),
         bg: d.defaultView.getComputedStyle(root).backgroundColor,
@@ -2205,9 +2264,10 @@ p{margin:0}
       tabs.forEach(function (html, i) { chain = chain.then(function () { return pdfLayout(frame, html).then(function (p) { parts[i] = p; }); }); });
       return chain.then(function () {
         var starts = [], n = 1;
-        parts.forEach(function (p) { p.cuts = pdfCuts(p.h, p.breaks); starts.push(n); n += p.cuts.length; });
+        parts.forEach(function (p) { p.cuts = pdfCuts(p.h, p.breaks); p.first = n; starts.push(n); n += p.cuts.length; });
         return pdfLayout(frame, coverHTML(starts, when)).then(function (cover) {
           cover.cuts = [[0, Math.min(cover.h, PDF_H), 0]];
+          cover.first = 0;
           parts.unshift(cover);
           var pages = [], total = n, chain2 = Promise.resolve();
           parts.forEach(function (p) {
@@ -2218,7 +2278,9 @@ p{margin:0}
                   pages.push({
                     w: PDF_W, h: PDF_H, iw: PDF_W * PDF_S, ih: PDF_H * PDF_S, jpg: jpg,
                     links: p.links.filter(function (l) { return l.y >= cut[0] - 1 && l.y + l.h <= cut[1] + 1; }).map(function (l) {
-                      return { x: l.x, y: l.y - cut[0] + cut[2], w: l.w, h: l.h, uri: l.uri, page: l.go == null ? null : starts[+l.go] };
+                      /* a jump goes to the page its situation starts on */
+                      var to = l.jumpY == null ? null : p.first + p.cuts.filter(function (c) { return c[0] <= l.jumpY; }).length - 1;
+                      return { x: l.x, y: l.y - cut[0] + cut[2], w: l.w, h: l.h, uri: l.uri, page: l.go != null ? starts[+l.go] : to };
                     })
                   });
                 });

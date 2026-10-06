@@ -296,14 +296,25 @@ function serve(dir, port) {
   var call = await text(p, "#view-callout");
   check("call out: no bare Kitchen Manager", (call.match(/Kitchen Manager/g) || []).length, (call.match(/Student Kitchen Manager/g) || []).length);
   check("call out: sick or unplanned first, then planned", await p.$$eval(".path-h h2", function (h) { return h.map(function (x) { return x.textContent; }); }), ["Sick or Unplanned Absence", "Planned Absence"]);
-  check("call out: the three sick situations", await p.$$eval(".path.k5 .sit h3", function (h) { return h.map(function (x) { return x.textContent; }); }),
-    ["Too sick to get out of bed", "Not sure yet if you'll be well enough", "Forgot your shift, and it has already started"]);
+  check("call out: the four situations, in the first person, in order", await p.$$eval(".sit h3", function (h) { return h.map(function (x) { return x.closest(".path").className.slice(5) + " " + x.textContent; }); }),
+    ["k5 Not sure if I can make it", "k5 I forgot my shift, and it has already started", "k5 I'm too sick to get out of bed", "k1 I already know I'll miss a shift"]);
+  check("call out: a jump list at the top, one button for each", await p.$$eval(".jump-b", function (b) { return b.map(function (x) { return x.getAttribute("data-jump") + " " + x.textContent; }); }),
+    ["sit-maybe Not sure if I can make it", "sit-forgot I forgot my shift, and it has already started", "sit-sick I'm too sick to get out of bed", "sit-plan I already know I'll miss a shift"]);
+  await p.click(".jump-b[data-jump='sit-plan']");
+  check("call out: a jump scrolls its situation to the top, and stays on Call out", [await p.evaluate(function () {
+    var d = document.getElementById("sit-plan").getBoundingClientRect().top - document.getElementById("scroll").getBoundingClientRect().top;
+    return d >= 0 && d <= 20;
+  }), await p.evaluate(function () { return location.hash; }), await p.evaluate(function () { return document.activeElement.textContent; })], [true, "#callout", "I already know I'll miss a shift"]);
   check("call out: the deadlines and the questions", await p.$$eval(".step.ask .t", function (h) { return h.map(function (x) { return x.textContent; }); }),
-    ["No one has said yes by 10:00 am?", "11:00 am, no backup, and you can't come in?", "Already after 12:40 pm?", "No backup by 5 days before your absence?", "Only 1 or 2 days before your absence?"]);
+    ["It's 10:30 am, no one has said yes, and you still can't come?", "Is it already after 12:40 pm?", "It's 10:00 am and no one has said yes?",
+     "Your absence is 4 days away, and you still have no backup?", "Your absence is only 1 or 2 days away?"]);
+  check("call out: once you arrive, tell the Shift Leader", await text(p, "#sit-forgot .step:nth-child(3) .t"), "Once you arrive, tell the Shift Leader what happened.");
   var msgs = await p.$$eval(".tpl", function (b) { return b.map(function (x) { return [x.querySelector(".tpl-t").getAttribute("lang"), x.querySelector(".copy-btn").getAttribute("data-copy")]; }); });
   check("call out: eight messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [8, true]);
-  check("call out: the first message, with Beth's name and her role filled in", msgs[0][1],
-    "Hello friend, I woke up sick and I am not sure I can come to my Pots & Pans shift today. Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\nBeth");
+  check("call out: the first message, with Beth's name, and her role as she only does Pots & Pans", msgs[0][1],
+    "Hi friend, I have a Pots & Pans shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nBeth");
+  check("call out: the late message leaves room to explain", msgs[2][1],
+    "Hello Art, I forgot my Pots & Pans shift today and only remembered after 12:40 pm. [your explanation] I am sorry. Please advise.\nBeth");
   check("call out: messages to the Student Kitchen Manager use the name from the settings", msgs.filter(function (m) { return /^Hello Art,/.test(m[1]); }).length, 4);
   check("call out: what's left to fill in is marked", await p.$$eval(".tpl:nth-of-type(1) .ph, .ph", function (m) { return m.length > 0 && m.every(function (x) { return /^\[.+\]$/.test(x.textContent); }); }), true);
   check("call out: contacts", await text(p, "#contacts"), "STUDENT KITCHEN MANAGER Art WORK STUDY MANAGER Nahelia");
@@ -323,15 +334,14 @@ function serve(dir, port) {
   await p.waitForFunction(function () { return document.querySelector(".copy-btn").textContent !== "Copy message"; }, null, { timeout: 3000 }).catch(function () {});
   check("copy: the button says so", await text(p, ".tpl >> nth=0 >> .copy-btn"), "Copied");
   var copied = await p.evaluate(function () { return navigator.clipboard.readText(); });
-  check("copy: the message is on the clipboard, with today's role", copied,
-    "Hello friend, I woke up sick and I am not sure I can come to my Pots & Pans shift today. Could you cover it for me? In return, I will work one of your shifts within the next 7 days.\nThank you,\nAdam");
+  check("copy: the message is on the clipboard; Adam does two jobs, so his role is left to fill in", copied,
+    "Hi friend, I have a [your role] shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nAdam");
   await p.waitForTimeout(2700);
   check("copy: the button goes back", await text(p, ".tpl >> nth=0 >> .copy-btn"), "Copy message");
-  await p.clock.setFixedTime(new Date("2026-10-07T09:00:00")); await p.reload(); await ready(p);   // Wednesday: Adam has no shift, and two roles
-  check("copy: no shift today and two roles: the role is left to fill in", (await p.$$eval(".copy-btn", function (b) { return b[0].getAttribute("data-copy"); })).indexOf("my [your role] shift today") >= 0, true);
+  check("copy: even on a day he works one job, as the message may be for another day", (await p.$$eval(".copy-btn", function (b) { return b.map(function (x) { return x.getAttribute("data-copy"); }); })).every(function (m) { return m.indexOf("Pots & Pans") < 0; }), true);
   await p.evaluate(function () { var m = document.getElementById("me"); m.value = ""; m.dispatchEvent(new Event("change")); });
   check("copy: no name chosen: the name is left to fill in, and the page says so",
-    [(await p.$$eval(".copy-btn", function (b) { return b[0].getAttribute("data-copy"); })).slice(-12), /Choose your name on My shifts/.test(await text(p, ".co-how"))],
+    [(await p.$$eval(".copy-btn", function (b) { return b[0].getAttribute("data-copy"); })).slice(-12), /Choose your name on the My shifts page/.test(await text(p, ".co-how"))],
     ["\n[your name]", true]);
   await p.context().close();
 
@@ -361,7 +371,7 @@ function serve(dir, port) {
   check("language: On with you keeps Shift Leader in English", (await text(p, ".shift .crew")).indexOf("Shift Leader") >= 0 || (await text(p, ".shift:nth-of-type(2) .crew")).indexOf("Shift Leader") >= 0, true);
   await p.goto(BASE + "#callout"); await ready(p);
   check("language: Call out in Chinese, the messages still in English", [await text(p, ".path-h h2"), (await p.$$eval(".copy-btn", function (b) { return b[0].getAttribute("data-copy"); })).slice(0, 12), await text(p, ".copy-btn")],
-    ["生病或临时请假", "Hello friend", "复制消息"]);
+    ["生病或临时请假", "Hi friend, I", "复制消息"]);
   check("language: the page title", await p.title(), "请假 · Kitchen Cleanup");
   await p.goto(BASE + "#availability"); await ready(p);
   check("language: My availability in Chinese", (await text(p, "#avail-lead")).indexOf("Ivwananji，你是以下日子的替班人选") === 0, true);
@@ -397,7 +407,7 @@ function serve(dir, port) {
       hidden: vis(".bottomnav, .topbar, .copy-btn, #pdf-btn, #install-btn, [data-theme-btn], [data-lang-btn]"),
       stamp: document.getElementById("stamp").innerText.replace(/\s+/g, " ").trim(),
       link: document.querySelector("#stamp a").getAttribute("href"),
-      role: document.querySelector(".copy-btn").getAttribute("data-copy").indexOf("my [your role] shift today") >= 0
+      role: document.querySelector(".copy-btn").getAttribute("data-copy").indexOf("a [your role] shift today") >= 0
     };
   });
   check("PDF: light, all four tabs, no Today or Tomorrow, no dates, backups open, no buttons", [pr.theme, pr.views, pr.today, pr.dates, pr.open, pr.hidden],
@@ -437,7 +447,7 @@ function serve(dir, port) {
   check("Save as PDF: phone-sized pages, each a picture", [pageCount > 8, (bin.match(/\/MediaBox \[0 0 390 844\]/g) || []).length === pageCount,
     (bin.match(/\/Width 780 \/Height 1688/g) || []).length === pageCount], [true, true, true]);
   var dests = (bin.match(/\/Subtype \/Link [^\n]*\/Dest \[(\d+) 0 R/g) || []).length;
-  check("Save as PDF: the cover's contents go to the four tabs; bookmarks too", [dests, (bin.match(/\/Parent \d+ 0 R \/Prev|\/Parent \d+ 0 R \/Next|\/Parent \d+ 0 R \/Dest/g) || []).length, bin.indexOf("/Title (Call out)") > 0], [4, 4, true]);
+  check("Save as PDF: the cover's contents go to the four tabs, Call out's jump list to its situations; bookmarks too", [dests, (bin.match(/\/Parent \d+ 0 R \/Prev|\/Parent \d+ 0 R \/Next|\/Parent \d+ 0 R \/Dest/g) || []).length, bin.indexOf("/Title (Call out)") > 0], [8, 4, true]);
   check("Save as PDF: live links to the timesheet portal and the app", [bin.indexOf("/URI (https://www.drbu.edu/timesheet)") > 0, bin.indexOf("/URI (" + BASE + ")") > 0], [true, true]);
   check("Save as PDF: the app is left as it was", [await p.$$eval(".when", function (w) { return w.length; }), await p.$$eval("iframe", function (f) { return f.length; }), await p.evaluate(function () { return document.documentElement.dataset.theme; })], [4, 0, "dark"]);
   /* if the phone can't draw the pages, the dialog offers the print window */
