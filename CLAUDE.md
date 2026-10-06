@@ -79,7 +79,10 @@ and the tab shell from the second.
   - **Order:** "Not sure if I can make it", "I forgot my shift, and it has
     already started" and "I'm too sick to get out of bed" (Sick or
     Unplanned Absence), then "I already know I'll miss a shift" (Planned
-    Absence). Situation titles are first person.
+    Absence), then "Oh no! I missed my shift" (Missed Shift, in rust):
+    message the Student Kitchen Manager and the Shift Leader, then wait
+    for a make-up shift and **never** come in for another shift without
+    approval. Situation titles are first person.
   - **Standalone:** each situation is written to be read alone (`sit()`).
   - **Times:** 10:30 am (not sure), 10:00 am (too sick), 12:15 pm and
     12:40 pm (forgot), and 4 days ahead (planned). They are the user's

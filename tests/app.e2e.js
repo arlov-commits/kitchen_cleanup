@@ -294,12 +294,14 @@ function serve(dir, port) {
   check("tab: active", await p.$$eval("#bottom-nav a.active", function (a) { return a.map(function (x) { return x.textContent; }); }), ["Call out"]);
   check("tab: scrolled to top", await p.$eval("#scroll", function (e) { return e.scrollTop; }), 0);
   var call = await text(p, "#view-callout");
+  check("call out: every {name} filled in", /\{\w+\}/.test(call), false);
   check("call out: no bare Kitchen Manager", (call.match(/Kitchen Manager/g) || []).length, (call.match(/Student Kitchen Manager/g) || []).length);
-  check("call out: sick or unplanned first, then planned", await p.$$eval(".path-h h2", function (h) { return h.map(function (x) { return x.textContent; }); }), ["Sick or Unplanned Absence", "Planned Absence"]);
+  check("call out: sick or unplanned first, then planned", await p.$$eval(".path-h h2", function (h) { return h.map(function (x) { return x.textContent; }); }), ["Sick or Unplanned Absence", "Planned Absence", "Missed Shift"]);
   check("call out: the four situations, in the first person, in order", await p.$$eval(".sit h3", function (h) { return h.map(function (x) { return x.closest(".path").className.slice(5) + " " + x.textContent; }); }),
-    ["k5 Not sure if I can make it", "k5 I forgot my shift, and it has already started", "k5 I'm too sick to get out of bed", "k1 I already know I'll miss a shift"]);
+    ["k5 Not sure if I can make it", "k5 I forgot my shift, and it has already started", "k5 I'm too sick to get out of bed", "k1 I already know I'll miss a shift", "k0 Oh no! I missed my shift"]);
   check("call out: a jump list at the top, one button for each", await p.$$eval(".jump-b", function (b) { return b.map(function (x) { return x.getAttribute("data-jump") + " " + x.textContent; }); }),
-    ["sit-maybe Not sure if I can make it", "sit-forgot I forgot my shift, and it has already started", "sit-sick I'm too sick to get out of bed", "sit-plan I already know I'll miss a shift"]);
+    ["sit-maybe Not sure if I can make it", "sit-forgot I forgot my shift, and it has already started", "sit-sick I'm too sick to get out of bed", "sit-plan I already know I'll miss a shift",
+     "sit-missed Oh no! I missed my shift"]);
   await p.click(".jump-b[data-jump='sit-plan']");
   check("call out: a jump scrolls its situation to the top, and stays on Call out", [await p.evaluate(function () {
     var d = document.getElementById("sit-plan").getBoundingClientRect().top - document.getElementById("scroll").getBoundingClientRect().top;
@@ -310,12 +312,16 @@ function serve(dir, port) {
      "Your absence is 4 days away, and you still have no backup?", "Your absence is only 1 or 2 days away?"]);
   check("call out: once you arrive, tell the Shift Leader", await text(p, "#sit-forgot .step:nth-child(3) .t"), "Once you arrive, tell the Shift Leader what happened.");
   var msgs = await p.$$eval(".tpl", function (b) { return b.map(function (x) { return [x.querySelector(".tpl-t").getAttribute("lang"), x.querySelector(".copy-btn").getAttribute("data-copy")]; }); });
-  check("call out: eight messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [8, true]);
+  check("call out: ten messages, all in English", [msgs.length, msgs.every(function (m) { return m[0] === "en"; })], [10, true]);
+  check("call out: a missed shift: message the Student Kitchen Manager and the Shift Leader, then wait", [msgs[8][1], msgs[9][1], await text(p, "#sit-missed .step:nth-child(3)")],
+    ["Hello Art, I missed my Pots & Pans shift on [day]. [your explanation] I am sorry. Please advise.\nBeth",
+     "Hello [Shift Leader's name], I missed my Pots & Pans shift on [day]. [your explanation] I am sorry.\nBeth",
+     "Then wait for instructions. You will be given a make-up shift. Do not come in for another shift on your own, without approval."]);
   check("call out: the first message, with Beth's name, and her role as she only does Pots & Pans", msgs[0][1],
     "Hi friend, I have a Pots & Pans shift today, but I am not sure I will feel well enough to come. Could you be my backup in case I do not feel better by 10:30 am? I will let you know by 10:30 am.\nThank you,\nBeth");
   check("call out: the late message leaves room to explain", msgs[2][1],
     "Hello Art, I forgot my Pots & Pans shift today and only remembered after 12:40 pm. [your explanation] I am sorry. Please advise.\nBeth");
-  check("call out: messages to the Student Kitchen Manager use the name from the settings", msgs.filter(function (m) { return /^Hello Art,/.test(m[1]); }).length, 4);
+  check("call out: messages to the Student Kitchen Manager use the name from the settings", msgs.filter(function (m) { return /^Hello Art,/.test(m[1]); }).length, 5);
   check("call out: what's left to fill in is marked", await p.$$eval(".tpl:nth-of-type(1) .ph, .ph", function (m) { return m.length > 0 && m.every(function (x) { return /^\[.+\]$/.test(x.textContent); }); }), true);
   check("call out: contacts", await text(p, "#contacts"), "STUDENT KITCHEN MANAGER Art WORK STUDY MANAGER Nahelia");
   await p.goto(BASE + "#nope"); await ready(p);
@@ -447,7 +453,7 @@ function serve(dir, port) {
   check("Save as PDF: phone-sized pages, each a picture", [pageCount > 8, (bin.match(/\/MediaBox \[0 0 390 844\]/g) || []).length === pageCount,
     (bin.match(/\/Width 780 \/Height 1688/g) || []).length === pageCount], [true, true, true]);
   var dests = (bin.match(/\/Subtype \/Link [^\n]*\/Dest \[(\d+) 0 R/g) || []).length;
-  check("Save as PDF: the cover's contents go to the four tabs, Call out's jump list to its situations; bookmarks too", [dests, (bin.match(/\/Parent \d+ 0 R \/Prev|\/Parent \d+ 0 R \/Next|\/Parent \d+ 0 R \/Dest/g) || []).length, bin.indexOf("/Title (Call out)") > 0], [8, 4, true]);
+  check("Save as PDF: the cover's contents go to the four tabs, Call out's jump list to its situations; bookmarks too", [dests, (bin.match(/\/Parent \d+ 0 R \/Prev|\/Parent \d+ 0 R \/Next|\/Parent \d+ 0 R \/Dest/g) || []).length, bin.indexOf("/Title (Call out)") > 0], [9, 4, true]);
   check("Save as PDF: live links to the timesheet portal and the app", [bin.indexOf("/URI (https://www.drbu.edu/timesheet)") > 0, bin.indexOf("/URI (" + BASE + ")") > 0], [true, true]);
   check("Save as PDF: the app is left as it was", [await p.$$eval(".when", function (w) { return w.length; }), await p.$$eval("iframe", function (f) { return f.length; }), await p.evaluate(function () { return document.documentElement.dataset.theme; })], [4, 0, "dark"]);
   /* if the phone can't draw the pages, the dialog offers the print window */
