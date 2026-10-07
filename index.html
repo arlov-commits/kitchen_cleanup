@@ -64,6 +64,7 @@ window.kitchenTheme();
   --on-dark:#c0c4c8;
   --line:#dee2e6;
   --line-soft:#e7e7ea;
+  --grid:#e7e7ea;          /* My availability's table lines */
   --rust:#b8431c;         /* fills, rails, rules */
   --rust-deep:#8c2f12;    /* rust as text on light, always this, not --rust */
   --rust-on-dark:#d66a48; /* rust as text on near-black */
@@ -102,6 +103,7 @@ window.kitchenTheme();
   --on-dark:#b8bcc3;
   --line:#2e353f;
   --line-soft:#262c35;
+  --grid:#434b58;          /* table lines: seen, but quieter than text */
   --rust-deep:#ec8a66;    /* rust as text */
   --mark-bg:#eceef1; --mark-fg:#14181f;
   --rust-btn:#a33a17;
@@ -315,10 +317,10 @@ p{margin:0}
 .avday .shift-h{padding:0 6px}
 .avt table{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.35}
 .avt th{text-align:left;vertical-align:bottom;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:6px 6px 8px}
-.avt td{vertical-align:middle;padding:10px 6px;border-top:1px solid var(--line-soft);color:var(--ink)}
+.avt td{vertical-align:middle;padding:10px 6px;border-top:1px solid var(--grid);color:var(--ink)}
 /* merged cells: centred down their rows, set off by a hairline */
-.avt .avr{font-weight:600;padding-left:6px;border-right:1px solid var(--line-soft)}
-.avt .avn[rowspan]{border-left:1px solid var(--line-soft)}
+.avt .avr{font-weight:600;padding-left:6px;border-right:1px solid var(--grid)}
+.avt .avn[rowspan]{border-left:1px solid var(--grid)}
 .avt .avb span{display:block}
 .avt .avb .dp{display:inline-block;margin-bottom:3px}
 .avt .avb span+span{font-weight:600}
