@@ -338,6 +338,9 @@ check("fixedVw: vw units become pixels at the PDF's width", b.fixedVw("h1{font-s
 check("pdfCuts: a short part is one page", JSON.stringify(b.pdfCuts(500, [100, 300])), "[[0,500,0]]");
 check("pdfCuts: cut at the last gap that fits, later pages with a top margin", JSON.stringify(b.pdfCuts(2000, [100, 700, 830, 900, 1500, 1640])),
   "[[0,830,0],[830,1640,18],[1640,2000,18]]");
+check("pdfCuts: a gap between cards in the page's lower half wins over a later gap inside a card", JSON.stringify(b.pdfCuts(2000, [500, 700, 800], [500])),
+  "[[0,500,0],[500,800,18],[800,1626,18],[1626,2000,18]]");
+check("pdfCuts: a gap between cards in the upper half doesn't", JSON.stringify(b.pdfCuts(1200, [300, 800], [300])), "[[0,800,0],[800,1200,18]]");
 check("pdfCuts: no gap that fits: cut at the page's foot", JSON.stringify(b.pdfCuts(1000, [10])), "[[0,844,0],[844,1000,18]]");
 check("pdfText: plain text, and anything else as UTF-16", [b.pdfText("a (b) \\c"), b.pdfText("班 · x")], ["(a \\(b\\) \\\\c)", "<FEFF73ED002000B700200078>"]);
 var pdfBytes = b.makePDF([
@@ -358,7 +361,7 @@ check("makePDF: two pages, a link to page 2, a web link, two bookmarks, the pict
 
 /* ------------------------------------------------------ the languages */
 var langs = Object.keys(b.STR);
-check("languages", langs, ["en", "zh-Hans", "zh-Hant", "th", "vi"]);
+check("languages", langs, ["en", "zh-Hans", "zh-Hant", "th", "vi", "bo"]);
 function marks(v) {
   if (Array.isArray(v)) return "list of " + v.length;
   return JSON.stringify([(v.match(/\{\w+\}/g) || []).sort(), (v.match(/<\/?\w+/g) || []).sort(), (v.match(/\[/g) || []).length]);
@@ -387,7 +390,12 @@ check("dates and words in each language", dates, [
   ["10月4日 星期日", "10月5日", "周一", "替班人选 · 3"],
   ["10月4日 星期日", "10月5日", "週一", "代班人選 · 3"],
   ["วันอาทิตย์ที่ 4 ตุลาคม", "5 ต.ค.", "จ.", "ตัวสำรอง · 3"],
-  ["Chủ nhật, 4 tháng 10", "5/10", "T2", "Người dự phòng · 3"]]);
+  ["Chủ nhật, 4 tháng 10", "5/10", "T2", "Người dự phòng · 3"],
+  ["གཟའ་ཉི་མ ཟླ་ 10 ཚེས་ 4", "ཟླ་ 10 ཚེས་ 5", "ཟླ་བ", "ཚབ་མི · 3"]]);
+check("Tibetan: every string is in Tibetan script, apart from names, roles and app words", Object.keys(b.STR.bo).filter(function (k) {
+  var v = b.STR.bo[k];
+  return typeof v === "string" && /[a-z]{3}/i.test(v.replace(/Student Kitchen Manager|Shift Leader|DRBU|WhatsApp|Google|PDF|Safari|Share|Add to Home Screen|Install app|Add to Home screen|Save as PDF|<\/?\w+>|\{\w+\}/g, ""));
+}), []);
 check("a missing string falls back to English, then to its key", [b.t("nope"), (b.lang = "th", b.t("copied")), (delete b.STR.th.copied, b.t("copied"))], ["nope", "คัดลอกแล้ว", "Copied"]);
 b.lang = "en";
 

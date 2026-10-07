@@ -255,22 +255,23 @@ function serve(dir, port) {
     });
   }
   check("availability: one row per trade, in order", await availOnPage(), availOf("Aryashree"));
-  check("availability: the day merged across the top of its rows, the job merged down them", await p.evaluate(function () {
-    return [].map.call(document.querySelectorAll(".avt tbody"), function (g) {
-      var head = g.querySelector("tr.avd .dp"), rows = g.querySelectorAll("tr[data-trade]").length, spans = 0;
+  check("availability: a card per day, in its hue, with the job merged down its rows", await p.evaluate(function () {
+    return [].map.call(document.querySelectorAll("#avail-body .avday"), function (g) {
+      var head = g.querySelector(".shift-h h2"), rows = g.querySelectorAll("tr[data-trade]").length, spans = 0;
       [].forEach.call(g.querySelectorAll(".avr"), function (c) { spans += +c.getAttribute("rowspan"); });
-      return head.textContent + " " + (spans === rows) + " " + head.classList.contains(g.className);
+      var allThisDay = [].every.call(g.querySelectorAll("tr[data-trade]"), function (r) { return r.dataset.trade.split("|")[0] === g.dataset.day; });
+      return head.textContent + " " + (spans === rows) + " " + allThisDay + " " + (getComputedStyle(g).borderTopColor === getComputedStyle(g).getPropertyValue("--c").trim() || /\bk\d\b/.test(g.className));
     });
   }), (function () {
     var days = [];
     availOf("Aryashree").forEach(function (r) { var d = r.split("|")[0]; if (days.indexOf(d) < 0) days.push(d); });
-    return days.map(function (d) { return d + " true true"; });
+    return days.map(function (d) { return d + " true true true"; });
   })());
   async function mergedNames(who) {
     await p.selectOption("#me", who);
     return p.evaluate(function () {
       var bad = 0, merged = 0;
-      [].forEach.call(document.querySelectorAll(".avt tbody"), function (g) {
+      [].forEach.call(document.querySelectorAll("#avail-body .avday"), function (g) {
         var cells = [].slice.call(g.querySelectorAll(".avn"));
         cells.forEach(function (c, i) {
           if (+(c.getAttribute("rowspan") || 1) > 1) merged++;
@@ -291,8 +292,9 @@ function serve(dir, port) {
   check("availability: merged cells are centred down their rows", await p.$$eval(".avt td", function (c) {
     return c.every(function (x) { return getComputedStyle(x).verticalAlign === "middle"; });
   }), true);
-  check("availability: the headings", await p.$$eval(".avt thead th", function (h) { return h.map(function (x) { return x.textContent; }); }),
-    ["You may be asked to work", "In exchange, they would work your", "Who may ask"]);
+  check("availability: each day's card has the three headings", await p.$$eval("#avail-body .avday", function (cards) {
+    return cards.map(function (c) { return [].map.call(c.querySelectorAll("thead th"), function (x) { return x.textContent; }).join(" | "); });
+  }), ["You may be asked to work | In exchange, they would work your | Who may ask", "You may be asked to work | In exchange, they would work your | Who may ask"]);
   for (var who of ["Adam", "Ben Kong", "Ivwananji", "Thanh"]) {
     await p.selectOption("#me", who);
     check("availability: " + who, await availOnPage(), availOf(who));
@@ -306,7 +308,7 @@ function serve(dir, port) {
   check("availability tab: its own view, between Call out and Submit Timesheet",
     [await p.$$eval("#bottom-nav a", function (a) { return a.map(function (x) { return x.textContent; }); }), await p.title(),
      await p.$$eval("main.view", function (v) { return v.filter(function (x) { return !x.hidden; }).map(function (x) { return x.id; }); })],
-    [["My shifts", "Call out", "My availability", "Submit Timesheet"], "My availability · Kitchen Cleanup", ["view-availability"]]);
+    [["My shifts", "My availability", "Call out", "Submit Timesheet"], "My availability · Kitchen Cleanup", ["view-availability"]]);
   check("availability tab: each day a card in its hue", await p.$$eval(".avail-list li", function (l) {
     return l.every(function (x) { return x.classList.contains("panel") && /\bk[0-6]\b/.test(x.className) && x.querySelector("h2.d"); });
   }), true);
@@ -418,12 +420,13 @@ function serve(dir, port) {
   }
   check("language: English by default here", await langState(), ["en", "EN", "Your shifts", "My shifts", null]);
   var seen = [];
-  for (var i = 0; i < 5; i++) { await p.locator(visLang).first().click(); seen.push(await langState()); }
-  check("language: the button steps through all five, and remembers", seen, [
+  for (var i = 0; i < 6; i++) { await p.locator(visLang).first().click(); seen.push(await langState()); }
+  check("language: the button steps through all six, and remembers", seen, [
     ["zh-Hans", "简", "你的班次", "我的班次", "zh-Hans"],
     ["zh-Hant", "繁", "你的班次", "我的班次", "zh-Hant"],
     ["th", "ไทย", "กะของคุณ", "กะของฉัน", "th"],
     ["vi", "VI", "Ca của bạn", "Ca của tôi", "vi"],
+    ["bo", "བོད", "ཁྱེད་ཀྱི་ལས་སྐོར།", "ངའི་ལས་སྐོར", "bo"],
     ["en", "EN", "Your shifts", "My shifts", "en"]]);
   await p.locator(visLang).first().click();   // 简体中文
   await p.reload(); await ready(p);
@@ -444,6 +447,11 @@ function serve(dir, port) {
   p = await page({ ctx: { locale: "vi-VN" } });
   await p.goto(BASE); await ready(p);
   check("language: a phone set to Vietnamese starts in Vietnamese", (await langState()).slice(0, 2), ["vi", "VI"]);
+  await p.context().close();
+  p = await page({ ctx: { locale: "bo-CN" } });
+  await p.goto(BASE); await ready(p);
+  check("language: a phone set to Tibetan starts in Tibetan, drawn in the app's Tibetan font", [(await langState()).slice(0, 2),
+    await p.evaluate(function () { return document.fonts.ready.then(function () { return document.fonts.check("16px 'Noto Serif Tibetan'", "ཚབ་མི"); }); })], [["bo", "བོད"], true]);
   await p.context().close();
   p = await page({ ctx: { locale: "fr-FR" } });
   await p.goto(BASE); await ready(p);
@@ -717,7 +725,7 @@ function serve(dir, port) {
     }
   }
 
-  for (var lg of ["zh-Hans", "zh-Hant", "th", "vi"]) {
+  for (var lg of ["zh-Hans", "zh-Hant", "th", "vi", "bo"]) {
     p = await page({ ctx: { viewport: { width: 320, height: 640 } }, init: new Function("localStorage.setItem('kitchen.lang','" + lg + "');localStorage.setItem('kitchen.me','Aryashree')"), time: "2026-10-04T10:00:00" });
     for (var tab2 of ["", "#callout", "#availability", "#timesheet"]) {
       await p.goto(BASE + tab2); await ready(p); await p.waitForTimeout(100);

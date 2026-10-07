@@ -47,6 +47,9 @@ window.kitchenTheme();
 @font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-italic-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Inter';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/inter-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
 @font-face{font-family:'Playfair Display';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+/* Tibetan: not every phone has a Tibetan font, so the app carries one.
+   It is drawn a little larger, as Tibetan reads small beside Latin. */
+@font-face{font-family:'Noto Serif Tibetan';font-style:normal;font-weight:400;font-display:swap;size-adjust:112%;src:url(fonts/noto-serif-tibetan.woff2) format('woff2');unicode-range:U+0F00-0FFF,U+200C-200D,U+25CC}
 @font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 700;font-display:swap;src:url(fonts/playfair-display-italic-vietnamese.woff2) format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
 
 :root{
@@ -114,8 +117,13 @@ window.kitchenTheme();
 *,*::before,*::after{box-sizing:border-box}
 :root[lang="zh-Hant"]{--display:'Playfair Display',Georgia,"Songti TC","Noto Serif CJK TC",serif;
   --body:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif}
-:root[lang^="zh"] em,:root[lang="th"] em{font-style:normal}
-:root[lang="th"] body *,:root[lang="th"] .snap *{letter-spacing:0}   /* spaced-out Thai falls apart */
+:root[lang^="zh"] em,:root[lang="th"] em,:root[lang="bo"] em{font-style:normal}
+:root[lang="th"] body *,:root[lang="th"] .snap *,:root[lang="bo"] body *,:root[lang="bo"] .snap *{letter-spacing:0}   /* spaced-out Thai or Tibetan falls apart */
+/* Tibetan stacks letters above and below the line: give it room */
+:root[lang="bo"]{--display:'Playfair Display','Noto Serif Tibetan',"Kailasa","Microsoft Himalaya",Georgia,serif;
+  --body:'Inter','Noto Serif Tibetan',"Kailasa","Microsoft Himalaya",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+:root[lang="bo"] body,:root[lang="bo"] .snap{line-height:1.75}
+:root[lang="bo"] h1,:root[lang="bo"] h2,:root[lang="bo"] h3,:root[lang="bo"] .motto,:root[lang="bo"] .due .big,:root[lang="bo"] .bn-item{line-height:1.45}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--white)}
 body{margin:0;background:var(--white);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:clip}
@@ -300,16 +308,14 @@ p{margin:0}
 .backups .cover-lead{font-size:15px;color:var(--ink-2);margin-bottom:6px}
 .backups .cover{margin-bottom:4px}
 /* ------------------------------------------------- My availability */
-/* one table: the day you'd work merged across the top of its rows, then
-   the job merged down them; each day's rows framed by a rule in its hue */
-.avt{padding:4px 10px 8px}
+/* a card per day, topped in its hue like the shift cards, holding a
+   table: the job merged down its rows, then each trade and who may ask.
+   Its sides are trimmed so three columns fit at 320px. */
+.avday{border-top:4px solid var(--c);padding:14px 10px 8px;gap:6px}
+.avday .shift-h{padding:0 6px}
 .avt table{width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.35}
-.avt th{text-align:left;vertical-align:bottom;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:10px 6px 8px}
-.avt tbody{border-top:2px solid var(--c)}
+.avt th{text-align:left;vertical-align:bottom;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:6px 6px 8px}
 .avt td{vertical-align:middle;padding:10px 6px;border-top:1px solid var(--line-soft);color:var(--ink)}
-.avt tr.avd th{padding:10px 6px 2px;text-align:left;font-weight:400}
-.avt tr.avd .dp{font-size:12.5px;padding:4px 10px}
-.avt tr.avd+tr td{border-top:0}
 /* merged cells: centred down their rows, set off by a hairline */
 .avt .avr{font-weight:600;padding-left:6px;border-right:1px solid var(--line-soft)}
 .avt .avn[rowspan]{border-left:1px solid var(--line-soft)}
@@ -319,6 +325,7 @@ p{margin:0}
 .avt .avn{color:var(--ink-2);overflow-wrap:break-word}
 .avt tr.lr .avb span,.avt tr.lr .avn{color:var(--ink-3);font-weight:400}
 :root[lang="th"] .avt th{letter-spacing:0}
+:root[lang="bo"] .avt th,:root[lang="bo"] .eyebrow,:root[lang="bo"] .dp{font-size:12.5px}
 .cover{margin:0;padding:0 0 0 1.6em;font-size:15px}
 /* each backup: the name on its own line, then what they work, as role
    labels each followed by day tags in that day's colour */
@@ -655,7 +662,7 @@ p{margin:0}
   /* English day names for the shift files and their checks; what the
      app shows comes from STR, in the chosen language */
   var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  var TABS = ["shifts", "callout", "availability", "timesheet"];
+  var TABS = ["shifts", "availability", "callout", "timesheet"];
   var ME_KEY = "kitchen.me", TS_KEY = "kitchen.timesheet", LANG_KEY = "kitchen.lang";
 
   /* STRINGS: every word the app shows, in each language it offers. Names,
@@ -784,7 +791,7 @@ p{margin:0}
       status_ok: "Shift list: {students} students, {shifts} shifts a week.",
       status_failed: "Shift list: not loaded.",
       saved_here: "Your name is saved on this phone only.",
-      install: "Install as app",
+      install: "Install as app (works offline)",
       install_ios: "In Safari, tap the Share button, then Add to Home Screen.",
       install_other: "Open your browser's menu and choose Install app or Add to Home screen.",
       every_hour: "<b>Every hour counts.</b> Each shift must be done in full: an hour you miss is an hour a teammate works for you.",
@@ -793,7 +800,7 @@ p{margin:0}
       pdf_for: "For {name}",
       pdf_note: "This copy doesn't change. For the latest shifts and backups, open the app: {link}",
       pdf_q: "Save the app as a PDF?",
-      pdf_what: "This downloads the whole app to your phone as one PDF: your shifts, Call out, My availability and the timesheet, as they are now. Keep it for when you're offline. It won't update itself.",
+      pdf_what: "This downloads the whole app to your phone as one PDF: your shifts, My availability, Call out and the timesheet, as they are now. Keep it for when you're offline. It won't update itself.",
       cancel: "Cancel",
       pdf_go: "Download PDF",
       pdf_making: "Making the PDF…",
@@ -938,7 +945,7 @@ p{margin:0}
       status_ok: "班表：{students}位学生，每周{shifts}个班次。",
       status_failed: "班表：未载入。",
       saved_here: "你的名字只保存在这部手机上。",
-      install: "安装为应用",
+      install: "安装为应用（可离线使用）",
       install_ios: "在 Safari 中点按“分享”按钮，然后选择“添加到主屏幕”。",
       install_other: "打开浏览器的菜单，选择“安装应用”或“添加到主屏幕”。",
       every_hour: "<b>每一小时都很重要。</b>每个班次都必须完整完成：你缺的每一小时，都要由同事替你做。",
@@ -947,7 +954,7 @@ p{margin:0}
       pdf_for: "姓名：{name}",
       pdf_note: "这份文件不会更新。要看最新的班次和替班人选，请打开本应用：{link}",
       pdf_q: "把本应用保存为 PDF？",
-      pdf_what: "这会把整个应用下载到你的手机，保存成一个 PDF：你的班次、请假、我的替班和工时表，都是现在的内容。没有网络时可以用它。它不会自动更新。",
+      pdf_what: "这会把整个应用下载到你的手机，保存成一个 PDF：你的班次、我的替班、请假和工时表，都是现在的内容。没有网络时可以用它。它不会自动更新。",
       cancel: "取消",
       pdf_go: "下载 PDF",
       pdf_making: "正在生成 PDF…",
@@ -1092,7 +1099,7 @@ p{margin:0}
       status_ok: "班表：{students}位學生，每週{shifts}個班次。",
       status_failed: "班表：未載入。",
       saved_here: "你的名字只儲存在這支手機上。",
-      install: "安裝為應用程式",
+      install: "安裝為應用程式（可離線使用）",
       install_ios: "在 Safari 中點按「分享」按鈕，然後選擇「加入主畫面」。",
       install_other: "開啟瀏覽器的選單，選擇「安裝應用程式」或「加到主畫面」。",
       every_hour: "<b>每一小時都很重要。</b>每個班次都必須完整完成：你缺的每一小時，都要由同事幫你做。",
@@ -1101,7 +1108,7 @@ p{margin:0}
       pdf_for: "姓名：{name}",
       pdf_note: "這份文件不會更新。要看最新的班次和代班人選，請開啟本應用程式：{link}",
       pdf_q: "把本應用程式儲存為 PDF？",
-      pdf_what: "這會把整個應用程式下載到你的手機，儲存成一個 PDF：你的班次、請假、我的代班和工時表，都是現在的內容。沒有網路時可以用它。它不會自動更新。",
+      pdf_what: "這會把整個應用程式下載到你的手機，儲存成一個 PDF：你的班次、我的代班、請假和工時表，都是現在的內容。沒有網路時可以用它。它不會自動更新。",
       cancel: "取消",
       pdf_go: "下載 PDF",
       pdf_making: "正在產生 PDF…",
@@ -1246,7 +1253,7 @@ p{margin:0}
       status_ok: "ตารางกะ: นักศึกษา {students} คน, {shifts} กะต่อสัปดาห์",
       status_failed: "ตารางกะ: โหลดไม่สำเร็จ",
       saved_here: "ชื่อของคุณบันทึกไว้ในโทรศัพท์เครื่องนี้เท่านั้น",
-      install: "ติดตั้งเป็นแอป",
+      install: "ติดตั้งเป็นแอป (ใช้ได้แม้ไม่มีเน็ต)",
       install_ios: "ใน Safari แตะปุ่มแชร์ แล้วเลือก “เพิ่มไปยังหน้าจอโฮม”",
       install_other: "เปิดเมนูของเบราว์เซอร์ แล้วเลือก “ติดตั้งแอป” หรือ “เพิ่มไปยังหน้าจอหลัก”",
       every_hour: "<b>ทุกชั่วโมงสำคัญ</b> ทุกกะต้องทำให้ครบ ชั่วโมงที่คุณขาด คือชั่วโมงที่เพื่อนร่วมทีมต้องทำแทนคุณ",
@@ -1255,7 +1262,7 @@ p{margin:0}
       pdf_for: "สำหรับ {name}",
       pdf_note: "สำเนานี้จะไม่อัปเดต ดูกะและตัวสำรองล่าสุดได้ในแอป: {link}",
       pdf_q: "บันทึกแอปเป็น PDF?",
-      pdf_what: "จะดาวน์โหลดแอปทั้งหมดลงโทรศัพท์ของคุณเป็น PDF ไฟล์เดียว: กะของคุณ การแจ้งลา การรับแทนกะ และใบลงเวลา ตามข้อมูลตอนนี้ เก็บไว้ใช้ตอนไม่มีอินเทอร์เน็ต ไฟล์นี้จะไม่อัปเดตเอง",
+      pdf_what: "จะดาวน์โหลดแอปทั้งหมดลงโทรศัพท์ของคุณเป็น PDF ไฟล์เดียว: กะของคุณ การรับแทนกะ การแจ้งลา และใบลงเวลา ตามข้อมูลตอนนี้ เก็บไว้ใช้ตอนไม่มีอินเทอร์เน็ต ไฟล์นี้จะไม่อัปเดตเอง",
       cancel: "ยกเลิก",
       pdf_go: "ดาวน์โหลด PDF",
       pdf_making: "กำลังสร้าง PDF…",
@@ -1400,7 +1407,7 @@ p{margin:0}
       status_ok: "Lịch ca: {students} sinh viên, {shifts} ca mỗi tuần.",
       status_failed: "Lịch ca: chưa tải được.",
       saved_here: "Tên của bạn chỉ được lưu trên điện thoại này.",
-      install: "Cài làm ứng dụng",
+      install: "Cài làm ứng dụng (dùng được khi không có mạng)",
       install_ios: "Trong Safari, chạm nút Chia sẻ, rồi chọn “Thêm vào MH chính”.",
       install_other: "Mở menu của trình duyệt và chọn “Cài đặt ứng dụng” hoặc “Thêm vào màn hình chính”.",
       every_hour: "<b>Mỗi giờ đều quan trọng.</b> Mỗi ca phải được làm trọn vẹn: mỗi giờ bạn vắng là một giờ đồng đội phải làm thay bạn.",
@@ -1409,7 +1416,7 @@ p{margin:0}
       pdf_for: "Dành cho {name}",
       pdf_note: "Bản này không tự cập nhật. Để xem ca và người dự phòng mới nhất, hãy mở ứng dụng: {link}",
       pdf_q: "Lưu ứng dụng thành PDF?",
-      pdf_what: "Thao tác này tải toàn bộ ứng dụng về điện thoại của bạn thành một tệp PDF: các ca của bạn, Báo nghỉ, Thay ca và bảng giờ, theo nội dung hiện tại. Hãy giữ để dùng khi không có mạng. Tệp này không tự cập nhật.",
+      pdf_what: "Thao tác này tải toàn bộ ứng dụng về điện thoại của bạn thành một tệp PDF: các ca của bạn, Thay ca, Báo nghỉ và bảng giờ, theo nội dung hiện tại. Hãy giữ để dùng khi không có mạng. Tệp này không tự cập nhật.",
       cancel: "Hủy",
       pdf_go: "Tải PDF",
       pdf_making: "Đang tạo PDF…",
@@ -1432,14 +1439,163 @@ p{margin:0}
       av_form_open: "Mở phiếu ngày rảnh",
       status_avail: "Câu trả lời ngày rảnh: {n} sinh viên.",
       status_avail_failed: "Câu trả lời ngày rảnh: chưa tải được, nên mọi người được tính là rảnh."
+    },
+
+    bo: {
+      days: ["གཟའ་ཟླ་བ", "གཟའ་མིག་དམར", "གཟའ་ལྷག་པ", "གཟའ་ཕུར་བུ", "གཟའ་པ་སངས", "གཟའ་སྤེན་པ", "གཟའ་ཉི་མ"],
+      dshort: ["ཟླ་བ", "མིག་དམར", "ལྷག་པ", "ཕུར་བུ", "པ་སངས", "སྤེན་པ", "ཉི་མ"],
+      months: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      mshort: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+      date_long: "{wd} ཟླ་ {month} ཚེས་ {d}",
+      date_short: "ཟླ་ {mon} ཚེས་ {d}",
+      tab_shifts: "ངའི་ལས་སྐོར",
+      tab_callout: "དགོངས་པ་ཞུ་བ",
+      tab_availability: "ངའི་ཚབ་བྱེད",
+      tab_timesheet: "ལས་ཚོད་ཐོ་སྤྲོད",
+      views: "ཤོག་ངོས།",
+      due_today: "(དེ་རིང་སྤྲོད་དགོས།)",
+      lang_label: "སྐད་ཡིག {name}། {next} ལ་བརྗེ་བར་མནོན།",
+      mode_auto: "རང་འགུལ། (ཕྱི་དྲོ་ 7 ནས་སྔ་དྲོ་ 7 བར་ནག་པོ།)",
+      mode_light: "དཀར་པོ།",
+      mode_dark: "ནག་པོ།",
+      theme_label: "མདོག་གཞི། {mode}། {next} ལ་བརྗེ་བར་མནོན།",
+      theme_title: "མདོག་གཞི། {mode}",
+      shifts_eyebrow: "ཐབ་ཚང་གཙང་སྦྲ།",
+      shifts_h1: "ཁྱེད་ཀྱི་<em>ལས་སྐོར།</em>",
+      your_name: "ཁྱེད་ཀྱི་མིང་།",
+      choose_name: "ཁྱེད་ཀྱི་མིང་འདེམས།…",
+      loading: "ལས་སྐོར་ཐོ་ཁ་ཕྱེ་བཞིན་པ…",
+      choose_prompt: "ཁྱེད་ཀྱི་ལས་སྐོར་དང་ཁྱེད་ཀྱི་ཚབ་བྱེད་ཐུབ་མཁན་མཐོང་བར། གོང་དུ་ཁྱེད་ཀྱི་མིང་འདེམས།",
+      load_failed: "ལས་སྐོར་ཐོ་ཁ་ཕྱེ་མ་ཐུབ།",
+      load_file: "ཉེར་སྤྱོད་འདི་དེའི་དྲ་ཚིགས་ཁ་བྱང་ནས་ཁ་ཕྱེ། ཡིག་ཆ་ཐད་ཀར་ཁ་ཕྱེ་ན་ཐོ་ཀློག་མི་ཐུབ།",
+      load_retry: "ཉེར་སྤྱོད་ཁ་རྒྱབ་ནས་ཡང་བསྐྱར་ཁ་ཕྱེ། ད་དུང་ཁ་ཕྱེ་མ་ཐུབ་ན་ Student Kitchen Manager ལ་ཤོད།",
+      today_is: "དེ་རིང་ {date} རེད།",
+      glance_label: "གཟའ་འཁོར་འདིའི་ཁྱེད་ཀྱི་ལས་སྐོར།",
+      today: "དེ་རིང་",
+      tomorrow: "སང་ཉིན",
+      on_with_you: "ཁྱེད་དང་མཉམ་དུ་ལས་ཀ་བྱེད་མཁན།",
+      shift_backups: "ཚབ་མི · {n}",
+      can_cover: "ཁྱེད་ཀྱི་ཚབ་བྱེད་ཐུབ་མཁན།",
+      last_resort: "མཐའ་མའི་ཐབས།",
+      last_resort_note: "ཁོང་ཚོས་ཁྱེད་ཀྱི་ཚབ་བྱེད་ཐུབ། འོན་ཀྱང་ཁྱེད་ཀྱིས་ལན་དུ་ཁོང་ཚོའི་ལས་སྐོར་བྱེད་མི་ཐུབ། ཡང་ན་ཁོང་ཚོ་ཉིན་དེར་ལས་ཀ་བྱེད་ཀྱི་ཡོད།",
+      no_cover: "ལས་སྐོར་འདིའི་ཚབ་མི་ད་དུང་མེད།",
+      co_eyebrow: "མི་ཡོང་བ།",
+      co_h1: "ལས་སྐོར་ལ་<em>ཡོང་མི་ཐུབ་བམ།</em>",
+      msg_h: "འཕྲིན།",
+      copy: "འཕྲིན་འདྲ་བཤུས།",
+      copied: "འདྲ་བཤུས་ཟིན།",
+      copy_failed: "འཕྲིན་འདི་འདྲ་བཤུས་བྱེད་པར་ཡུན་རིང་མནོན།",
+      sick_h: "ན་བ་འམ་སྔོན་མ་ཤེས་པའི་མི་ཡོང་བ།",
+      planned_h: "སྔོན་ནས་ཤེས་པའི་མི་ཡོང་བ།",
+      co_lead: "ལས་སྐོར་རེ་རེ་ཆ་ཚང་བྱེད་དགོས། སུས་ཀྱང་ཁྱེད་ཀྱི་ཚབ་མ་བྱས་ན། ཁྱེད་ཀྱི་ལས་ཟླ་ཚོས་ལས་ཀ་ལྷག་མ་བྱེད་དགོས།",
+      msg_noname: "“ངའི་ལས་སྐོར་” ཤོག་ངོས་སུ་ཁྱེད་ཀྱི་མིང་འདེམས་ན། ཁྱེད་ཀྱི་འཕྲིན་ནང་ཁྱེད་ཀྱི་མིང་ཡོང་།",
+      jump_h: "ག་རེ་བྱུང་ངམ།",
+      sit_maybe: "དེ་རིང་ཡོང་ཐུབ་མིན་ངེས་པ་མེད།",
+      sit_maybe_s: "ང་འཕྲོད་བསྟེན་ཡག་པོ་མེད། དེ་རིང་ལས་ཀ་བྱེད་ཐུབ་མིན་ད་དུང་མི་ཤེས།",
+      m1: "རྗེས་སུ་བདེ་ཐང་ཡོང་སྲིད་ཀྱང་། ད་ལྟ་ཚབ་མི་ཞིག་འཚོལ།",
+      m1s: "ཁྱེད་ཀྱི་ཚབ་མི་རེ་རེར་ WhatsApp འམ་ཡི་གེ་བརྒྱུད་འཕྲིན་གཏོང་། ཚོགས་ཁང་ནང་མ་ཡིན་པར་མི་རེ་རེར་སོ་སོར་གཏོང་། ཁྱེད་ཀྱི་ཚབ་མི་ཚོ་ “ངའི་ལས་སྐོར་” ཤོག་ངོས་སུ་ཡོད།",
+      m2: "སྔ་དྲོ་ 10:00 མ་སླེབ་གོང་ཐག་གཅོད།",
+      m2s: "ཚབ་མི་ཞིག་གིས་ཁྱེད་ཀྱི་ལས་སྐོར་བྱེད་པ་འམ། ཡང་ན་ཁྱེད་རང་ཡོང་། གང་ཡིན་ཁྱེད་ཀྱི་ཚབ་མི་ལ་ཤོད།",
+      m3: "སྔ་དྲོ་ 10:00 སླེབས་ཀྱང་སུས་ཀྱང་ཡོང་ཐུབ་མ་ཟེར། ཁྱེད་ད་དུང་ཡོང་མི་ཐུབ་བམ།",
+      m3t: "འཕྲལ་མར་ Student Kitchen Manager ({km}) ལ་འཕྲིན་གཏོང་།",
+      late_yes: "Student Kitchen Manager ལ་འཕྲིན་བཏང་རྗེས་སུ་མི་ཞིག་གིས་ཡོང་ཐུབ་ཟེར་བ་ཡིན་ནམ།",
+      late_yes_t: "འཕྲལ་མར་ Student Kitchen Manager ({km}) ལ་ཡང་བསྐྱར་འཕྲིན་གཏོང་། དེས་ཁོང་གིས་མི་འཚོལ་མཚམས་འཇོག་ཐུབ། ཚབ་མི་གཞན་ཚོར་ཡང་ཤོད།",
+      sit_forgot: "ངས་ལས་སྐོར་བརྗེད་སོང་། ལས་སྐོར་འགོ་ཚུགས་ཟིན།",
+      f1: "ཉིན་གུང་ 12:15 ཡིན་ཡང་། ད་ལྟ་འཕྲལ་མར་ལས་ཀར་སོང་།",
+      f2: "ཐད་ཀར་སོང་། ལག་སུབ་དང་པང་ཁེབས་ལེན་པར་ DRBU ཁང་པར་མ་བསྡད།",
+      f3: "སླེབས་མ་ཐག་ Shift Leader ལ་བྱུང་བ་ཤོད།",
+      f4: "ཉིན་གུང་ 12:40 བརྒལ་ཟིན་ནམ།",
+      f4t: "Student Kitchen Manager ({km}) ལ་འཕྲིན་བཏང་ནས་བྱུང་བ་གསལ་བཤད་བྱོས།",
+      sit_sick: "ང་ན་ནས་ཉལ་ཁྲི་ནས་ལང་མི་ཐུབ།",
+      sit_sick_s: "ང་གཉིད་སད་དུས་ན་འདུག དེ་རིང་ལས་ཀ་བྱེད་མི་ཐུབ།",
+      s1: "འཕྲལ་མར་ཁྱེད་ཀྱི་ཚབ་མི་རེ་རེར་འཕྲིན་གཏོང་།",
+      s1s: "WhatsApp འམ་ཡི་གེ་བེད་སྤྱོད་གྱིས། ཚོགས་ཁང་ནང་མ་ཡིན་པར་མི་རེ་རེར་སོ་སོར་གཏོང་། ཁྱེད་ཀྱི་ཚབ་མི་ཚོ་ “ངའི་ལས་སྐོར་” ཤོག་ངོས་སུ་ཡོད།",
+      s2: "མི་ཞིག་གིས་ཡོང་ཐུབ་ཟེར་ན། གཞན་ཚོས་ཤེས་པར་ཚང་མར་ཤོད།",
+      s3: "སྔ་དྲོ་ 10:00 སླེབས་ཀྱང་སུས་ཀྱང་ཡོང་ཐུབ་མ་ཟེར་བ་ཡིན་ནམ།",
+      s3t: "WhatsApp བརྒྱུད་ Student Kitchen Manager ({km}) ལ་འཕྲིན་གཏོང་།",
+      s4: "དེ་ནས་ Student Kitchen Manager གིས་ཤོད་པ་ལྟར་བྱོས།",
+      sit_plan: "མ་འོངས་པར་ངས་ལས་སྐོར་ཞིག་ལ་ཡོང་མི་ཐུབ།",
+      p1: "སྔ་མོ་ནས་ཚབ་མི་ཞིག་འཚོལ།",
+      p1s: "ཁྱེད་ཀྱི་ཚབ་མི་རེ་རེར་སོ་སོར་འཕྲིན་གཏོང་།",
+      p2: "མི་ཡོང་བའི་ཉིན་མོ་དེར་ཉིན་ 4 ལས་མེད། ད་དུང་ཚབ་མི་མེད་དམ།",
+      p2t: "Student Kitchen Manager ({km}) ལ་འཕྲིན་གཏོང་། སུས་ལན་མ་བཏབ་པ་དང་། སུས་ཚབ་བྱེད་མི་ཐུབ་པ་ཤོད།",
+      p3: "མི་ཡོང་བའི་ཉིན་མོ་དེར་ཉིན་ 1 ནས་ 2 ལས་མེད། ད་དུང་སུ་ལའང་འཕྲིན་མ་བཏང་ངམ།",
+      p3t: "དེ་ན་གོང་གི་ “དེ་རིང་ཡོང་མི་ཐུབ” ཞེས་པའི་གོ་རིམ་ལྟར་བྱོས།",
+      after_text: "ཁྱེད་ཀྱིས་ལན་དུ་ཁས་བླངས་པའི་ལས་སྐོར་དེ། གྲོས་མཐུན་བྱས་པའི་ཉིན་མོར་བྱོས།",
+      missed_h: "ལས་སྐོར་ཤོར་བ།",
+      sit_missed: "ཨ་ཁ། ངའི་ལས་སྐོར་ཤོར་སོང་།",
+      x1: "འཕྲལ་མར་ Student Kitchen Manager ({km}) ལ་འཕྲིན་གཏོང་།",
+      x2: "འཕྲིན་དེ་ཉིད་ Shift Leader ལའང་གཏོང་།",
+      x3: "དེ་ནས་ལམ་སྟོན་ལ་སྒུག",
+      x3s: "ཁྱེད་ལ་ཚབ་སྐོང་ལས་སྐོར་ཞིག་སྤྲོད་ཡོང་། ཆོག་མཆན་མེད་པར་ལས་སྐོར་གཞན་ཞིག་ལ་རང་འགུལ་གྱིས་<b>མ་ཡོང་།</b>",
+      sit_today: "དེ་རིང་ཡོང་མི་ཐུབ།",
+      sit_today_s: "དོན་དག་ཅིག་བྱུང་བས། དེ་རིང་ངའི་ལས་སྐོར་བྱེད་མི་ཐུབ།",
+      afterward: "དེའི་རྗེས།",
+      co_motto: "མི་ཞིག་གིས་<em>ཡོང་ཐུབ་</em>ཟེར་བར་དུ་ཚབ་མི་མེད།",
+      contacts: "འབྲེལ་གཏུག",
+      avail_eyebrow: "ངའི་ཚབ་བྱེད།",
+      avail_h1: "ཁྱེད་ལ་<em>ཚབ་བྱེད་རོགས་</em>ཞུ་སྲིད་པའི་ཉིན།",
+      avail_lead: "<b>{name}</b>། ཁྱེད་ནི་ཉིན་འདི་དག་གི་ཚབ་མི་ཡིན། ཉིན་དེའི་ལས་སྐོར་ཡོད་མཁན་ཞིག་གིས་ཁྱེད་ལ་ཚབ་བྱེད་རོགས་ཞུ་སྲིད། ལན་དུ་ཁོང་གིས་ཁྱེད་ཀྱི་ལས་སྐོར་ཞིག་བྱེད། ཁས་ལེན་དགོས་པ་མེད། འོན་ཀྱང་མི་ཞིག་གིས་འདྲི་ན་<b>ཐུབ་བམ་མི་ཐུབ་ལན་འདེབས་རོགས།</b>",
+      avail_no_name: "ཁྱེད་ལ་ཚབ་བྱེད་རོགས་ཞུ་སྲིད་པའི་ཉིན་མཐོང་བར། “ངའི་ལས་སྐོར་” ནང་ཁྱེད་ཀྱི་མིང་འདེམས།",
+      avail_failed: "ལས་སྐོར་ཐོ་ཁ་ཕྱེ་མ་ཐུབ། “ངའི་ལས་སྐོར་” ལ་ལྟོས།",
+      avail_none: "ཁྱེད་ཉིན་གང་ཡང་ཚབ་མིའི་ཐོ་ནང་མེད།",
+      list_sep: ", ",
+      av_h_work: "ཁྱེད་ལ་བྱེད་རོགས་ཞུ་སྲིད་པ།",
+      av_h_back: "ལན་དུ་ཁོང་གིས་བྱེད་པའི་ཁྱེད་ཀྱི་ལས་སྐོར།",
+      av_h_who: "སུས་འདྲི་སྲིད།",
+      av_no_trade: "མཐའ་མའི་ཐབས། བརྗེ་རེས་མེད།",
+      wrong_info: "འདིར་ནོར་བ་འམ་རྙིང་པ་ཡོད་དམ། Student Kitchen Manager ({name}) ལ་གློག་འཕྲིན་གཏོང་།",
+      ts_eyebrow: "ལས་སློབ་ལས་ཚོད།",
+      ts_h1: "ཁྱེད་ཀྱི་<em>ལས་ཚོད་ཐོ</em>་སྤྲོད།",
+      ts_due: "གཟའ་འཁོར་རེ་རེར་སྤྲོད་དགོས།",
+      ts_big: "<em>གཟའ་ཉི་མ</em>། ཕྱི་དྲོ་ 5",
+      ts_text: "ཁྱེད་ཀྱི་ལས་ཚོད་ཐོ་གཟའ་ཉི་མའི་ཕྱི་དྲོ་ཆུ་ཚོད་ 5 མ་སླེབ་གོང་སྤྲོད་དགོས།",
+      ts_portal: "ལས་ཚོད་ཐོའི་དྲ་ཚིགས་ཁ་ཕྱེ།",
+      ts_motto: "ཁྱེད་ཀྱི་ལས་ཚོད་<em>སྤྲོད་</em>མ་ཚར་བར་དུ་ལས་ཀ་མ་ཚར།",
+      status_loading: "ལས་སྐོར་ཐོ། ཁ་ཕྱེ་བཞིན་པ…",
+      status_ok: "ལས་སྐོར་ཐོ། སློབ་མ་ {students}། གཟའ་འཁོར་རེར་ལས་སྐོར་ {shifts}།",
+      status_failed: "ལས་སྐོར་ཐོ། ཁ་ཕྱེ་མ་ཐུབ།",
+      saved_here: "ཁྱེད་ཀྱི་མིང་ཁ་པར་འདིའི་ནང་ཁོ་ནར་ཉར་ཡོད།",
+      install: "ཉེར་སྤྱོད་ལྟར་འཇུག (དྲ་རྒྱ་མེད་ཀྱང་བེད་སྤྱོད་ཐུབ།)",
+      install_ios: "Safari ནང་ Share མཐེབ་གནོན་ལ་མནན་ནས་ Add to Home Screen འདེམས།",
+      install_other: "དྲ་ལྟ་ཆས་ཀྱི་འདེམས་ཐོ་ཁ་ཕྱེ་ནས་ Install app འམ་ Add to Home screen འདེམས།",
+      every_hour: "<b>ཆུ་ཚོད་རེ་རེ་གལ་ཆེན་ཡིན།</b> ལས་སྐོར་རེ་རེ་ཆ་ཚང་བྱེད་དགོས། ཁྱེད་ཀྱིས་ཤོར་བའི་ཆུ་ཚོད་རེ་རེ་ནི་ལས་ཟླ་ཞིག་གིས་ཁྱེད་ཀྱི་ཚབ་བྱེད་པའི་ཆུ་ཚོད་རེ་རེ་ཡིན།",
+      save_pdf: "PDF ལྟར་ཉར།",
+      pdf_stamp: "ཉར་དུས། {when}",
+      pdf_for: "{name} ཆེད།",
+      pdf_note: "འདྲ་བཤུས་འདི་མི་འགྱུར། ལས་སྐོར་དང་ཚབ་མི་གསར་ཤོས་ཆེད་ཉེར་སྤྱོད་ཁ་ཕྱེ། {link}",
+      pdf_q: "ཉེར་སྤྱོད་ PDF ལྟར་ཉར་རམ།",
+      pdf_what: "འདིས་ཉེར་སྤྱོད་ཆ་ཚང་ PDF གཅིག་ལྟར་ཁྱེད་ཀྱི་ཁ་པར་ནང་ཕབ་ལེན་བྱེད། ཁྱེད་ཀྱི་ལས་སྐོར། ངའི་ཚབ་བྱེད། དགོངས་པ་ཞུ་བ། ལས་ཚོད་ཐོ་བཅས་ད་ལྟའི་གནས་སྟངས་ལྟར་ཡིན། དྲ་རྒྱ་མེད་དུས་བེད་སྤྱོད་པར་ཉར། རང་འགུལ་གྱིས་གསར་བསྒྱུར་མི་བྱེད།",
+      cancel: "ཕྱིར་འཐེན།",
+      pdf_go: "PDF ཕབ་ལེན།",
+      pdf_making: "PDF བཟོ་བཞིན་པ…",
+      pdf_failed: "ཁ་པར་འདིས་ PDF བཟོ་མ་ཐུབ། པར་འདེབས་སྒེའུ་ཁུང་ནས་ཉར་ཆོག དེར་ Save as PDF འདེམས།",
+      pdf_print: "པར་འདེབས་སྒེའུ་ཁུང་ཁ་ཕྱེ།",
+      pdf_contents: "དཀར་ཆག",
+      pdf_page: "ཤོག་ངོས་ {n}",
+      pdf_tap: "སྡེ་ཚན་ཞིག་ལ་མནན་ན་དེར་འགྲོ།",
+      maybe_tag: "ཐུབ་སྲིད",
+      cl_need: "ཁ་པར་ཨང་གྲངས་དགོས་སམ།",
+      cl_open: "འབྲེལ་གཏུག་ཐོ་ཁ་ཕྱེ།",
+      cl_h: "འབྲེལ་གཏུག་ཐོ།",
+      cl_text: "མི་ཚང་མའི་ཁ་པར་ཨང་གྲངས་དང་འཕྲིན་གཏོང་ཉེར་སྤྱོད། ལས་ཚན་གྱི་མི་ཁོ་ནས་ཁ་ཕྱེ་ཐུབ། ཁྱེད་ལ་མཉམ་སྤྱོད་བྱས་པའི་ Google རྩིས་ཁྲ་ནས་ནང་འཛུལ་གྱིས། ཁྱེད་རང་གི་ཐིག་ཕྲེང་ཡང་ཡང་གསར་བསྒྱུར་གནང་རོགས།",
+      av_form_h: "ཁྱེད་ཀྱི་ཁོམ་ཚོད་འགེང་ཤོག",
+      av_form_none: "ཁྱེད་ཀྱིས་ཁོམ་ཚོད་འགེང་ཤོག་ད་དུང་འགེངས་མེད། དེར་བརྟེན་ཉིན་འདི་དག་གང་རུང་ལ་ཁྱེད་ལ་འདྲི་སྲིད།",
+      av_form_all: "ཁྱེད་ཀྱིས་ཉིན་རེ་རེར་ཁོམ་པ་ཡོད་ཟེར།",
+      av_form_no: "<b>ཁོམ་པ་མེད།</b> {days}། ཉིན་དེ་དག་ལ་སུས་ཀྱང་ཁྱེད་ལ་ཚབ་བྱེད་རོགས་མི་ཞུ།",
+      av_form_maybe: "<b>ཐུབ་སྲིད།</b> {days}། ཁོམ་པ་ཡོད་པའི་ཚབ་མི་ཚོར་ཁྱེད་ལས་སྔོན་ལ་འདྲི།",
+      av_form_change: "ཁྱེད་ཀྱི་འཆར་གཞི་འགྱུར་སོང་ངམ། འགེང་ཤོག་ཡང་བསྐྱར་འགེངས། ཁྱེད་ཀྱི་ལན་གསར་ཤོས་དེ་བེད་སྤྱོད་བྱེད།",
+      av_form_open: "ཁོམ་ཚོད་འགེང་ཤོག་ཁ་ཕྱེ།",
+      status_avail: "ཁོམ་ཚོད་ལན། སློབ་མ་ {n}།",
+      status_avail_failed: "ཁོམ་ཚོད་ལན། ཁ་ཕྱེ་མ་ཐུབ། དེར་བརྟེན་མི་ཚང་མ་ཁོམ་པ་ཡོད་པར་བརྩི།"
     }
   };
   /* END STRINGS */
 
   /* the languages, in the order the language button steps through them */
-  var LANGS = ["en", "zh-Hans", "zh-Hant", "th", "vi"];
-  var LANG_SHORT = { en: "EN", "zh-Hans": "简", "zh-Hant": "繁", th: "ไทย", vi: "VI" };
-  var LANG_NAME = { en: "English", "zh-Hans": "简体中文", "zh-Hant": "繁體中文", th: "ภาษาไทย", vi: "Tiếng Việt" };
+  var LANGS = ["en", "zh-Hans", "zh-Hant", "th", "vi", "bo"];
+  var LANG_SHORT = { en: "EN", "zh-Hans": "简", "zh-Hant": "繁", th: "ไทย", vi: "VI", bo: "བོད" };
+  var LANG_NAME = { en: "English", "zh-Hans": "简体中文", "zh-Hant": "繁體中文", th: "ภาษาไทย", vi: "Tiếng Việt", bo: "བོད་ཡིག" };
   var lang = "en";
 
   /* a string in the chosen language (English if it's missing), with any
@@ -1469,6 +1625,7 @@ p{margin:0}
       if (/^zh/.test(w)) return /hant|tw|hk|mo/.test(w) ? "zh-Hant" : "zh-Hans";
       if (/^th/.test(w)) return "th";
       if (/^vi/.test(w)) return "vi";
+      if (/^bo/.test(w)) return "bo";
       if (/^en/.test(w)) return "en";
     }
     return "en";
@@ -1868,10 +2025,10 @@ p{margin:0}
     }).join("");
   }
 
-  /* The days this student appears in someone's backup list, as one table:
-     the shift you may be asked to work (its day merged across the top of
-     that day's rows, then its job merged down them), the shift of yours
-     they would work in exchange, and who may ask. A Shift Leader's shift
+  /* The days this student appears in someone's backup list, a card per
+     day (topped in its hue, like the shift cards), each holding a table:
+     the job you may be asked to work (merged down its rows), the shift of
+     yours they would work in exchange, and who may ask. A Shift Leader's shift
      counts as Pots & Pans. Where you're only someone's last resort, a
      quieter row ends that job's rows: no trade. Each row also carries
      data-trade, plain words for the tests. */
@@ -1911,11 +2068,11 @@ p{margin:0}
             (same(lines[i - 1], l) ? "" : '<td class="avn"' + (span > 1 ? ' rowspan="' + span + '"' : "") + ">" + l.who + "</td>") + "</tr>");
         });
       });
-      /* the day, merged across the top of its rows */
-      groups.push('<tbody class="k' + d + '"><tr class="avd"><th colspan="3" scope="rowgroup"><span class="dp k' + d + '">' + dayName(d) + "</span></th></tr>" + rows.join("") + "</tbody>");
+      groups.push('<section class="panel avday k' + d + '" data-day="' + DAYS[d] + '"><div class="shift-h"><h2>' + dayName(d) + "</h2></div>" +
+        '<div class="avt"><table><thead><tr><th>' + t("av_h_work") + "</th><th>" + t("av_h_back") + "</th><th>" + t("av_h_who") +
+        "</th></tr></thead><tbody>" + rows.join("") + "</tbody></table></div></section>");
     });
-    return groups.length ? '<div class="panel avt"><table><thead><tr><th>' + t("av_h_work") + "</th><th>" + t("av_h_back") + "</th><th>" + t("av_h_who") +
-      "</th></tr></thead>" + groups.join("") + "</table></div>" : '<p class="note">' + t("avail_none") + "</p>";
+    return groups.length ? groups.join("") : '<p class="note">' + t("avail_none") + "</p>";
   }
 
 
@@ -2313,8 +2470,12 @@ p{margin:0}
      it. Links stay links. If the phone can't draw the pictures, the
      dialog offers the print window instead. */
   var PDF_W = 390, PDF_H = 844, PDF_S = 2, PDF_TOP = 18;
+  /* never cut just after one of these: a heading stays with what it heads */
+  var PDF_HEADS = "h1, h2, h3, h4, summary, thead, .shift-h, .path-h, .sit-s, .last-h, .last-n, .cover-lead, .tpl-h, .eyebrow";
+  /* the gaps between whole blocks: the best places to cut */
+  var PDF_STRONG = ".head, .body .in > *, .foot";
   var PDF_BREAKS = ".head, .body .in > *, .shift-h, .part, .crew li, .backups summary, .cover-lead, .cover li, .last-h, .last-n, .path-h, .sit, .sit h3, " +
-    ".step, .tpl, .avt tbody, .avt tr, .panel, .motto, .contacts li, .foot, .gl li, .co-how, .portal, .portal-url";
+    ".step, .tpl, .avt tr, .panel, .motto, .contacts li, .foot, .gl li, .co-how, .portal, .portal-url";
 
   /* CSS without its @media blocks: the copy is always phone-sized and on
      screen, whatever the phone it's made on */
@@ -2411,9 +2572,23 @@ p{margin:0}
     }).then(function () {
       var top = root.getBoundingClientRect().top;
       function box(e) { var b = e.getBoundingClientRect(); return { x: b.left, y: b.top - top, w: b.width, h: b.height }; }
+      /* a cut before e is allowed unless it would leave a heading at the
+         foot of a page, or cut off the top edge of a box that is itself a
+         place to cut (a card above its day) */
+      var all = [].slice.call(root.querySelectorAll(PDF_BREAKS));
+      function cuttable(e) {
+        for (var x = e; x && x !== root; ) {
+          if (x.previousElementSibling) return !x.previousElementSibling.matches(PDF_HEADS);
+          x = x.parentElement;
+          if (all.indexOf(x) >= 0) return false;
+        }
+        return true;
+      }
+      var ok = all.filter(cuttable);
       return {
         h: Math.ceil(root.getBoundingClientRect().height),
-        breaks: [].map.call(root.querySelectorAll(PDF_BREAKS), function (e) { return Math.floor(box(e).y); }),
+        breaks: ok.map(function (e) { return Math.floor(box(e).y); }),
+        strong: ok.filter(function (e) { return e.matches(PDF_STRONG); }).map(function (e) { return Math.floor(box(e).y); }),
         links: [].map.call(root.querySelectorAll("a[href^='http'], [data-goto], [data-jump]"), function (e) {
           var b = box(e), to = e.getAttribute("data-jump");
           b.uri = e.getAttribute("href");
@@ -2426,16 +2601,18 @@ p{margin:0}
       };
     });
   }
-  /* cut a part of height h into pages: [from, to, top margin], each cut
-     at the last gap between blocks that fits */
-  function pdfCuts(h, breaks) {
+  /* cut a part of height h into pages: [from, to, top margin]. Each cut
+     falls between whole cards if one fits in the page's lower half, or
+     else at the last gap between blocks inside one */
+  function pdfCuts(h, breaks, strong) {
     var out = [], from = 0, top, room, to;
     while (h - from > 1) {
       top = out.length ? PDF_TOP : 0;
       room = PDF_H - top;
       if (h - from <= room) { out.push([from, h, top]); break; }
       to = 0;
-      breaks.forEach(function (b) { if (b > from + room * 0.35 && b <= from + room) to = Math.max(to, b); });
+      (strong || []).forEach(function (b) { if (b > from + room * 0.5 && b <= from + room) to = Math.max(to, b); });
+      if (!to) breaks.forEach(function (b) { if (b > from + room * 0.35 && b <= from + room) to = Math.max(to, b); });
       if (!to) to = from + room;
       out.push([from, to, top]);
       from = to;
@@ -2534,7 +2711,7 @@ p{margin:0}
       tabs.forEach(function (html, i) { chain = chain.then(function () { return pdfLayout(frame, html).then(function (p) { parts[i] = p; }); }); });
       return chain.then(function () {
         var starts = [], n = 1;
-        parts.forEach(function (p) { p.cuts = pdfCuts(p.h, p.breaks); p.first = n; starts.push(n); n += p.cuts.length; });
+        parts.forEach(function (p) { p.cuts = pdfCuts(p.h, p.breaks, p.strong); p.first = n; starts.push(n); n += p.cuts.length; });
         window.__parts = parts.map(function (p) { return { h: p.h, cuts: p.cuts, breaks: p.breaks.slice().sort(function (a, b) { return a - b; }) }; });
         return pdfLayout(frame, coverHTML(starts, when)).then(function (cover) {
           cover.cuts = [[0, Math.min(cover.h, PDF_H), 0]];
