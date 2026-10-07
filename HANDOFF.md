@@ -63,10 +63,17 @@ the app.
    in `students.csv` (anything under **Only does**, **Only covers** or
    **Covered only by same job**) and who is trained as a lunch monitor.
    Explain anything that has changed, and add it to the log.
-6. **Their phone.** They open the app and tap **Install as app** at the
-   bottom.
-7. **Second owner.** Make sure the Work Study Manager is still an owner.
-   If they're new too, invite them the same way.
+6. **The Google files.** Make them an editor of the availability form, its
+   answers sheet and the contact list (`HOW-TO-UPDATE.md`, step 6). If
+   the files are yours, hand them over too: in **Share**, next to their
+   name, choose **Transfer ownership**; they accept it from the email.
+   Show them where the form's names and old answers are cleared each
+   semester (step 6f).
+7. **Their phone.** They open the app and tap **Install as app (works
+   offline)** at the bottom.
+8. **Second owner.** Make sure the Work Study Manager is still an owner,
+   and an editor of the three Google files. If they're new too, invite
+   them the same way.
 
 ## After the handover
 
@@ -144,7 +151,7 @@ the same job twice in a day.
 
 **Rule 5: the order.** Your shift is a **swap** for a backup if you could
 take one of their shifts in return: on another day, and allowed by Rules
-1 to 4 (a double the hours allow counts). The list has two parts.
+1 to 4 and 7 (a double the hours allow counts). The list has two parts.
 1. **The main list:** students **not working that day** whom you can swap
    with. First priority is the same job on a different date:
    1. **Same job:** they already do this job.
@@ -152,7 +159,9 @@ take one of their shifts in return: on another day, and allowed by Rules
       for a Pots & Pans shift.
    3. **Another group,** for example a lunch monitor.
 
-   Within each, fewest shifts first, then alphabetical order.
+   Within each, fewest shifts first, then alphabetical order. Anyone who
+   answered Maybe for the day comes after the rest, in the same order
+   (Rule 7).
 2. **The last resort,** boxed off below:
    1. Students not working that day with **no shift you could take back**
       (they'd help without a swap), in the same order.
@@ -170,10 +179,23 @@ take one of their shifts in return: on another day, and allowed by Rules
   shows it only when two or more do Recycling that day.
 - **Shift Backups:** each backup's name, then their shifts you could take
   in return, same job first (all their shifts, in the last resort).
-- **My availability** (its own tab): one table of the shifts you may be
-  asked to work, by day and then job, each with the shift of yours they
-  would work in exchange and who may ask. Anyone whose last resort you are
-  closes that job's rows: no trade.
+- **My availability** (its own tab, after My shifts): one card per day
+  you may be asked to work, each with a table: the job, the shift of yours
+  they would work in exchange, and who may ask. Anyone whose last resort
+  you are closes that job's rows: no trade. Under the cards, your own
+  answers on the availability form (Rule 7).
+
+**Rule 7: the availability form.** Students say, for each weekday,
+whether they're Available, Maybe or Not available to cover. The answers
+come from the form's published sheet (⚙ *Availability answers link* in
+`settings.csv`; `HOW-TO-UPDATE.md`, step 6).
+- **Not available:** never a backup that day, and never offered as a swap
+  on that day (you'd be asking them to work it).
+- **Maybe:** moved to just above the last resort, in the same order among
+  themselves, with a **Maybe** tag beside the name. A Maybe already in the
+  last resort stays where they are, with the tag.
+- **No answer, or answers that can't be read:** available.
+- A student who answers again replaces their earlier answers.
 
 **Where instructions pulled against each other, and how it's settled.**
 For the record, so a later rule change starts from here:
@@ -207,7 +229,8 @@ For the record, so a later rule change starts from here:
 
 `tests/expected-cover-lists.csv` holds every shift's list as worked out by
 a second, independent copy of these rules (`tests/expected_cover_lists.py`),
-and the app is tested against it.
+and the app is tested against it. `tests/expected-cover-lists-availability.csv`
+does the same with a made-up set of form answers, for Rule 7.
 
 ---
 
@@ -246,6 +269,7 @@ for example between semesters. Old links don't forward to the new one.
   passwords or servers to look after.
 - **Nothing is ever lost.** GitHub keeps every earlier version of every
   file.
-- **Changes beyond the two files** (wording, the timesheet deadline, the
-  tabs) need someone comfortable with code. `CLAUDE.md` holds instructions
+- **Changes beyond the CSV files and the Google files** (wording, the
+  timesheet deadline, the tabs, the languages) need someone comfortable
+  with code. `CLAUDE.md` holds instructions
   for an AI coding assistant such as Claude Code.

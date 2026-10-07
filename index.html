@@ -546,6 +546,16 @@ p{margin:0}
   <div class="body"><div class="in" id="shifts-body"></div></div>
 </main>
 
+<!-- ====================================================== MY AVAILABILITY -->
+<main class="view" id="view-availability" hidden>
+  <div class="head"><div class="in">
+    <div class="head-top"><span class="eyebrow" data-t="avail_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
+    <h1 data-t="avail_h1"></h1>
+    <p class="lead" id="avail-lead" hidden></p>
+  </div></div>
+  <div class="body"><div class="in" id="avail-body"></div></div>
+</main>
+
 <!-- ============================================================ CALL OUT -->
 <main class="view" id="view-callout" hidden>
   <div class="head"><div class="in">
@@ -569,16 +579,6 @@ p{margin:0}
     </div>
 
   </div></div>
-</main>
-
-<!-- ====================================================== MY AVAILABILITY -->
-<main class="view" id="view-availability" hidden>
-  <div class="head"><div class="in">
-    <div class="head-top"><span class="eyebrow" data-t="avail_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
-    <h1 data-t="avail_h1"></h1>
-    <p class="lead" id="avail-lead" hidden></p>
-  </div></div>
-  <div class="body"><div class="in" id="avail-body"></div></div>
 </main>
 
 <!-- ============================================================ TIMESHEET -->
@@ -860,11 +860,11 @@ p{margin:0}
       glance_label: "你本周的班次",
       today: "今天",
       tomorrow: "明天",
-      on_with_you: "同班同学",
+      on_with_you: "一起上班的人",
       shift_backups: "替班人选 · {n}",
       can_cover: "可以替你的人",
       last_resort: "最后选择",
-      last_resort_note: "他们可以替你，但你无法回替他们的班，或者他们当天已经有班。",
+      last_resort_note: "他们可以替你，但你无法替他们上班作为回报，或者他们当天已经有班。",
       no_cover: "这个班次还没有可以替班的人。",
 
       co_eyebrow: "请假",
@@ -909,7 +909,7 @@ p{margin:0}
       p2t: "给 Student Kitchen Manager（{km}）发消息，说明谁没有回复，谁无法替班。",
       p3: "离请假日只剩1到2天，而你还没有给任何人发消息？",
       p3t: "那就按照上面「我今天来不了」的步骤去做。",
-      after_text: "在约定的那一天，上你答应回替的那个班。",
+      after_text: "在约定的那一天，去上你答应替对方上的那个班。",
       missed_h: "错过班次",
       sit_missed: "糟了！我错过了我的班次",
       x1: "马上给 Student Kitchen Manager（{km}）发消息。",
@@ -977,7 +977,7 @@ p{margin:0}
       av_form_maybe: "<b>可能有空：</b>{days}。会先问有空的替班人选，再问你。",
       av_form_change: "计划有变？再填写一次问卷就可以，以最新的回答为准。",
       av_form_open: "打开空闲时间问卷",
-      status_avail: "空闲时间回答：{n} 位学生。",
+      status_avail: "空闲时间回答：{n}位学生。",
       status_avail_failed: "空闲时间回答：未能载入，所以每个人都算作有空。"
     },
 
@@ -1014,11 +1014,11 @@ p{margin:0}
       glance_label: "你本週的班次",
       today: "今天",
       tomorrow: "明天",
-      on_with_you: "同班同學",
+      on_with_you: "一起上班的人",
       shift_backups: "代班人選 · {n}",
       can_cover: "可以幫你代班的人",
       last_resort: "最後選擇",
-      last_resort_note: "他們可以幫你代班，但你無法回代他們的班，或者他們當天已經有班。",
+      last_resort_note: "他們可以幫你代班，但你無法幫他們代班作為回報，或者他們當天已經有班。",
       no_cover: "這個班次還沒有可以代班的人。",
 
       co_eyebrow: "請假",
@@ -1063,7 +1063,7 @@ p{margin:0}
       p2t: "傳訊息給 Student Kitchen Manager（{km}），說明誰沒有回覆，誰無法代班。",
       p3: "離請假日只剩1到2天，而你還沒有傳訊息給任何人？",
       p3t: "那就依照上面「我今天來不了」的步驟去做。",
-      after_text: "在約定的那一天，上你答應回代的那個班。",
+      after_text: "在約定的那一天，去上你答應幫對方上的那個班。",
       missed_h: "錯過班次",
       sit_missed: "糟了！我錯過了我的班次",
       x1: "馬上傳訊息給 Student Kitchen Manager（{km}）。",
@@ -1131,7 +1131,7 @@ p{margin:0}
       av_form_maybe: "<b>可能有空：</b>{days}。會先問有空的代班人選，再問你。",
       av_form_change: "計畫有變？再填寫一次問卷就可以，以最新的回答為準。",
       av_form_open: "開啟空閒時間問卷",
-      status_avail: "空閒時間回答：{n} 位學生。",
+      status_avail: "空閒時間回答：{n}位學生。",
       status_avail_failed: "空閒時間回答：未能載入，所以每個人都算作有空。"
     },
 
@@ -1394,7 +1394,7 @@ p{margin:0}
       av_h_work: "Bạn có thể được nhờ làm",
       av_h_back: "Đổi lại, họ sẽ làm ca của bạn",
       av_h_who: "Ai có thể nhờ",
-      av_no_trade: "Phương án cuối cùng: không đổi ca",
+      av_no_trade: "Lựa chọn cuối cùng: không đổi ca",
       wrong_info: "Thông tin ở đây sai hoặc đã cũ? Hãy gửi email cho Student Kitchen Manager ({name}).",
 
       ts_eyebrow: "Giờ làm Work Study",
@@ -1495,7 +1495,7 @@ p{margin:0}
       sit_maybe: "དེ་རིང་ཡོང་ཐུབ་མིན་ངེས་པ་མེད།",
       sit_maybe_s: "ང་འཕྲོད་བསྟེན་ཡག་པོ་མེད། དེ་རིང་ལས་ཀ་བྱེད་ཐུབ་མིན་ད་དུང་མི་ཤེས།",
       m1: "རྗེས་སུ་བདེ་ཐང་ཡོང་སྲིད་ཀྱང་། ད་ལྟ་ཚབ་མི་ཞིག་འཚོལ།",
-      m1s: "ཁྱེད་ཀྱི་ཚབ་མི་རེ་རེར་ WhatsApp འམ་ཡི་གེ་བརྒྱུད་འཕྲིན་གཏོང་། ཚོགས་ཁང་ནང་མ་ཡིན་པར་མི་རེ་རེར་སོ་སོར་གཏོང་། ཁྱེད་ཀྱི་ཚབ་མི་ཚོ་ “ངའི་ལས་སྐོར་” ཤོག་ངོས་སུ་ཡོད།",
+      m1s: "ཁྱེད་ཀྱི་ཚབ་མི་རེ་རེར་ WhatsApp འམ་ཡི་གེ་བརྒྱུད་འཕྲིན་གཏོང་། ཁ་བརྡའི་ཚོགས་པའི་ནང་མ་ཡིན་པར་མི་རེ་རེར་སོ་སོར་གཏོང་། ཁྱེད་ཀྱི་ཚབ་མི་ཚོ་ “ངའི་ལས་སྐོར་” ཤོག་ངོས་སུ་ཡོད།",
       m2: "སྔ་དྲོ་ 10:00 མ་སླེབ་གོང་ཐག་གཅོད།",
       m2s: "ཚབ་མི་ཞིག་གིས་ཁྱེད་ཀྱི་ལས་སྐོར་བྱེད་པ་འམ། ཡང་ན་ཁྱེད་རང་ཡོང་། གང་ཡིན་ཁྱེད་ཀྱི་ཚབ་མི་ལ་ཤོད།",
       m3: "སྔ་དྲོ་ 10:00 སླེབས་ཀྱང་སུས་ཀྱང་ཡོང་ཐུབ་མ་ཟེར། ཁྱེད་ད་དུང་ཡོང་མི་ཐུབ་བམ།",
@@ -1511,7 +1511,7 @@ p{margin:0}
       sit_sick: "ང་ན་ནས་ཉལ་ཁྲི་ནས་ལང་མི་ཐུབ།",
       sit_sick_s: "ང་གཉིད་སད་དུས་ན་འདུག དེ་རིང་ལས་ཀ་བྱེད་མི་ཐུབ།",
       s1: "འཕྲལ་མར་ཁྱེད་ཀྱི་ཚབ་མི་རེ་རེར་འཕྲིན་གཏོང་།",
-      s1s: "WhatsApp འམ་ཡི་གེ་བེད་སྤྱོད་གྱིས། ཚོགས་ཁང་ནང་མ་ཡིན་པར་མི་རེ་རེར་སོ་སོར་གཏོང་། ཁྱེད་ཀྱི་ཚབ་མི་ཚོ་ “ངའི་ལས་སྐོར་” ཤོག་ངོས་སུ་ཡོད།",
+      s1s: "WhatsApp འམ་ཡི་གེ་བེད་སྤྱོད་གྱིས། ཁ་བརྡའི་ཚོགས་པའི་ནང་མ་ཡིན་པར་མི་རེ་རེར་སོ་སོར་གཏོང་། ཁྱེད་ཀྱི་ཚབ་མི་ཚོ་ “ངའི་ལས་སྐོར་” ཤོག་ངོས་སུ་ཡོད།",
       s2: "མི་ཞིག་གིས་ཡོང་ཐུབ་ཟེར་ན། གཞན་ཚོས་ཤེས་པར་ཚང་མར་ཤོད།",
       s3: "སྔ་དྲོ་ 10:00 སླེབས་ཀྱང་སུས་ཀྱང་ཡོང་ཐུབ་མ་ཟེར་བ་ཡིན་ནམ།",
       s3t: "WhatsApp བརྒྱུད་ Student Kitchen Manager ({km}) ལ་འཕྲིན་གཏོང་།",
@@ -1738,10 +1738,11 @@ p{margin:0}
                                  cover their shifts */
   function readStudents(text, roles, problems) {
     var rows = parseCSV(text), F = FILES.students, people = Object.create(null);
-    var col = header(rows, F, { who: /^(student|name)/, gender: /^gender/, only: /^only do/, trained: /^trained/ }, problems);
+    var col = header(rows, F, { who: /^(student|name)/, gender: /^gender/, trained: /^trained/ }, problems);
     if (!col) return people;
-    var covCol = -1, sameCol = -1;
+    var onlyCol = -1, covCol = -1, sameCol = -1;
     rows[0].forEach(function (h, i) {
+      if (/^only do/.test(lower(h))) onlyCol = i;
       if (/^only cover/.test(lower(h))) covCol = i;
       if (/^covered only/.test(lower(h))) sameCol = i;
     });
@@ -1751,7 +1752,7 @@ p{margin:0}
       if (people[who]) { problems.push(line + who + " is listed twice."); return; }
       var g = personGender(cell(r, col.gender));
       if (!g) problems.push(line + who + "'s gender should be F or M.");
-      var p = { gender: g, only: list(cell(r, col.only)), trained: list(cell(r, col.trained)),
+      var p = { gender: g, only: onlyCol < 0 ? [] : list(cell(r, onlyCol)), trained: list(cell(r, col.trained)),
                 covers: covCol < 0 ? [] : list(cell(r, covCol)), sameJobOnly: sameCol >= 0 && yes(cell(r, sameCol)) };
       p.only.concat(p.trained, p.covers.filter(function (x) { return x !== "none"; })).forEach(function (x) {
         if (!roles.by[x]) problems.push(line + who + ": \"" + x + "\" isn't a role in " + FILES.roles + ".");
@@ -1825,7 +1826,7 @@ p{margin:0}
       (groups[x.who] = groups[x.who] || Object.create(null))[x.r.cover.group] = true;
       (onDay[x.who] = onDay[x.who] || Object.create(null))[x.day] = lower(x.r.cover.name);
     });
-    /* Can n cover shift x? (Rules 2, 3, 4 and 6) */
+    /* Can n cover shift x? (Rules 2, 3, 4 and 7) */
     var said = function (n, d) { return out.avail[n] ? out.avail[n][d] : ""; };
     var eligible = function (n, x) {
       var job = x.r.cover, owner = people[x.who], today = onDay[n] && onDay[n][x.day];
@@ -1863,7 +1864,7 @@ p{margin:0}
     return out;
   }
 
-  /* The availability form's answers (Rule 6), as its sheet publishes them:
+  /* The availability form's answers (Rule 7), as its sheet publishes them:
      a name column, and a column for each day ("Monday", or the form's
      "Could you cover … [Monday]"). Each answer is Available, Maybe or Not
      available; a blank counts as available. A later row for the same
@@ -2265,7 +2266,7 @@ p{margin:0}
     var rows = parseCSV(text), seen = Object.create(null);
     if (rows.length && (rows[0][0] || "").trim().toLowerCase() === "setting") rows = rows.slice(1);
     rows.forEach(function (r) {
-      var key = (r[0] || "").trim().toLowerCase(), val = (r[1] || "").trim();
+      var key = (r[0] || "").trim().toLowerCase(), val = r.slice(1).join(",").replace(/,+\s*$/, "").trim();
       if (!key) return;
       if (seen[key]) { settingsProblems.push("\"" + r[0].trim() + "\" is listed twice; the last one is used."); }
       seen[key] = true;
@@ -2446,6 +2447,7 @@ p{margin:0}
      was saved. Afterwards the app goes back as it was. */
   function savedWhen(d) {
     var tag = { en: "en-US", "zh-Hans": "zh-CN", "zh-Hant": "zh-TW", th: "th-TH", vi: "vi-VN" }[lang];
+    if (!tag) return longDate(d) + " " + d.getFullYear() + " · " + d.getHours() + ":" + ("0" + d.getMinutes()).slice(-2);
     try { return d.toLocaleString(tag, { weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }); }
     catch (e) { return longDate(d) + " " + d.getFullYear(); }
   }
@@ -2511,20 +2513,26 @@ p{margin:0}
     return out;
   }
   /* the app's CSS with its fonts inside, as a picture can't fetch them */
-  var snapCSS = null;
+  var snapCSS = {};
   function pdfCSS() {
-    if (snapCSS) return snapCSS;
+    var key = lang === "bo" ? "bo" : "other";
+    if (snapCSS[key]) return snapCSS[key];
     var css = fixedVw(stripMedia(document.querySelector("style").textContent)), files = [];
+    /* the Tibetan font (160 KB, drawn into every page) only for a Tibetan copy */
+    if (key !== "bo") {
+      var at = css.indexOf("fonts/noto-serif-tibetan.woff2"), from = css.lastIndexOf("@font-face", at), to = css.indexOf(String.fromCharCode(125), at);
+      if (at >= 0 && from >= 0 && to > at) css = css.slice(0, from) + css.slice(to + 1);
+    }
     css.replace(/url\((fonts\/[^)]+\.woff2)\)/g, function (m, f) { if (files.indexOf(f) < 0) files.push(f); return m; });
-    snapCSS = Promise.all(files.map(function (f) {
+    var made = snapCSS[key] = Promise.all(files.map(function (f) {
       return fetch(f).then(function (r) { if (!r.ok) throw new Error(f); return r.arrayBuffer(); })
         .then(function (b) { return [f, base64(new Uint8Array(b))]; });
     })).then(function (list) {
       list.forEach(function (x) { css = css.split("url(" + x[0] + ")").join("url(data:font/woff2;base64," + x[1] + ")"); });
       return css;
     });
-    snapCSS.catch(function () { snapCSS = null; });
-    return snapCSS;
+    made.catch(function () { delete snapCSS[key]; });
+    return made;
   }
 
   /* the four tabs as they print, plus the footer after the last */

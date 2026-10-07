@@ -20,6 +20,7 @@ the files link.
 | The Student Kitchen Manager's name | `settings.csv` |
 | The Work Study Manager's name | `settings.csv` |
 | The timesheet portal link | `settings.csv` |
+| The links to the availability form, its answers and the contact list | `settings.csv` (see **6**) |
 | Who works which day, in which role | `shifts.csv` |
 | Who the students are: gender, training, and any special limits | `students.csv` |
 | The rules for each role: gender, training, work group, same-day backups (rarely) | `roles.csv` |
@@ -27,6 +28,10 @@ the files link.
 **You never write the cover lists.** The app works out who can cover each
 shift from these files, by the rules in **"How the cover lists are worked
 out"** in `HANDOFF.md`.
+
+Two Google files sit beside the app: the **availability form**, where
+students say which days they can cover, and the private **contact list**
+of phone numbers. They're kept up to date in Google, not here. See **6**.
 
 **Don't change any other file**, except to add a line to the handover log
 in `HANDOFF.md`. Everything else is the app itself.
@@ -78,13 +83,19 @@ This is a small change, made straight on the GitHub website.
    Student Kitchen Manager,Art
    Work Study Manager,Nahelia
    Timesheet portal link,https://www.drbu.edu/timesheet
+   Availability form link,https://forms.gle/…
+   Availability answers link,https://docs.google.com/spreadsheets/d/e/…/pub?output=csv
+   Contact list link,https://docs.google.com/spreadsheets/d/…/edit
    ```
+
+   The last three rows may be missing if the form and the contact list
+   haven't been set up yet. See **6**.
 
 5. Change only the text **after the comma**. For example, put your own
    name after `Student Kitchen Manager,`.
    - Leave the words before the comma exactly as they are.
    - Don't put a comma inside a name.
-   - The link must start with `https://`.
+   - Every link must start with `https://`.
 6. Click the green **Commit changes…** button. "Commit" is GitHub's word
    for "save".
 7. A box opens. Click the green **Commit changes** button in it.
@@ -167,6 +178,9 @@ Do this for each file you change, usually `shifts.csv`, and
 > **Using Excel instead?** **File → Save As**, type **CSV UTF-8 (Comma
 > delimited)**. Then upload the same way.
 
+**New students?** Update the availability form's names and the contact
+list too (**6f**).
+
 ### A small fix, such as a misspelled name
 
 Do it straight on GitHub, as in step 3: open the file, click the
@@ -215,6 +229,11 @@ The row order in `roles.csv` is also the order roles appear on the cards.
      upload it again.
 4. Choose a student's name and check that their shifts look right.
 
+If the availability form is set up, the footer also says *"Availability
+answers: 12 students."* (however many have answered). Yellow text after
+it names any answer it couldn't use: usually a name that isn't spelled as
+in `shifts.csv`.
+
 If the app says **"The shift list didn't load"**, a file's name is
 probably wrong. The message names the file. The files must be called
 exactly `shifts.csv`, `students.csv` and `roles.csv`. Upload it again with
@@ -222,7 +241,139 @@ the right name, or upload your backup.
 
 ---
 
-## 6. If something goes wrong
+## 6. The availability form and the contact list
+
+Students fill in a **Google Form** saying, for each weekday, whether
+they're **Available**, **Maybe** or **Not available** to cover a shift.
+The app reads the answers and uses them in every cover list:
+- **Not available:** never asked to cover that day.
+- **Maybe:** asked after everyone who is available, just above the last
+  resort, with a **Maybe** tag beside their name.
+- **No answer:** counts as available.
+
+If a student answers twice, the newest answer counts. On **My
+availability**, each student sees their own answers and a button to the
+form.
+
+The **contact list** is a Google Sheet with everyone's phone number. Only
+the people it's shared with can open it. The app links to it on Call out
+and Submit Timesheet, but never reads it.
+
+Use a Google account that will be handed on, and make the Work Study
+Manager an editor of all three Google files (the form, its answers sheet
+and the contact list). If **Publish to web** is greyed out in **b**, the
+school account blocks it: use a personal Gmail account instead.
+
+### a) Make the form (once)
+
+1. Go to **https://forms.google.com** and start a **Blank form**.
+2. Title: `Kitchen Cleanup: which days could you cover?` Description:
+   *"Tell us which days you could cover a kitchen cleanup shift for
+   someone. If your plans change, fill in this form again. Your newest
+   answers count. Your name and answers are shown to the crew in the app,
+   so don't write anything private here."*
+3. **Question 1:** `Your name`, type **Dropdown**, **Required**. Paste all
+   the names at once, one per line, exactly as in `shifts.csv`. Google
+   makes one option per line.
+4. **Question 2:** `Could you cover a shift on these days?`, type
+   **Multiple choice grid**. Rows: `Monday`, `Tuesday`, `Wednesday`,
+   `Thursday`, `Friday`. Columns: `Available`, `Maybe`, `Not available`.
+   Turn on **Require a response in each row**.
+5. **Settings → Responses:** **Collect email addresses** → **Do not
+   collect**. Leave **Limit to 1 response** off, so students don't need a
+   Google account.
+6. Click **Publish**, and under **Responders** choose **Anyone with the
+   link**. Copy the form's link (**Send** → the link icon → **Shorten
+   URL**). It looks like `https://forms.gle/…`.
+
+The app finds the questions by the word **name** in the first and the
+**day names** in the rows. Keep those words, and add no other questions:
+everything in this form is published in the next step.
+
+### b) Publish the answers for the app (once)
+
+1. In the form, open **Responses** and click **Link to Sheets**. Create a
+   new spreadsheet.
+2. In that sheet: **File → Share → Publish to web**.
+3. In the first box choose the answers tab (**Form Responses 1**), not
+   **Entire document**. In the second, choose **Comma-separated values
+   (.csv)**.
+4. Under **Published content and settings**, tick **Automatically
+   republish when changes are made**.
+5. Click **Publish**, and copy the link. It starts with
+   `https://docs.google.com/spreadsheets/d/e/` and ends with `output=csv`.
+
+Anyone with this link can see the names and answers, and the link sits in
+`settings.csv`, which is public. That's why the form asks only for a name
+and days. New answers reach the app within about 5 minutes.
+
+### c) Make the contact list (once)
+
+1. Go to **https://sheets.new**. Name it `Kitchen Cleanup contact list
+   (private)`.
+2. Row 1: `Student`, `Phone number`, `Messaging app`, `Email`, `Notes`.
+   Put each student's name in column A, one per row. Make row 1 bold, then
+   **View → Freeze → 1 row**.
+3. **Share:** keep **General access** on **Restricted**. Add the Student
+   Kitchen Manager and the Work Study Manager as **Editor**. In the share
+   box's gear icon, untick **Editors can change permissions and share**.
+4. Students: add each one's Google email as **Editor**, or let them tap
+   **Request access** when they open the link, and approve them as
+   **Editor**.
+5. Click **Copy link**.
+
+If someone changes the wrong row, **File → Version history** brings back
+an earlier copy.
+
+### d) Give the links to the app (once)
+
+Add the three links to `settings.csv`, the same way as in **3**:
+
+```
+Availability form link,https://forms.gle/…
+Availability answers link,https://docs.google.com/spreadsheets/d/e/…/pub?output=csv
+Contact list link,https://docs.google.com/spreadsheets/d/…/edit
+```
+
+Then check the footer, as in **5**.
+
+### e) Send it to the students
+
+Post something like this in the crew's group chat:
+
+> Hi everyone, two quick things for kitchen cleanup, please. It takes 2
+> minutes.
+>
+> 1. Which days could you cover a shift for someone? Fill in this form:
+>    [form link]. For each day, choose Available, Maybe or Not available.
+>    If you choose Not available, no one will ask you to cover that day.
+>    If your plans change, just fill in the form again. Your newest
+>    answers count.
+> 2. Add your phone number to our contact list, so your backups can reach
+>    you: [contact list link]. Sign in with your Google account. If it
+>    says you need access, tap Request access and I will let you in. Then
+>    fill in your own row only.
+>
+> Thank you!
+
+Send a reminder at the start of each month, or whenever schedules change.
+
+### f) Each new semester
+
+1. **Names:** in the form, question 1, delete the old names and paste the
+   new ones, exactly as in the new `shifts.csv`.
+2. **Old answers:** in the answers sheet, on **Form Responses 1**, select
+   row 2 down to the last row, right-click, **Delete rows**. Keep the
+   heading row and the tab, so the published link keeps working.
+3. **Contact list:** remove the rows of students who left, add the new
+   names, and remove people who left from **Share**.
+4. Send the message in **e** again.
+
+The links stay the same, so `settings.csv` needs no change.
+
+---
+
+## 7. If something goes wrong
 
 - **Undo:** upload the backup you downloaded in 4a, the same way as in
   4e.
@@ -233,7 +384,7 @@ the right name, or upload your backup.
 
 ---
 
-## 7. When it's your turn to hand over
+## 8. When it's your turn to hand over
 
 Open **`HANDOFF.md`**. It's written for you then: how to give the next
 person access, what to go through with them, and what to add to the
@@ -243,9 +394,9 @@ handover log. Then send them the files link and point them to this page.
 
 ## Something else needs changing
 
-These are part of the app itself, so they're not in the two files:
+These are part of the app itself, so they're not in the files above:
 - the wording on the Call out steps and messages, and the translations
-  (Chinese, Thai, Vietnamese);
+  (Chinese, Thai, Vietnamese, Tibetan);
 - the tab names;
 - the timesheet deadline (Sunday, 5 pm);
 - the colours.

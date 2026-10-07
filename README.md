@@ -2,8 +2,8 @@
 
 > **Taking the app over, or looking after it?** Start with
 > **[HOW-TO-UPDATE.md](HOW-TO-UPDATE.md)**. It covers changing the
-> managers' names, the timesheet link and each semester's shift list. No
-> code needed.
+> managers' names, the timesheet link, each semester's shift list, and the
+> availability form and contact list. No code needed.
 > **Handing it over to the next person?** Read **[HANDOFF.md](HANDOFF.md)**.
 >
 > **The app:** https://arlov-commits.github.io/kitchen_cleanup/
@@ -28,12 +28,14 @@ dependencies. Served over the web, it installs as an app on a phone.
 
 | Tab | What it shows |
 | --- | --- |
-| **My shifts** | Choose your name from the list. The phone remembers it, and shows it as a small pill beside the heading. Under the heading, **the week at a glance**: today's date, then each of your shifts by the next date it falls on, with a **Today** or **Tomorrow** pill. Then, for each of your shifts: the day (with the same pill) and your job, and who else from your work group is on that day, with their roles, in `roles.csv` order (left out when no one else in your group is on). Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. |
-| **Call out** | What to do when you can't make a shift, in plain words. At the top, **What's happening?** has a button for each situation that jumps to it: "I can't make it today", "Not sure if I can make it today", "I'm too sick to get out of bed", "I forgot my shift, and it has already started" (Sick or Unplanned Absence), "I will miss a shift in the future" (Planned Absence), and "Oh no! I missed my shift" (Missed Shift: message the Student Kitchen Manager and the Shift Leader, then wait for a make-up shift, and don't come in for another shift without approval). Each is written to be read on its own. Then **Afterward**, "It's not covered until someone says yes", and the contacts. Under each step that needs one is the message to send, in English, with a **Copy message** button. Your name and the Student Kitchen Manager's name are filled in, and your role too if you only ever do one job. |
-| **My availability** | The days the chosen student is a backup on, as one table: **You may be asked to work** (each day across the top of its rows, then the job), **In exchange, they would work your** (day and job), and **Who may ask**. Then a line to email the Student Kitchen Manager (Art) if anything is wrong. |
-| **Submit Timesheet** | The deadline, Sunday at 5 pm, a button to the timesheet portal at drbu.edu/timesheet, and "It's not done until your hours are submitted". On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). |
+| **My shifts** | Choose your name from the list. The phone remembers it, and shows it as a small pill beside the heading. Under the heading, **the week at a glance**: today's date, then each of your shifts by the next date it falls on, with a **Today** or **Tomorrow** pill. Then, for each of your shifts: the day (with the same pill) and your job, and who else from your work group is on that day, with their roles, in `roles.csv` order (left out when no one else in your group is on). Under that, **Shift Backups** opens to show who can cover for you, numbered in the order to ask. Anyone who answered **Maybe** on the availability form for that day has a small **Maybe** tag beside their name. |
+| **My availability** | The days the chosen student is a backup on, one card per day, topped in the day's colour like the shift cards. Each card holds a small table: **You may be asked to work** (the job), **In exchange, they would work your** (day and job), and **Who may ask**. Under the cards, the student's own answers on the availability form, with a button to the form (when the form is set up). Then a line to email the Student Kitchen Manager if anything is wrong. |
+| **Call out** | What to do when you can't make a shift, in plain words. At the top, **What's happening?** has a button for each situation that jumps to it: "I can't make it today", "Not sure if I can make it today", "I'm too sick to get out of bed", "I forgot my shift, and it has already started" (Sick or Unplanned Absence), "I will miss a shift in the future" (Planned Absence), and "Oh no! I missed my shift" (Missed Shift: message the Student Kitchen Manager and the Shift Leader, then wait for a make-up shift, and don't come in for another shift without approval). Each is written to be read on its own. Then **Afterward**, "It's not covered until someone says yes", and the contacts. Under each step that needs one is the message to send, in English, with a **Copy message** button. Your name and the Student Kitchen Manager's name are filled in, and your role too if you only ever do one job. Under each "message your backups" step is a link to the contact list (when it's set up). |
+| **Submit Timesheet** | The deadline, Sunday at 5 pm, a button to the timesheet portal at drbu.edu/timesheet, and "It's not done until your hours are submitted". On Sundays the tab shows a "1" bubble until the portal button is pressed that day (kept in `localStorage` as `kitchen.timesheet`). Under it, a panel with a button to the contact list (when it's set up). |
 
-There are no phone numbers and no call buttons in the app.
+There are no phone numbers and no call buttons in the app. Phone numbers
+live only in the private contact list, a Google Sheet that only the crew
+can open.
 
 The chosen name is kept in this browser only (`localStorage`, key
 `kitchen.me`). To change it, pick a different name from the list.
@@ -51,7 +53,7 @@ types the lists.
 
 **A cover list** follows the numbered rules in HANDOFF.md, "How the cover
 lists are worked out": the groups (A Lunch Monitors, B Dishwashing, C
-Recycling) and Rules 1 to 6. That section is the specification: the code
+Recycling) and Rules 1 to 7. That section is the specification: the code
 and the tests follow it. In short:
 - **main list:** people not working that day who can cover the job, and
   have at least one shift you could take back on another day. They come
@@ -60,6 +62,10 @@ and the tests follow it. In short:
 - **boxed last resort:** those you can't swap with, then those working
   that day in one of the job's same-day backups from `roles.csv`, where
   the hours allow both (Lunch Monitor last).
+- **the availability form (Rule 7):** someone who answered **Not
+  available** for a day is never a backup that day, and is never offered
+  as a swap on that day. Someone who answered **Maybe** moves to just
+  above the last resort. No answer counts as available.
 
 A Shift Leader shift counts as Pots & Pans everywhere except **On with
 you**, which shows only the shift's own work group. Backup lines show the
@@ -73,7 +79,13 @@ The footer checks all three files and names anything that looks wrong:
 - a student with fewer than 2 or more than 4 shifts, or in
   `students.csv` with no shifts.
 
-The browser console shows the same warnings.
+It also says how many students have answered the availability form, and
+flags a name there that isn't on the shift list, an answer that isn't
+Available, Maybe or Not available, a link that gives a web page instead of
+a CSV, or answers that couldn't be read (then everyone counts as
+available).
+
+The browser console shows the shift files' warnings.
 
 ## The settings: `settings.csv`
 
@@ -86,13 +98,21 @@ Setting,Value
 Student Kitchen Manager,Art
 Work Study Manager,Nahelia
 Timesheet portal link,https://www.drbu.edu/timesheet
+Availability form link,https://forms.gle/…
+Availability answers link,https://docs.google.com/spreadsheets/d/e/…/pub?output=csv
+Contact list link,https://docs.google.com/spreadsheets/d/…/edit
 ```
+
+The first three rows are required. The last three are optional: leave one
+out, or leave its link empty, and that part of the app stays off. HOW-TO-UPDATE.md,
+step 6, says how to make the form, publish its answers and make the
+contact list.
 
 Rows are matched by the Setting text, in any order. The footer flags an
 empty name, a link that doesn't start with `https://`, an unknown or
 missing row, or a file that can't be read. If the file can't be read, the
-defaults in `CONFIG` in `index.html` are used. Names only: no emails or
-phone numbers.
+defaults in `CONFIG` in `index.html` are used. Names and links only: no
+emails or phone numbers.
 
 ## Files
 
@@ -100,11 +120,12 @@ phone numbers.
 | --- | --- |
 | `index.html` | The whole app. |
 | `shifts.csv`, `students.csv`, `roles.csv` | The shift files: who works when, who the students are, and the role rules. The app works out the cover lists from them. |
-| `settings.csv` | The two managers' names and the timesheet portal link. Read when the app opens. |
+| `settings.csv` | The two managers' names, the timesheet portal link, and the optional links to the availability form, its answers and the contact list. Read when the app opens. |
 | `HOW-TO-UPDATE.md` | For whoever is taking the app over or looking after it, written for someone who has never used GitHub. |
 | `HANDOFF.md` | For whoever is handing it over: the steps, the handover log, how the cover lists are worked out, and the one-time move into a shared organization. |
-| `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page and the shift list are fetched fresh whenever there's a connection. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
-| `fonts/` | Inter and Playfair Display (Latin and Vietnamese), self-hosted, with their SIL Open Font Licenses. Chinese and Thai use the phone's own fonts. |
+| `manifest.webmanifest`, `sw.js` | Make it installable and let it work offline. The page, the four CSV files and the availability answers are fetched fresh whenever there's a connection, and the last copy is used offline. When the app is updated (bump `CACHE` in `sw.js`), open copies reload themselves. |
+| `fonts/` | Inter and Playfair Display (Latin and Vietnamese), and Noto Serif Tibetan, self-hosted, with their SIL Open Font Licenses. Chinese and Thai use the phone's own fonts. |
+| `tests/` | The two test files, the Python copy of the rules, the reference lists it writes, and a made-up set of availability answers (see **Tests**). |
 | `icons/` | `icon.svg` is the source. The PNGs are rendered from it. |
 
 ## Saving it as a PDF
@@ -116,6 +137,8 @@ once. Each page is a phone-sized picture of the app, in colour.
   app, and the contents. Tapping a tab there jumps to it, and the same
   tabs are bookmarks.
 - Each tab starts on a new page, and every shift's backups are open.
+- A page ends between whole cards where one fits in its lower half, and
+  never right after a heading.
 - It has no Today or Tomorrow and no upcoming dates, so it stays true.
 - The links (the timesheet portal, the app) still work.
 - It's made in the app itself, with no outside service, so it also works
@@ -126,7 +149,7 @@ instead, where they choose Save as PDF.
 
 ## Installing it
 
-The footer has an **Install as app** button. In Chrome and Edge it opens
+The footer has an **Install as app (works offline)** button. In Chrome and Edge it opens
 the browser's own install prompt. Safari on iPhone has no prompt, so there
 the button explains how to add the app from the Share menu. The button is
 hidden once the app is installed.
@@ -143,15 +166,21 @@ it always tests the code that ships. It checks every cover list and swap
 option against `tests/expected-cover-lists.csv`, which
 `tests/expected_cover_lists.py` writes from the same three files with a
 separate Python copy of the rules (run `python3
-tests/expected_cover_lists.py` after changing a shift file or a rule). It
-then flips each setting in `roles.csv` and `students.csv` to see that the
-lists change as they should. `app.e2e.js` serves the repo and drives the
-whole app:
+tests/expected_cover_lists.py` after changing a shift file or a rule). The
+script also writes `tests/expected-cover-lists-availability.csv` from the
+made-up answers in `tests/sample-availability-answers.csv`, to check the
+availability rule. It then flips each setting in `roles.csv` and
+`students.csv` to see that the lists change as they should, and checks
+the settings, the PDF writer and that every language has every string.
+`app.e2e.js` serves the repo and drives the whole app:
 - picking a name, the week at a glance, the shift cards, work groups,
   backups, and the My availability tab;
+- the availability answers, the Maybe tag and the contact list links;
+- Call out's messages, and Save as PDF;
 - the tabs, the Sunday badge, settings and load errors;
-- the theme button and Install as app;
-- the layout at 320, 375 and 1280px in both modes;
+- the theme and language buttons, and Install as app;
+- the layout at 320, 375 and 1280px in both modes, and at 320px in every
+  language;
 - offline use, and the service worker reloading an open page when the
   app updates.
 
@@ -185,11 +214,12 @@ are Sick or Unplanned in orange, Planned in teal, and Missed in rust. Each quest
 There are no shadows, no hover effects and no motion.
 
 **Languages.** A second round button beside the appearance button steps
-through **English, 简体中文, 繁體中文, ไทย and Tiếng Việt**, kept on the
-phone as `kitchen.lang`. Until one is chosen, the app follows the phone's
-language if it's one of these, and English otherwise. Names, roles (Pots
-& Pans, Shift Leader), the managers' titles and every message students
-send stay in English in all of them.
+through **English, 简体中文, 繁體中文, ไทย, Tiếng Việt and བོད་ཡིག
+(Tibetan)**, kept on the phone as `kitchen.lang`. Until one is chosen, the
+app follows the phone's language if it's one of these, and English
+otherwise. Names, roles (Pots & Pans, Shift Leader), the managers' titles
+and every message students send stay in English in all of them. The app
+carries its own Tibetan font, as not every phone has one.
 
 **Appearance.** A round icon button in the header cycles **Auto → Light →
 Dark**, kept on the phone as `kitchen.theme`. It sits at the right of each

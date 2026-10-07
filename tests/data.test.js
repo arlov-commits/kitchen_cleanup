@@ -108,7 +108,7 @@ check("work groups: Group B Dishwashing, Group C Recycling, Group A Lunch Monito
   var p = k.split("|"); return shiftOf(real, p[0], p[1]).group;
 }), ["dishwashing", "dishwashing", "dishwashing", "recycling", "lunch monitors"]);
 
-/* Rule 6, the availability form: tests/sample-availability-answers.csv
+/* Rule 7, the availability form: tests/sample-availability-answers.csv
    (made up, shaped like the form's published sheet) against the
    reference the Python copy wrote from it */
 var ANSWERS = read("tests/sample-availability-answers.csv");
@@ -118,33 +118,33 @@ function swapsText(s) {
     return n + ": " + (s.swap[n].slice().sort(function (x, y) { return x.day - y.day; }).map(function (x) { return b.DAYS[x.day] + " " + x.as; }).join(", ") || "none");
   }).join("; ");
 }
-check("6: every cover list, last resort and swap matches the reference", expectedAns.filter(function (r) {
+check("7: every cover list, last resort and swap matches the reference", expectedAns.filter(function (r) {
   var s = shiftOf(withAns, r[0], r[1]);
   return JSON.stringify(s.cover) !== JSON.stringify(r[3] ? r[3].split(", ") : []) || s.lastFrom !== +r[4] || swapsText(s) !== r[5];
 }).map(function (r) { return r[0] + " " + r[1]; }), []);
-check("6: the answers differ from the plain lists somewhere", expectedAns.some(function (r, i) { return r[3] !== expected[i][3]; }), true);
-check("6: Not available on Monday: Beth is no one's backup on Monday", withAns.shifts.filter(function (s) { return s.day === 0 && s.cover.indexOf("Beth") >= 0; }).length, 0);
-check("6: Not available on Monday: no one is offered Beth's Monday in return",
+check("7: the answers differ from the plain lists somewhere", expectedAns.some(function (r, i) { return r[3] !== expected[i][3]; }), true);
+check("7: Not available on Monday: Beth is no one's backup on Monday", withAns.shifts.filter(function (s) { return s.day === 0 && s.cover.indexOf("Beth") >= 0; }).length, 0);
+check("7: Not available on Monday: no one is offered Beth's Monday in return",
   withAns.shifts.some(function (s) { return s.who === "Beth" && Object.keys(s.swap).some(function (n) { return s.swap[n].some(function (x) { return x.day === 0; }); }); }), false);
-check("6: Maybe: Lavanya moves to just above the last resort on Adam's Monday", (function () {
+check("7: Maybe: Lavanya moves to just above the last resort on Adam's Monday", (function () {
   var s = shiftOf(withAns, "Adam", "Monday"); return [s.cover.indexOf("Lavanya"), s.lastFrom - 1];
 })(), [2, 2]);
-check("6: Adam can't cover on Wednesday, so Roxanne (only Wednesday) is a last resort for him", (function () {
+check("7: Adam can't cover on Wednesday, so Roxanne (only Wednesday) is a last resort for him", (function () {
   var s = shiftOf(withAns, "Adam", "Monday"); return [s.cover.indexOf("Roxanne") >= s.lastFrom, s.swap.Roxanne];
 })(), [true, []]);
-check("6: a later row replaces an earlier one, in any case and spacing (Priya)", [withAns.avail.Priya, withAns.avail.Beth], [["", "", "", "", "maybe"], ["no", "", "", "", ""]]);
-check("6: a blank counts as available; the answers are kept for those on the list", [withAns.avail.Huiyi[2], Object.keys(withAns.avail).sort()],
+check("7: a later row replaces an earlier one, in any case and spacing (Priya)", [withAns.avail.Priya, withAns.avail.Beth], [["", "", "", "", "maybe"], ["no", "", "", "", ""]]);
+check("7: a blank counts as available; the answers are kept for those on the list", [withAns.avail.Huiyi[2], Object.keys(withAns.avail).sort()],
   ["", ["Adam", "Beth", "Huiyi", "Lavanya", "Priya", "Shuxing"]]);
-has("6: a name not on the shift list", withAns.availProblems, "Row 7: \"Amelia Quang\" isn't a name on the shift list");
-has("6: an answer that isn't one of the three", withAns.availProblems, "\"Sometimes\" for Huiyi on Tuesday isn't Available, Maybe or Not available");
-check("6: answer problems are kept apart from the shift files'", [withAns.problems, withAns.availProblems.length], [[], 2]);
-check("6: no answers file: as before, and not counted as answered", [real.answered, withAns.answered, build(null, null, null, "").answered], [false, true, true]);
+has("7: a name not on the shift list", withAns.availProblems, "Row 7: \"Amelia Quang\" isn't a name on the shift list");
+has("7: an answer that isn't one of the three", withAns.availProblems, "\"Sometimes\" for Huiyi on Tuesday isn't Available, Maybe or Not available");
+check("7: answer problems are kept apart from the shift files'", [withAns.problems, withAns.availProblems.length], [[], 2]);
+check("7: no answers file: as before, and not counted as answered", [real.answered, withAns.answered, build(null, null, null, "").answered], [false, true, true]);
 function ans(text) { var p = []; return { a: b.readAvailability(text, ["Ann", "Bo"], p), p: p }; }
-check("6: plain day headers and other words", ans("Name,Mon,Tuesday,Wed\nAnn,no,unavailable,not sure\nBo,Yes,N,Maybe later\n").a,
+check("7: plain day headers and other words", ans("Name,Mon,Tuesday,Wed\nAnn,no,unavailable,not sure\nBo,Yes,N,Maybe later\n").a,
   { Ann: ["no", "no", "maybe"], Bo: ["", "no", "maybe"] });
-has("6: no Name column", ans("Who,Monday\nAnn,Maybe\n").p, "There's no Name column");
-has("6: no day columns", ans("Name,When\nAnn,Maybe\n").p, "There are no day columns");
-has("6: a web page, not a CSV", ans("<!DOCTYPE html><html>\n").p, "The link gives a web page, not a CSV file");
+has("7: no Name column", ans("Who,Monday\nAnn,Maybe\n").p, "There's no Name column");
+has("7: no day columns", ans("Name,When\nAnn,Maybe\n").p, "There are no day columns");
+has("7: a web page, not a CSV", ans("<!DOCTYPE html><html>\n").p, "The link gives a web page, not a CSV file");
 
 /* the rules, one by one, on the shipped files (HANDOFF.md numbering) */
 var S = function (day, as) { return { day: b.DAYS.indexOf(day), as: as }; };
@@ -281,6 +281,8 @@ has("shifts: untrained Lunch Monitor", probs(edit(SHIFTS, "Beth,Wednesday,Pots &
 has("shifts: too few", probs(SHIFTS + "Zed,Friday,Pots & Pans\r\n", STUDENTS + "Zed,M,,\r\n"), "Zed has 1 shift (expected 2 to 4)");
 check("shifts: duplicate row ignored", build(SHIFTS + "Adam,Monday,Pots & Pans\r\n").shifts.length, 41);
 var ctor = build("Student,Shift day,Role\nconstructor,Monday,Pots & Pans\nconstructor,Tuesday,Pots & Pans\n", "Student,Gender,Only does,Trained for\nconstructor,F,,\n");
+var noOnly = build(null, STUDENTS.replace(/^(\uFEFF?)Student,Gender,Trained for,Only does,/, "$1Student,Gender,Trained for,Was only does,"));
+check("students.csv: the Only does column may be left out", [noOnly.problems, coverOf(noOnly, "Adam", "Thursday").indexOf("Ben Kong") >= 0], [[], true]);
 check("names like constructor are plain names", [ctor.problems, ctor.names], [[], ["constructor"]]);
 check("roles matched in any case", build(edit(SHIFTS, "Adam,Monday,Pots & Pans", "Adam,Monday,pots & pans")).problems, []);
 
@@ -303,6 +305,8 @@ check("settings keep defaults on bad values", [st.CONFIG.contacts[0].name, st.CO
 has("settings missing row", settings("Setting,Value\nStudent Kitchen Manager,Art\n").settingsProblems, "\"Timesheet Portal Link\" row is missing");
 check("settings refuse a non-web link", settings("Setting,Value\nTimesheet portal link,javascript:alert(1)\nStudent Kitchen Manager,Art\nWork Study Manager,N\n").CONFIG.portal, "https://www.drbu.edu/timesheet");
 check("shipped settings clean", settings(read("settings.csv")).settingsProblems, []);
+st = settings("Setting,Value\nStudent Kitchen Manager,Art,,\nWork Study Manager,N\nTimesheet portal link,https://x.edu/a,b\n");
+check("settings: a value may hold a comma, and trailing empty cells are dropped", [st.CONFIG.contacts[0].name, st.CONFIG.portal, st.settingsProblems], ["Art", "https://x.edu/a,b", []]);
 st = settings("Setting,Value\nStudent Kitchen Manager,Art\nWork Study Manager,N\nTimesheet portal link,https://x.edu\n" +
   "Availability form link,https://forms.gle/abc\nAvailability answers link,https://docs.google.com/spreadsheets/d/e/X/pub?output=csv\nContact list link,https://docs.google.com/spreadsheets/d/Y/edit\n");
 check("settings: the three optional links", [st.CONFIG.form, st.CONFIG.answers, st.CONFIG.contactList, st.settingsProblems],

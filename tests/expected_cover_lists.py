@@ -15,7 +15,7 @@ The rules are in HANDOFF.md, "How the cover lists are worked out":
   day) come first: same job, same work group, other group, each fewest
   shifts first, then A-Z. Then the last resort: those free that day with no
   shift to take back, then those working that day, in same-day order.
-- Rule 6: the availability form. Someone who answered "Not available" for a
+- Rule 7: the availability form. Someone who answered "Not available" for a
   day is never a backup that day, and is never offered a swap on that day.
   Someone who answered "Maybe" for a day moves to just above the last resort
   (in the same order among themselves). A later answer replaces an earlier

@@ -329,7 +329,7 @@ function serve(dir, port) {
   await p.click("#bottom-nav a[href='#callout']");
   await p.waitForFunction(function () { return !document.getElementById("view-callout").hidden; });
   check("tab: hash", await p.evaluate(function () { return location.hash; }), "#callout");
-  check("tab: views", await p.$$eval("main.view", function (v) { return v.map(function (x) { return x.id + ":" + !x.hidden; }); }), ["view-shifts:false", "view-callout:true", "view-availability:false", "view-timesheet:false"]);
+  check("tab: views", await p.$$eval("main.view", function (v) { return v.map(function (x) { return x.id + ":" + !x.hidden; }); }), ["view-shifts:false", "view-availability:false", "view-callout:true", "view-timesheet:false"]);
   check("tab: title", await p.title(), "Call out · Kitchen Cleanup");
   check("tab: active", await p.$$eval("#bottom-nav a.active", function (a) { return a.map(function (x) { return x.textContent; }); }), ["Call out"]);
   check("tab: scrolled to top", await p.$eval("#scroll", function (e) { return e.scrollTop; }), 0);
