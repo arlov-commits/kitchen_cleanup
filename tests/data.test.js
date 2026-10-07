@@ -30,14 +30,14 @@ function sandbox() {
     MONTHS: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     FILES: { shifts: "shifts.csv", students: "students.csv", roles: "roles.csv" },
     CONFIG: { contacts: [{ role: "Student Kitchen Manager", name: "Art" }, { role: "Work Study Manager", name: "Nahelia" }],
-              portal: "https://www.drbu.edu/timesheet" },
+              portal: "https://www.drbu.edu/timesheet", form: "", answers: "", contactList: "" },
     settingsProblems: [], data: null, PDF_H: 844, PDF_TOP: 18, PDF_W: 390
   };
   vm.createContext(box);
   /* the strings, in every language */
   vm.runInContext(html.slice(html.indexOf("var STR = {"), html.indexOf("/* END STRINGS */")) + "; this.STR = STR; var lang = 'en';", box);
   ["esc", "parseCSV", "dayIndex", "lower", "header", "cell", "list", "personGender", "roleGender", "yes",
-   "readRoles", "readStudents", "canDo", "canCover", "buildData", "roleRank", "applySettings", "dateKey",
+   "readRoles", "readStudents", "canDo", "canCover", "buildData", "readAvailability", "roleRank", "applySettings", "dateKey",
    "nextDate", "longDate", "shortDate", "whenPill", "t", "dayName", "dayShort",
    "stripMedia", "fixedVw", "pdfCuts", "pdfText", "makePDF"].forEach(function (n) {
     vm.runInContext(lift(n), box);
@@ -58,7 +58,7 @@ function has(label, list, piece) {
 var b = sandbox();
 var SHIFTS = read("shifts.csv"), STUDENTS = read("students.csv"), ROLES = read("roles.csv");
 /* null means "the shipped file" */
-function build(shifts, students, roles) { return sandbox().buildData(shifts != null ? shifts : SHIFTS, students != null ? students : STUDENTS, roles != null ? roles : ROLES); }
+function build(shifts, students, roles, answers) { return sandbox().buildData(shifts != null ? shifts : SHIFTS, students != null ? students : STUDENTS, roles != null ? roles : ROLES, answers); }
 function shiftOf(d, who, day) { return d.shifts.filter(function (x) { return x.who === who && b.DAYS[x.day] === day; })[0]; }
 function coverOf(d, who, day) { var s = shiftOf(d, who, day); return s ? s.cover : null; }
 /* swap one piece of a CSV for another */
@@ -107,6 +107,44 @@ check("role order from roles.csv", ["Shift Leader", "Pots & Pans", "Buckets & Co
 check("work groups: Group B Dishwashing, Group C Recycling, Group A Lunch Monitors", ["Ivwananji|Monday", "Adam|Monday", "Aryashree|Monday", "Adrian|Monday", "Shuxing|Monday"].map(function (k) {
   var p = k.split("|"); return shiftOf(real, p[0], p[1]).group;
 }), ["dishwashing", "dishwashing", "dishwashing", "recycling", "lunch monitors"]);
+
+/* Rule 6, the availability form: tests/sample-availability-answers.csv
+   (made up, shaped like the form's published sheet) against the
+   reference the Python copy wrote from it */
+var ANSWERS = read("tests/sample-availability-answers.csv");
+var withAns = build(null, null, null, ANSWERS), expectedAns = b.parseCSV(read("tests/expected-cover-lists-availability.csv")).slice(1);
+function swapsText(s) {
+  return s.cover.map(function (n) {
+    return n + ": " + (s.swap[n].slice().sort(function (x, y) { return x.day - y.day; }).map(function (x) { return b.DAYS[x.day] + " " + x.as; }).join(", ") || "none");
+  }).join("; ");
+}
+check("6: every cover list, last resort and swap matches the reference", expectedAns.filter(function (r) {
+  var s = shiftOf(withAns, r[0], r[1]);
+  return JSON.stringify(s.cover) !== JSON.stringify(r[3] ? r[3].split(", ") : []) || s.lastFrom !== +r[4] || swapsText(s) !== r[5];
+}).map(function (r) { return r[0] + " " + r[1]; }), []);
+check("6: the answers differ from the plain lists somewhere", expectedAns.some(function (r, i) { return r[3] !== expected[i][3]; }), true);
+check("6: Not available on Monday: Beth is no one's backup on Monday", withAns.shifts.filter(function (s) { return s.day === 0 && s.cover.indexOf("Beth") >= 0; }).length, 0);
+check("6: Not available on Monday: no one is offered Beth's Monday in return",
+  withAns.shifts.some(function (s) { return s.who === "Beth" && Object.keys(s.swap).some(function (n) { return s.swap[n].some(function (x) { return x.day === 0; }); }); }), false);
+check("6: Maybe: Lavanya moves to just above the last resort on Adam's Monday", (function () {
+  var s = shiftOf(withAns, "Adam", "Monday"); return [s.cover.indexOf("Lavanya"), s.lastFrom - 1];
+})(), [2, 2]);
+check("6: Adam can't cover on Wednesday, so Roxanne (only Wednesday) is a last resort for him", (function () {
+  var s = shiftOf(withAns, "Adam", "Monday"); return [s.cover.indexOf("Roxanne") >= s.lastFrom, s.swap.Roxanne];
+})(), [true, []]);
+check("6: a later row replaces an earlier one, in any case and spacing (Priya)", [withAns.avail.Priya, withAns.avail.Beth], [["", "", "", "", "maybe"], ["no", "", "", "", ""]]);
+check("6: a blank counts as available; the answers are kept for those on the list", [withAns.avail.Huiyi[2], Object.keys(withAns.avail).sort()],
+  ["", ["Adam", "Beth", "Huiyi", "Lavanya", "Priya", "Shuxing"]]);
+has("6: a name not on the shift list", withAns.availProblems, "Row 7: \"Amelia Quang\" isn't a name on the shift list");
+has("6: an answer that isn't one of the three", withAns.availProblems, "\"Sometimes\" for Huiyi on Tuesday isn't Available, Maybe or Not available");
+check("6: answer problems are kept apart from the shift files'", [withAns.problems, withAns.availProblems.length], [[], 2]);
+check("6: no answers file: as before, and not counted as answered", [real.answered, withAns.answered, build(null, null, null, "").answered], [false, true, true]);
+function ans(text) { var p = []; return { a: b.readAvailability(text, ["Ann", "Bo"], p), p: p }; }
+check("6: plain day headers and other words", ans("Name,Mon,Tuesday,Wed\nAnn,no,unavailable,not sure\nBo,Yes,N,Maybe later\n").a,
+  { Ann: ["no", "no", "maybe"], Bo: ["", "no", "maybe"] });
+has("6: no Name column", ans("Who,Monday\nAnn,Maybe\n").p, "There's no Name column");
+has("6: no day columns", ans("Name,When\nAnn,Maybe\n").p, "There are no day columns");
+has("6: a web page, not a CSV", ans("<!DOCTYPE html><html>\n").p, "The link gives a web page, not a CSV file");
 
 /* the rules, one by one, on the shipped files (HANDOFF.md numbering) */
 var S = function (day, as) { return { day: b.DAYS.indexOf(day), as: as }; };
@@ -265,6 +303,14 @@ check("settings keep defaults on bad values", [st.CONFIG.contacts[0].name, st.CO
 has("settings missing row", settings("Setting,Value\nStudent Kitchen Manager,Art\n").settingsProblems, "\"Timesheet Portal Link\" row is missing");
 check("settings refuse a non-web link", settings("Setting,Value\nTimesheet portal link,javascript:alert(1)\nStudent Kitchen Manager,Art\nWork Study Manager,N\n").CONFIG.portal, "https://www.drbu.edu/timesheet");
 check("shipped settings clean", settings(read("settings.csv")).settingsProblems, []);
+st = settings("Setting,Value\nStudent Kitchen Manager,Art\nWork Study Manager,N\nTimesheet portal link,https://x.edu\n" +
+  "Availability form link,https://forms.gle/abc\nAvailability answers link,https://docs.google.com/spreadsheets/d/e/X/pub?output=csv\nContact list link,https://docs.google.com/spreadsheets/d/Y/edit\n");
+check("settings: the three optional links", [st.CONFIG.form, st.CONFIG.answers, st.CONFIG.contactList, st.settingsProblems],
+  ["https://forms.gle/abc", "https://docs.google.com/spreadsheets/d/e/X/pub?output=csv", "https://docs.google.com/spreadsheets/d/Y/edit", []]);
+st = settings("Setting,Value\nStudent Kitchen Manager,Art\nWork Study Manager,N\nTimesheet portal link,https://x.edu\nContact list link,\nAvailability answers link,http://x.com/a.csv\nConstructor,x\n");
+check("settings: a blank link is off; a link must be https", [st.CONFIG.contactList, st.CONFIG.answers], ["", ""]);
+has("settings: http refused for the answers", st.settingsProblems, "The availability answers link should start with https://");
+has("settings: no odd names", st.settingsProblems, "\"Constructor\" isn't a setting");
 
 /* ----------------------------------------------------------- dateKey */
 check("dateKey", b.dateKey(new Date(2026, 9, 4)), "2026-10-4");

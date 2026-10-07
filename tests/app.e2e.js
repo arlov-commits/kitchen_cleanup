@@ -570,6 +570,69 @@ function serve(dir, port) {
   truthy("settings missing: footer says so", /couldn't be read/.test(await text(p, "#data-status")));
   await p.context().close();
 
+  /* ------------------------------------------ the availability form */
+  var ANS_URL = "https://docs.google.com/spreadsheets/d/e/TEST/pub?gid=0&single=true&output=csv";
+  var LINKS = "Setting,Value\nStudent Kitchen Manager,Art\nWork Study Manager,Nahelia\nTimesheet portal link,https://www.drbu.edu/timesheet\n" +
+    "Availability form link,https://forms.gle/TEST\nAvailability answers link," + ANS_URL + "\nContact list link,https://docs.google.com/spreadsheets/d/CONTACTS/edit\n";
+  var EXP_ANS = fs.readFileSync(path.join(ROOT, "tests/expected-cover-lists-availability.csv"), "utf8").split("\n").slice(1).filter(Boolean).map(function (l) {
+    var c = l.match(/("[^"]*"|[^,]*)(,|$)/g).map(function (x) { return x.replace(/,$/, "").replace(/^"|"$/g, ""); });
+    return { who: c[0], day: c[1], cover: c[3].split(", "), last: +c[4] };
+  });
+  async function answersPage(me, answers) {
+    var p = await page({ settings: LINKS, init: me ? new Function("localStorage.setItem('kitchen.me', '" + me + "')") : null });
+    await p.context().route(ANS_URL, function (r) {
+      return answers === 404 ? r.fulfill({ status: 404, body: "" }) : r.fulfill({ body: answers, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "text/csv" } });
+    });
+    return p;
+  }
+  var SAMPLE = fs.readFileSync(path.join(ROOT, "tests/sample-availability-answers.csv"), "utf8");
+  p = await answersPage("Adam", SAMPLE);
+  await p.goto(BASE); await ready(p);
+  await p.waitForFunction(function () { return /Availability answers/.test(document.getElementById("data-status").textContent); });
+  var adamMon = EXP_ANS.filter(function (r) { return r.who === "Adam" && r.day === "Monday"; })[0];
+  check("answers: Adam's Monday backups follow the reference", await p.$$eval(".shift.k0 .cover .cn", function (n) { return n.map(function (x) { return x.firstChild.textContent.trim(); }); }), adamMon.cover);
+  check("answers: Maybe beside the name, just above the last resort", await p.$$eval(".shift.k0 .cover .cn", function (n) {
+    return n.filter(function (x) { return x.querySelector(".mb"); }).map(function (x) { return [x.firstChild.textContent.trim(), x.querySelector(".mb").textContent, !!x.closest(".last")]; });
+  }), [["Lavanya", "Maybe", false]]);
+  check("answers: the main list ends where the reference says", await p.$$eval(".shift.k0 .backups > .cover > li", function (l) { return l.length; }), adamMon.last);
+  var foot2 = await text(p, "#data-status");
+  truthy("answers: footer counts them", /Availability answers: 6 students\./.test(foot2));
+  truthy("answers: footer names the problems", /Check the availability answers: .*"Amelia Quang" isn't a name on the shift list.*"Sometimes"/.test(foot2));
+  await p.goto(BASE + "#callout"); await ready(p); await p.waitForTimeout(150);
+  check("answers: Call out shows the contact list under each message-your-backups step", await p.$$eval(".step .cl a", function (a) {
+    return a.map(function (x) { return x.closest(".sit").id + " " + x.getAttribute("href") + " " + x.target; });
+  }), ["sit-today", "sit-maybe", "sit-sick", "sit-plan"].map(function (id) { return id + " https://docs.google.com/spreadsheets/d/CONTACTS/edit _blank"; }));
+  await p.goto(BASE + "#timesheet"); await ready(p); await p.waitForTimeout(150);
+  check("answers: Submit Timesheet shows the contact list", [await p.$eval("#clist", function (e) { return e.hidden; }), await p.getAttribute("#clist-a", "href"), await text(p, "#clist h4")],
+    [false, "https://docs.google.com/spreadsheets/d/CONTACTS/edit", "CONTACT LIST"]);
+  await p.goto(BASE + "#availability"); await ready(p); await p.waitForTimeout(150);
+  check("answers: Adam's own answers and the form", [await text(p, ".answers"), await p.getAttribute(".answers .out-link", "href")],
+    ["YOUR AVAILABILITY FORM Not available: Wednesday. No one will ask you to cover then. Have your plans changed? Fill in the form again. Your newest answers count. Open the availability form \u2197", "https://forms.gle/TEST"]);
+  check("answers: no Wednesday rows for someone not available on Wednesday", await p.$$eval("#avail-body tr[data-trade]", function (r) {
+    return r.filter(function (x) { return /^Wednesday\|/.test(x.dataset.trade); }).length;
+  }), 0);
+  await p.evaluate(function () { localStorage.setItem("kitchen.lang", "zh-Hans"); }); await p.reload(); await ready(p);
+  await p.waitForFunction(function () { return document.querySelector(".answers p"); });
+  check("answers: in Chinese, the days in Chinese", await text(p, ".answers p"), "没空：星期三。这些日子不会有人请你替班。");
+  await p.context().close();
+  p = await answersPage("Nita", SAMPLE);
+  await p.goto(BASE + "#availability"); await ready(p);
+  await p.waitForFunction(function () { return /Availability answers/.test(document.getElementById("data-status").textContent); });
+  check("answers: someone who hasn't answered", await text(p, ".answers p"), "You haven't filled in the availability form yet, so you may be asked on any of these days.");
+  await p.context().close();
+  p = await answersPage("Adam", 404);
+  await p.goto(BASE); await ready(p);
+  await p.waitForFunction(function () { return /Availability answers/.test(document.getElementById("data-status").textContent); });
+  truthy("answers missing: footer says everyone counts as available", /Availability answers: not loaded, so everyone counts as available\./.test(await text(p, "#data-status")));
+  check("answers missing: the plain lists", await p.$$eval(".shift.k0 .cover .cn", function (n) { return n.map(function (x) { return x.textContent; }); }),
+    ["Beth", "Lavanya", "Priya", "Roxanne", "Tsering", "Irina", "Thanh", "Adrian", "Vayu", "Shuxing"]);
+  await p.context().close();
+  p = await page({ init: function () { localStorage.setItem("kitchen.me", "Adam"); } });
+  await p.goto(BASE + "#timesheet"); await ready(p); await p.waitForTimeout(150);
+  check("no links in the settings: no contact list, no form panel, no answers in the footer", [await p.$eval("#clist", function (e) { return e.hidden; }),
+    await p.evaluate(function () { return document.querySelectorAll(".step .cl, .answers, .mb").length; }), /Availability/.test(await text(p, "#data-status"))], [true, 0, false]);
+  await p.context().close();
+
   /* ----------------------------------------------------- data problems */
   p = await page({ data: 404 });
   await p.goto(BASE); await p.waitForTimeout(400);

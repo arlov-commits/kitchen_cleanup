@@ -15,10 +15,19 @@ The rules are in HANDOFF.md, "How the cover lists are worked out":
   day) come first: same job, same work group, other group, each fewest
   shifts first, then A-Z. Then the last resort: those free that day with no
   shift to take back, then those working that day, in same-day order.
+- Rule 6: the availability form. Someone who answered "Not available" for a
+  day is never a backup that day, and is never offered a swap on that day.
+  Someone who answered "Maybe" for a day moves to just above the last resort
+  (in the same order among themselves). A later answer replaces an earlier
+  one; a blank counts as available.
 The "Before last resort" column counts the backups ahead of it, and "Swap
 options" gives each backup's shifts the student could take in return
-("Beth: Wednesday Pots & Pans, Thursday Pots & Pans; Irina: none")."""
-import csv, io, os
+("Beth: Wednesday Pots & Pans, Thursday Pots & Pans; Irina: none").
+
+It also writes tests/expected-cover-lists-availability.csv: the same, with
+the made-up answers in tests/sample-availability-answers.csv (shaped like
+the Google Form's published sheet)."""
+import csv, io, os, re
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -93,8 +102,35 @@ def same_day_ok(job, other):
     return other in [covered_as(x) for x in roles[job]["same"]]
 
 
+def answer(v):
+    v = (v or "").strip().lower()
+    if any(w in v for w in ("maybe", "not sure", "unsure")):
+        return "maybe"
+    if re.match(r"(not|no\b|n$|unavailable)", v):
+        return "no"
+    return ""
+
+
+def read_answers(name):
+    """{student: {day: "no" or "maybe"}}, the last row for each student winning"""
+    with open(os.path.join(ROOT, name), encoding="utf-8-sig") as f:
+        table = list(csv.reader(f))
+    head, out = table[0], {}
+    who_col = next(i for i, h in enumerate(head) if "name" in h.lower() or "student" in h.lower())
+    day_cols = [(i, DAYS.index(d)) for i, h in enumerate(head) for d in DAYS if h.rstrip().endswith("[" + d + "]") or h.strip() == d]
+    by_lower = {n.lower(): n for n in names}
+    for r in table[1:]:
+        who = by_lower.get(r[who_col].strip().lower())
+        if who:
+            out[who] = {d: answer(r[i]) for i, d in day_cols if answer(r[i])}
+    return out
+
+
+said = {}
+
+
 def eligible(n, owner, day, job):
-    if n == owner or not can_cover(n, job):
+    if n == owner or not can_cover(n, job) or said.get(n, {}).get(day) == "no":
         return False
     if people[owner]["same_job_only"] and job not in jobs[n]:
         return False
@@ -102,27 +138,36 @@ def eligible(n, owner, day, job):
     return today is None or same_day_ok(job, today)
 
 
-out = io.StringIO()
-w = csv.writer(out, lineterminator="\n")
-w.writerow(["Student", "Shift day", "Role", "Cover list, in order", "Before last resort", "Swap options"])
-for who, day, role in shifts:
-    job = covered_as(role)
-    can = [n for n in names if eligible(n, who, day, job)]
-    swaps = {n: [(d, j) for w2, d, j in jobs_of if w2 == n and d != day and eligible(who, n, d, j)] for n in can}
+def write(file):
+    out = io.StringIO()
+    w = csv.writer(out, lineterminator="\n")
+    w.writerow(["Student", "Shift day", "Role", "Cover list, in order", "Before last resort", "Swap options"])
+    for who, day, role in shifts:
+        job = covered_as(role)
+        can = [n for n in names if eligible(n, who, day, job)]
+        swaps = {n: [(d, j) for w2, d, j in jobs_of if w2 == n and d != day and eligible(who, n, d, j)] for n in can}
 
-    def tiered(n):
-        tier = 0 if job in jobs[n] else 1 if roles[job]["group"] in groups[n] else 2
-        return (tier, count[n], n.lower())
+        def tiered(n):
+            tier = 0 if job in jobs[n] else 1 if roles[job]["group"] in groups[n] else 2
+            return (tier, count[n], n.lower())
 
-    free = [n for n in can if (n, day) not in job_on]
-    main = sorted([n for n in free if swaps[n]], key=tiered)
-    one_way = sorted([n for n in free if not swaps[n]], key=tiered)
-    same = [covered_as(x) for x in roles[job]["same"]]
-    same_day = sorted([n for n in can if (n, day) in job_on], key=lambda n: (same.index(job_on[(n, day)]), count[n], n.lower()))
-    cover = main + one_way + same_day
-    options = "; ".join(n + ": " + (", ".join(DAYS[d] + " " + roles[j]["name"] for d, j in sorted(swaps[n])) or "none") for n in cover)
-    w.writerow([who, DAYS[day], roles[role]["name"], ", ".join(cover), len(main), options])
+        def maybe(n):
+            return said.get(n, {}).get(day) == "maybe"
 
-with open(os.path.join(ROOT, "tests", "expected-cover-lists.csv"), "w") as f:
-    f.write(out.getvalue())
-print("wrote", len(shifts), "cover lists")
+        free = [n for n in can if (n, day) not in job_on]
+        main = sorted([n for n in free if swaps[n] and not maybe(n)], key=tiered)
+        unsure = sorted([n for n in free if swaps[n] and maybe(n)], key=tiered)
+        one_way = sorted([n for n in free if not swaps[n]], key=tiered)
+        same = [covered_as(x) for x in roles[job]["same"]]
+        same_day = sorted([n for n in can if (n, day) in job_on], key=lambda n: (same.index(job_on[(n, day)]), count[n], n.lower()))
+        cover = main + unsure + one_way + same_day
+        options = "; ".join(n + ": " + (", ".join(DAYS[d] + " " + roles[j]["name"] for d, j in sorted(swaps[n])) or "none") for n in cover)
+        w.writerow([who, DAYS[day], roles[role]["name"], ", ".join(cover), len(main) + len(unsure), options])
+    with open(os.path.join(ROOT, "tests", file), "w") as f:
+        f.write(out.getvalue())
+
+
+write("expected-cover-lists.csv")
+said = read_answers("tests/sample-availability-answers.csv")
+write("expected-cover-lists-availability.csv")
+print("wrote", len(shifts), "cover lists, twice")

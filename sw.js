@@ -4,13 +4,16 @@
    or an installed copy will not have it offline. The page and
    the four CSV files (shifts, students, roles, settings) are fetched fresh
    whenever there is a network (racing a 2.5-second timer, so a slow
-   connection cannot hang the launch). Editing a CSV needs no change here.
+   connection cannot hang the launch). So are the availability form's
+   answers, a CSV published from a Google Sheet on another site (the link
+   in settings.csv): any CSV from elsewhere is kept as one copy. Editing a
+   CSV needs no change here.
 
    Bump CACHE whenever index.html, the data file's name or this file changes.
    The new worker then replaces the old one and reloads any page the old one
    left open, so no phone is stuck on an old page asking for files that are
    gone. */
-var CACHE = "kitchen-v39";
+var CACHE = "kitchen-v40";
 var SHELL = [
   "./",
   "index.html",
@@ -86,7 +89,10 @@ self.addEventListener("fetch", function (e) {
   var req = e.request;
   if (req.method !== "GET") return;
   var url = new URL(req.url);
-  if (url.origin !== location.origin) return;
+  if (url.origin !== location.origin) {
+    if (/output=csv|\.csv$/i.test(url.search + url.pathname)) e.respondWith(fresh(req, "availability-answers.csv"));
+    return;
+  }
 
   if (req.mode === "navigate") { e.respondWith(fresh(req, "index.html")); return; }
   var csv = url.pathname.match(/\/(shifts|students|roles|settings)\.csv$/);
