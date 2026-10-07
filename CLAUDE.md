@@ -71,8 +71,9 @@ and the tab shell from the second.
 - The head of My shifts: the heading with the name beside it as a pill
   (`.who.set`: the select sits unseen over `#me-pill`; before a name is
   chosen it is a full-width labelled select). Under it, the week at a
-  glance (`glance()`): "Today is …", then each shift by its next date
-  (`nextDate()`), with the Today/Tomorrow pill. No shift count line. The
+  glance (`glance()`): "Today is …", then each shift in week order,
+  Monday first (the user asked: so the dates may be out of order), with
+  its next date (`nextDate()`) and the Today/Tomorrow pill. No shift count line. The
   page re-renders when the date changes (`newDay()`).
   **"Shift Leader" appears only in "On with you"** (listed first). The
   card header, the week at a glance, substitute lists and My availability

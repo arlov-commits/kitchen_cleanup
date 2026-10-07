@@ -1943,15 +1943,16 @@ p{margin:0}
   }
 
   /* the week at a glance, in the head: today's date, then each of your
-     shifts by the next date it falls on, as the job it is (a Shift Leader
-     shift shows as Pots & Pans) */
+     shifts in week order (Monday first, as the user asked), each with the
+     next date it falls on, as the job it is (a Shift Leader shift shows as
+     Pots & Pans). So late in the week, next week's dates come first. */
   function glance(mine, now) {
     var today = (now.getDay() + 6) % 7;
     /* a saved PDF keeps nothing that goes stale: week order, no dates */
     if (printing) return '<ul class="gl" aria-label="' + t("glance_label") + '">' + mine.map(function (s) {
       return '<li class="k' + s.day + '"><span class="gd">' + dayShort(s.day) + '</span><span></span><span class="gr">' + esc(s.as) + "</span><span></span></li>";
     }).join("") + "</ul>";
-    var next = mine.map(function (s) { return { s: s, t: nextDate(s.day, now) }; }).sort(function (a, b) { return a.t - b.t; });
+    var next = mine.slice().sort(function (a, b) { return a.day - b.day; }).map(function (s) { return { s: s, t: nextDate(s.day, now) }; });
     return '<p class="today">' + t("today_is", { date: longDate(now) }) + "</p>" +
       '<ul class="gl" aria-label="' + t("glance_label") + '">' + next.map(function (x) {
         return '<li class="k' + x.s.day + '"><span class="gd">' + dayShort(x.s.day) + '</span><span class="gt">' + shortDate(x.t) +

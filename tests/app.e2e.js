@@ -116,14 +116,14 @@ function serve(dir, port) {
     var w = document.getElementById("who");
     return [w.className, document.getElementById("me-pill").textContent, document.querySelector("label[for=me]").textContent, document.getElementById("me").value];
   }), ["who set", "Aryashree", "Your name", "Aryashree"]);
-  /* the week at a glance, on Monday October 5: each shift by its next date */
+  /* the week at a glance, on Monday October 5: each shift in week order, with its next date */
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   function glanceOf(rows, now) {
     var today = (now.getDay() + 6) % 7;
     return rows.map(function (r) {
       var d = DAYS.indexOf(r.day), t = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (d - today + 7) % 7);
-      return { t: t, line: r.day.slice(0, 3) + "|" + MON[t.getMonth()] + " " + t.getDate() + "|" + ROLE[r.role].as + "|" + (d === today ? "Today" : d === (today + 1) % 7 ? "Tomorrow" : "") };
-    }).sort(function (a, b) { return a.t - b.t; }).map(function (x) { return x.line; });
+      return { d: d, line: r.day.slice(0, 3) + "|" + MON[t.getMonth()] + " " + t.getDate() + "|" + ROLE[r.role].as + "|" + (d === today ? "Today" : d === (today + 1) % 7 ? "Tomorrow" : "") };
+    }).sort(function (a, b) { return a.d - b.d; }).map(function (x) { return x.line; });
   }
   function glanceOnPage(p) {
     return p.evaluate(function () {
@@ -132,7 +132,7 @@ function serve(dir, port) {
       }));
     });
   }
-  check("glance: today's date, then each shift by its next date, with Today and Tomorrow", await glanceOnPage(p),
+  check("glance: today's date, then each shift in week order with its next date, with Today and Tomorrow", await glanceOnPage(p),
     ["Today is Monday, October 5"].concat(glanceOf(mine, new Date(2026, 9, 5))));
   var cards = await p.$$eval(".shift", function (cs) {
     return cs.map(function (c) {
@@ -552,6 +552,12 @@ function serve(dir, port) {
   await p.goto(BASE); await ready(p);
   var adam = ROWS.filter(function (r) { return r.who === "Adam"; });
   check("glance: Saturday", await glanceOnPage(p), ["Today is Saturday, October 10"].concat(glanceOf(adam, new Date(2026, 9, 10))));
+  await p.clock.setFixedTime(new Date("2026-10-07T07:43:00"));
+  await p.evaluate(function () { document.dispatchEvent(new Event("visibilitychange")); });
+  check("glance: on a Wednesday, still Monday first, though Thursday's date comes sooner", await glanceOnPage(p),
+    ["Today is Wednesday, October 7", "Mon|Oct 12|Pots & Pans|", "Tue|Oct 13|Pots & Pans|", "Thu|Oct 8|Recycling|Tomorrow"]);
+  await p.clock.setFixedTime(new Date("2026-10-10T23:00:00"));
+  await p.evaluate(function () { document.dispatchEvent(new Event("visibilitychange")); });
   await p.clock.setFixedTime(new Date("2026-10-11T08:00:00"));
   await p.evaluate(function () { document.dispatchEvent(new Event("visibilitychange")); });
   check("glance: moves on to Sunday when the app returns", await glanceOnPage(p), ["Today is Sunday, October 11"].concat(glanceOf(adam, new Date(2026, 9, 11))));

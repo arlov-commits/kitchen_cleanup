@@ -171,8 +171,9 @@ take one of their shifts in return: on another day, and allowed by Rules
       Recycling student's Recycling shift on another day.
 
 **Rule 6: what students see.**
-- **The week at a glance,** at the top: today's date, then each shift by
-  the next date it falls on, with **Today** or **Tomorrow**. The name
+- **The week at a glance,** at the top: today's date, then each shift in
+  week order (Monday first), with the next date it falls on and **Today**
+  or **Tomorrow**. The name
   sits beside the heading once chosen.
 - **Each card:** the day, the job (Rule 1), and **On with you:** only your
   own group, left out when no one else in it is on. So a Recycling card
