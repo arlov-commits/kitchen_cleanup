@@ -312,6 +312,13 @@ function serve(dir, port) {
   check("availability tab: each day a card in its hue", await p.$$eval(".avail-list li", function (l) {
     return l.every(function (x) { return x.classList.contains("panel") && /\bk[0-6]\b/.test(x.className) && x.querySelector("h2.d"); });
   }), true);
+  /* a name can be chosen from any tab */
+  await p.goto(BASE + "#callout"); await ready(p);
+  await p.selectOption("#view-callout [data-me]", "");
+  check("callout: pill invites a name", await text(p, "#view-callout .who.mini .me-pill"), "Choose your name…");
+  await p.selectOption("#view-callout [data-me]", "Aryashree");
+  check("callout: pill picks the name for every tab", [await text(p, "#view-callout .who.mini .me-pill"), await p.$eval("#view-timesheet .who.mini .me-pill", function (e) { return e.textContent; }), await p.inputValue("#me")],
+    ["Aryashree", "Aryashree", "Aryashree"]);
   await p.goto(BASE); await ready(p);
 
   /* persistence */

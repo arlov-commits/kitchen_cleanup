@@ -270,6 +270,8 @@ p{margin:0}
   -webkit-mask:var(--ic-me) center/contain no-repeat;mask:var(--ic-me) center/contain no-repeat}
 .me-pill::after{content:"";flex:0 0 auto;width:7px;height:7px;margin:-4px 2px 0 2px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);transform:rotate(45deg)}
 .who.set select{position:absolute;top:0;left:0;width:100%;height:100%;max-width:none;padding:0;opacity:0}
+.who.mini{flex:none;align-self:flex-start;max-width:100%}
+.who.mini:not(.has) .me-pill{border-style:dashed;color:var(--ink-2);font-weight:500}
 .who.set:focus-within .me-pill{outline:2px solid var(--rust-deep);outline-offset:2px}
 @media (max-width:359px){.title{column-gap:10px}.who.set .me-pill{padding-left:12px}.me-pill::before{display:none}}
 :root{--ic-me:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4.5 20.5a7.5 7.5 0 0 1 15 0'/%3E%3C/svg%3E")}
@@ -535,10 +537,10 @@ p{margin:0}
     <div class="head-top"><span class="eyebrow" data-t="shifts_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
     <div class="title">
       <h1 data-t="shifts_h1"></h1>
-      <div class="who" id="who">
+      <div class="who" id="who" data-who>
         <label for="me" data-t="your_name"></label>
         <span class="me-pill" id="me-pill" aria-hidden="true"></span>
-        <select id="me"><option value="">Choose your name…</option></select>
+        <select id="me" data-me><option value="">Choose your name…</option></select>
       </div>
     </div>
     <div class="glance" id="glance" hidden></div>
@@ -551,6 +553,7 @@ p{margin:0}
   <div class="head"><div class="in">
     <div class="head-top"><span class="eyebrow" data-t="avail_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
     <h1 data-t="avail_h1"></h1>
+    <div class="who mini set screen-only" data-who><span class="me-pill" aria-hidden="true"></span><select data-me></select></div>
     <p class="lead" id="avail-lead" hidden></p>
   </div></div>
   <div class="body"><div class="in" id="avail-body"></div></div>
@@ -561,6 +564,7 @@ p{margin:0}
   <div class="head"><div class="in">
     <div class="head-top"><span class="eyebrow" data-t="co_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
     <h1 data-t="co_h1"></h1>
+    <div class="who mini set screen-only" data-who><span class="me-pill" aria-hidden="true"></span><select data-me></select></div>
     <p class="lead" data-t="co_lead"></p>
   </div></div>
   <div class="body"><div class="in">
@@ -586,6 +590,7 @@ p{margin:0}
   <div class="head"><div class="in">
     <div class="head-top"><span class="eyebrow" data-t="ts_eyebrow"></span><span class="head-btns"><button type="button" class="theme-btn lang-btn" data-lang-btn></button><button type="button" class="theme-btn" data-theme-btn></button></span></div>
     <h1 data-t="ts_h1"></h1>
+    <div class="who mini set screen-only" data-who><span class="me-pill" aria-hidden="true"></span><select data-me></select></div>
   </div></div>
   <div class="body"><div class="in">
     <div class="panel due">
@@ -1911,20 +1916,27 @@ p{margin:0}
   /* On with you: roles in roles.csv's order, then alphabetical. */
   function roleRank(r) { return data && r in data.roleRank ? data.roleRank[r] : 99; }
 
+  /* the name list sits in My shifts' head, and, as a small pill, in the
+     head of the other tabs, so anyone who lands there can choose a name */
   function renderPicker() {
-    var sel = $("me");
     var opts = '<option value="">' + t("choose_name") + "</option>";
     if (data) opts += data.names.map(function (n) {
       return '<option value="' + esc(n) + '"' + (n === me ? " selected" : "") + ">" + esc(n) + "</option>";
     }).join("");
-    sel.innerHTML = opts;
-    sel.disabled = !data || !data.names.length;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-me]"), function (sel) {
+      sel.innerHTML = opts;
+      sel.disabled = !data || !data.names.length;
+      if (sel.id !== "me") sel.setAttribute("aria-label", t("your_name"));
+    });
     drawWho();
   }
   /* the name as a pill once it's chosen */
   function drawWho() {
-    $("who").className = "who" + (me && data ? " set" : "");
-    $("me-pill").innerHTML = "<span>" + esc(me) + "</span>";
+    Array.prototype.forEach.call(document.querySelectorAll("[data-who]"), function (w) {
+      var mini = /\bmini\b/.test(w.className);
+      w.className = "who" + (mini ? " mini set" + (me && data ? " has" : "") : me && data ? " set" : "");
+      w.querySelector(".me-pill").innerHTML = "<span>" + esc(me || (mini ? t("choose_name") : "")) + "</span>";
+    });
   }
 
   /* dates: the next date (today included) a shift on weekday d falls on */
@@ -2324,14 +2336,16 @@ p{margin:0}
   }
   function renderAll() { renderPicker(); renderShifts(); renderAvailability(); renderCallout(); renderContacts(); renderPortal(); renderStatus(); }
 
-  $("me").addEventListener("change", function () {
+  function changeMe() {
     me = this.value;
     if (me) store.set(ME_KEY, me); else store.del(ME_KEY);
     drawWho();
     renderShifts();
     renderAvailability();
     renderCallout();
-  });
+    renderPicker();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-me]"), function (sel) { sel.addEventListener("change", changeMe); });
 
   /* ------------------------------------------------------------- tabs */
   function current() {

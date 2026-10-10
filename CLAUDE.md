@@ -81,6 +81,12 @@ and the tab shell from the second.
 - "On with you" shows only the shift's own work group, and is left out
   when empty. Roles are shown as written ("Shift Leader"). Never
   highlight one. Role order on cards is `roles.csv` row order.
+- **Choosing a name from any tab.** The other three tabs carry a small pill
+  under their heading (`.who.mini`, `[data-who]`, `[data-me]`; "Choose your
+  name…" with a dashed outline until chosen). It is the same unseen select
+  over a pill as My shifts', kept in step by `renderPicker()`/`drawWho()`,
+  and is `screen-only` (not in the PDF). Someone who lands on `#callout`
+  from a link needs it.
 - Gender is for the rules only, never shown.
 - The managers are named consistently everywhere: "Student Kitchen
   Manager" (never just "Kitchen Manager") and "Work Study Manager".
